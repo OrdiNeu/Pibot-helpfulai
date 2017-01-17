@@ -1,5 +1,5 @@
 # Launchpad for the Helpful AI running on OrdiNeu's RaspberryPi
-
+### PREAMBLE ##################################################################
 import asyncio
 import random
 import time
