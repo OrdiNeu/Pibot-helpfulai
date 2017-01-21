@@ -13,10 +13,11 @@ class Netrunner:
 	def __init__(self, bot):
 		self.bot = bot
 		
-	@commands.command(pass_context=True)
+	@commands.command()
 	async def nr(self, ctx, *, member: discord.Member = None):
 		"""Netrunner card lookup"""
-		m_query = ' '.join(ctx.message.content.split()[1:]).lower()
+		print(ctx)
+		m_query = ctx.lower()
 		
 		# Auto-correct some card names (and inside jokes)
 		query_corrections = {

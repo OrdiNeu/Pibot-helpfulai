@@ -3,7 +3,9 @@
 import asyncio
 import datetime
 import random
+import sys
 import time
+import traceback
 
 import discord
 from discord.ext import commands
@@ -14,7 +16,7 @@ import requests
 COMMAND_PREFIX = ['?', '!']
 DESCRIPTION = 'OrdiNeu\'s Discord bot for the Netrunner channel'
 HELP_ATTRS = {'hidden': True}
-EXTENSIONS = ["exts.Netrunner"]
+EXTENSIONS = ['exts.Netrunner']
 
 bot = commands.Bot(
 	command_prefix=COMMAND_PREFIX, 
@@ -49,7 +51,8 @@ async def on_message(msg):
 	# Ignore messages from bots
 	if msg.author.bot:
 		return
-	await bot.process_commands(message)
+	print("<" + msg.channel.name + "> : " + msg.author.name + ": " + msg.content)
+	await bot.process_commands(msg)
 
 ### LOGIN AND RUN #############################################################
 def load_credentials():
