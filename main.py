@@ -47,6 +47,9 @@ async def on_ready():
 	print(bot.user.display_name)
 	print(bot.user.id)
 	print('------')
+	# Login successful: if we're debugging the main script we can exit now with successful
+	if sys.argv[1] == 'debug':
+		sys.exit(0)
 	if not hasattr(bot, 'uptime'):
 		bot.uptime = datetime.datetime.utcnow()
 
