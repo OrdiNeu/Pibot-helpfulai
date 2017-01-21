@@ -74,7 +74,7 @@ async def scavenge():
 	await bot.say('brb')
 	sys.exit(GIT_RELOAD_EXIT_CODE)	# Expect our helper script to do the git reloading
 
-@bot.command(hidden=True):
+@bot.command(hidden=True)
 async def locate():
 	"""Grabs the local and global IP of the bot"""
 	globalip = os.system("dig +short myip.opendns.com @resolver1.opendns.com")
