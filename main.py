@@ -70,6 +70,7 @@ async def on_message(msg):
 ### BOT DEFAULT COMMAND #######################################################
 @bot.command()
 async def scavenge():
+	await bot.say('brb')
 	sys.exit(GIT_RELOAD_EXIT_CODE)	# Expect our helper script to do the git reloading
 	
 ### LOGIN AND RUN #############################################################
