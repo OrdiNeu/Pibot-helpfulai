@@ -13,7 +13,7 @@ class Netrunner:
 	def __init__(self, bot):
 		self.bot = bot
 		
-	@commands.command()
+	@commands.command(aliases=['netrunner'])
 	async def nr(self, ctx, *, member: discord.Member = None):
 		"""Netrunner card lookup"""
 		m_query = ctx.lower()
