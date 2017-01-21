@@ -14,7 +14,7 @@ class Arkham:
 		self.bot = bot
 		
 	@commands.command(aliases=['arkham','arkhamhorror'])
-	async def ah(self, cardname, *):
+	async def ah(self, *, cardname : str):
 		"""Arkham Horror card lookup"""
 		m_query = cardname.lower()
 		

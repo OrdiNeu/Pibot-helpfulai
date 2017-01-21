@@ -14,7 +14,7 @@ class Netrunner:
 		self.bot = bot
 		
 	@commands.command(aliases=['netrunner'])
-	async def nr(self, cardname : str, *):
+	async def nr(self, *, cardname : str):
 		"""Netrunner card lookup"""
 		m_query = cardname.lower()
 		

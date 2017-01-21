@@ -14,7 +14,7 @@ class LOTR:
 		self.bot = bot
 		
 	@commands.command(aliases=['lordoftherings','rings'])
-	async def lotr(self, cardname, *):
+	async def lotr(self, *, cardname : str):
 		"""Lord of the Rings card lookup"""
 		m_query = cardname.lower()
 		
