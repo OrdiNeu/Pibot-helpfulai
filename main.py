@@ -16,7 +16,10 @@ import requests
 COMMAND_PREFIX = ['?', '!']
 DESCRIPTION = 'OrdiNeu\'s Discord bot for the Netrunner channel'
 HELP_ATTRS = {'hidden': True}
-EXTENSIONS = ['exts.Netrunner']
+EXTENSIONS = [
+	'exts.Netrunner',
+	'exts.Arkham'
+	]
 
 bot = commands.Bot(
 	command_prefix=COMMAND_PREFIX, 
