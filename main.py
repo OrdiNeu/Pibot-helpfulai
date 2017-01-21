@@ -15,7 +15,7 @@ import requests
 ### CONSTANTS #################################################################
 GIT_RELOAD_EXIT_CODE = 5
 COMMAND_PREFIX = ['?', '!']
-DESCRIPTION = 'OrdiNeu\'s Discord bot for the Netrunner channel'
+DESCRIPTION = 'OrdiNeu\'s Discord bot for the Netrunner channel. Also the git reload worked'
 HELP_ATTRS = {'hidden': True}
 EXTENSIONS = [
 	'exts.Netrunner',
