@@ -80,7 +80,7 @@ async def locate():
 	"""Grabs the local and global IP of the bot"""
 	globalip = os.system("dig +short myip.opendns.com @resolver1.opendns.com")
 	localip = os.system("ifconfig | grep -oP \"inet addr:192.168.\\\\d+.\\\\d+\"")
-	await bot.say(format("Global IP: {}\nLocal IP: {}", globalip, localip))
+	await bot.say("Global IP: {}\nLocal IP: {}".format(globalip, localip))
 	
 ### LOGIN AND RUN #############################################################
 def load_credentials():
