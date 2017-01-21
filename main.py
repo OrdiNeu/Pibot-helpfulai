@@ -13,6 +13,7 @@ import json
 import requests
 
 ### CONSTANTS #################################################################
+GIT_RELOAD_EXIT_CODE = 5
 COMMAND_PREFIX = ['?', '!']
 DESCRIPTION = 'OrdiNeu\'s Discord bot for the Netrunner channel'
 HELP_ATTRS = {'hidden': True}
@@ -48,7 +49,7 @@ async def on_ready():
 	print(bot.user.id)
 	print('------')
 	# Login successful: if we're debugging the main script we can exit now with successful
-	if sys.argv[1] == 'debug':
+	if len(sys.argv) > 1 and sys.argv[1] == 'debug':
 		sys.exit(0)
 	if not hasattr(bot, 'uptime'):
 		bot.uptime = datetime.datetime.utcnow()
@@ -66,6 +67,11 @@ async def on_message(msg):
 		print("(PM) : "  + msg.author.name + ": " + msg.content)
 	await bot.process_commands(msg)
 
+### BOT DEFAULT COMMAND #######################################################
+@bot.command()
+async def scavenge():
+	sys.exit(GIT_RELOAD_EXIT_CODE)	# Expect our helper script to do the git reloading
+	
 ### LOGIN AND RUN #############################################################
 def load_credentials():
 	with open('../pibot-discord-cred.json') as f:
