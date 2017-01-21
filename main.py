@@ -51,7 +51,12 @@ async def on_message(msg):
 	# Ignore messages from bots
 	if msg.author.bot:
 		return
-	print("<" + msg.channel.name + "> : " + msg.author.name + ": " + msg.content)
+
+	# Log the message
+	if msg.channel.name != None:
+		print("<" + msg.channel.name + "> : " + msg.author.name + ": " + msg.content)
+	else:
+		print("(PM) : "  + msg.author.name + ": " + msg.content)
 	await bot.process_commands(msg)
 
 ### LOGIN AND RUN #############################################################
