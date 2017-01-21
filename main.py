@@ -78,8 +78,8 @@ async def scavenge():
 @bot.command(hidden=True)
 async def locate():
 	"""Grabs the local and global IP of the bot"""
-	globalip = os.system("dig +short myip.opendns.com @resolver1.opendns.com")
-	localip = os.system("ifconfig | grep -oP \"inet addr:192.168.\\\\d+.\\\\d+\"")
+	globalip = os.popen("dig +short myip.opendns.com @resolver1.opendns.com").read()
+	localip = os.popen("ifconfig | grep -oP \"inet addr:192.168.\\\\d+.\\\\d+\"").read()
 	await bot.say("Global IP: {}\nLocal IP: {}".format(globalip, localip))
 	
 ### LOGIN AND RUN #############################################################
