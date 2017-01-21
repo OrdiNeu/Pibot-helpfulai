@@ -16,7 +16,6 @@ class Netrunner:
 	@commands.command()
 	async def nr(self, ctx, *, member: discord.Member = None):
 		"""Netrunner card lookup"""
-		print(ctx)
 		m_query = ctx.lower()
 		
 		# Auto-correct some card names (and inside jokes)
