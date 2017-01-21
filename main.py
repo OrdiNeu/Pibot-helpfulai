@@ -18,7 +18,8 @@ DESCRIPTION = 'OrdiNeu\'s Discord bot for the Netrunner channel'
 HELP_ATTRS = {'hidden': True}
 EXTENSIONS = [
 	'exts.Netrunner',
-	'exts.Arkham'
+	'exts.Arkham',
+	'exts.LOTR'
 	]
 
 bot = commands.Bot(
