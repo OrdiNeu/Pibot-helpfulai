@@ -14,9 +14,9 @@ class Arkham:
 		self.bot = bot
 		
 	@commands.command(aliases=['arkham','arkhamhorror'])
-	async def ah(self, ctx, *, member: discord.Member = None):
+	async def ah(self, cardname, *):
 		"""Arkham Horror card lookup"""
-		m_query = ctx.lower()
+		m_query = cardname.lower()
 		
 		# Auto-correct some card names (and inside jokes)
 		query_corrections = {

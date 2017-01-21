@@ -14,9 +14,9 @@ class LOTR:
 		self.bot = bot
 		
 	@commands.command(aliases=['lordoftherings','rings'])
-	async def lotr(self, ctx, *, member: discord.Member = None):
+	async def lotr(self, cardname, *):
 		"""Lord of the Rings card lookup"""
-		m_query = ctx.lower()
+		m_query = cardname.lower()
 		
 		# Auto-correct some card names (and inside jokes)
 		query_corrections = {
