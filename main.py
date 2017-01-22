@@ -68,20 +68,6 @@ async def on_message(msg):
 	else:
 		print("(PM) : "  + msg.author.name + ": " + msg.content)
 	await bot.process_commands(msg)
-
-### UNSORTED BOT COMMANDS #####################################################
-@bot.command()
-async def scavenge():
-	"""Restarts the bot, and tries to pull the latest version of itself from git"""
-	await bot.say('brb')
-	sys.exit(GIT_RELOAD_EXIT_CODE)	# Expect our helper script to do the git reloading
-
-@bot.command(hidden=True)
-async def locate():
-	"""Grabs the local and global IP of the bot"""
-	globalip = os.popen("dig +short myip.opendns.com @resolver1.opendns.com").read()
-	localip = os.popen("ifconfig | grep -oP \"inet addr:192.168.\\\\d+.\\\\d+\"").read()
-	await bot.say("Global IP: {}\nLocal IP: {}".format(globalip, localip))
 	
 ### LOGIN AND RUN #############################################################
 def load_credentials():
