@@ -98,7 +98,7 @@ class Admin:
 		await bot.say("Global IP: {}\nLocal IP: {}".format(globalip, localip))
 	
 	@commands.command(pass_context=True, hidden=True, aliases=['screenshot','wiretap'])
-	@checks.is_admin(self)
+	@checks.is_admin()
 	async def sc(self, ctx):
 		"""Take a screenshot and send it back"""
 		os.system("import -window root screenshot.png")
