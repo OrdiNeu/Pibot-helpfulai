@@ -84,18 +84,25 @@ class Admin:
 	
 	@commands.command(hidden=True)
 	@checks.is_admin()
-	async def scavenge():
+	async def scavenge(self):
 		"""Restarts the bot, and tries to pull the latest version of itself from git"""
 		await bot.say('brb')
 		sys.exit(GIT_RELOAD_EXIT_CODE)	# Expect our helper script to do the git reloading
 	
 	@commands.command(hidden=True)
 	@checks.is_admin()
-	async def locate():
+	async def locate(self):
 		"""Grabs the local and global IP of the bot"""
 		globalip = os.popen("dig +short myip.opendns.com @resolver1.opendns.com").read()
 		localip = os.popen("ifconfig | grep -oP \"inet addr:192.168.\\\\d+.\\\\d+\"").read()
 		await bot.say("Global IP: {}\nLocal IP: {}".format(globalip, localip))
-
+	
+	@commands.command(pass_context=True, hidden=True, aliases=['screenshot','wiretap'])
+	@checks.is_admin(self)
+	async def sc(self, ctx):
+		"""Take a screenshot and send it back"""
+		os.system("import -window root screenshot.png")
+		await self.bot.send_file(message.channel,"screenshot.png")
+		
 def setup(bot):
 	bot.add_cog(Admin(bot))
