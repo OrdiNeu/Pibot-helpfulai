@@ -1,13 +1,14 @@
 # Shamelessly stolen from Rapptz's RoboDanny github because it's useful
 # PREAMBLE ####################################################################
-from discord.ext import commands
-from .utils import checks
 import discord
 import inspect
 
 # to expose to the eval command
 import datetime
+
 from collections import Counter
+from discord.ext import commands
+from .utils import checks
 
 class Admin:
     """Admin-only commands that make the bot dynamic."""
