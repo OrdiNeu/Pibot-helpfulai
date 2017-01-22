@@ -19,6 +19,7 @@ COMMAND_PREFIX = ['?', '!']
 DESCRIPTION = 'OrdiNeu\'s Discord bot for the Netrunner channel.'
 HELP_ATTRS = {'hidden': True}
 EXTENSIONS = [
+	'exts.admin',
 	'exts.Netrunner',
 	'exts.Arkham',
 	'exts.LOTR'
