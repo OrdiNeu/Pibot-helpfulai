@@ -17,7 +17,7 @@ class Admin:
         self.bot = bot
 
     @commands.command(hidden=True)
-    @checks.is_owner()
+    @checks.is_admin()
     async def load(self, *, module : str):
         """Loads a module."""
         try:
@@ -29,7 +29,7 @@ class Admin:
             await self.bot.say('\N{OK HAND SIGN}')
 
     @commands.command(hidden=True)
-    @checks.is_owner()
+    @checks.is_admin()
     async def unload(self, *, module : str):
         """Unloads a module."""
         try:
@@ -41,7 +41,7 @@ class Admin:
             await self.bot.say('\N{OK HAND SIGN}')
 
     @commands.command(name='reload', hidden=True)
-    @checks.is_owner()
+    @checks.is_admin()
     async def _reload(self, *, module : str):
         """Reloads a module."""
         try:
@@ -54,7 +54,7 @@ class Admin:
             await self.bot.say('\N{OK HAND SIGN}')
 
     @commands.command(pass_context=True, hidden=True)
-    @checks.is_owner()
+    @checks.is_admin()
     async def debug(self, ctx, *, code : str):
         """Evaluates code."""
         code = code.strip('` ')

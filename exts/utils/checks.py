@@ -6,8 +6,8 @@ import asyncio
 from discord.ext import commands
 
 # Checks if a message came from the administrator
-def is_admin(message):
+def is_admin_check(message):
 	return "135449740778274816" == message.author.id
 
-def is_owner():
-    return commands.check(lambda ctx: is_owner_check(ctx.message))
+def is_admin():
+    return commands.check(lambda ctx: is_admin_check(ctx.message))
