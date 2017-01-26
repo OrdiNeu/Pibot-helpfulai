@@ -84,5 +84,9 @@ if __name__ == '__main__':
 			bot.load_extension(extension)
 		except Exception as e:
 			print('Failed to load extension {}\n{}: {}'.format(extension, type(e).__name__, e))
-
-	bot.run(token)
+	while true:
+		try:
+			bot.run(token)
+		except ConnectionResetError:
+			# Likely kicked out for inactivity: reconnect
+			pass;
