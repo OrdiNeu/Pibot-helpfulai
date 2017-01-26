@@ -89,4 +89,4 @@ if __name__ == '__main__':
 			bot.run(token)
 		except ConnectionResetError:
 			# Likely kicked out for inactivity: reconnect
-			pass;
+			time.sleep(5)
