@@ -72,7 +72,7 @@ async def on_message(msg):
 		text = msg.content
 		command_breakpoint = text.find(" ")
 		if command_breakpoint > 0:	# I.e. there was a space
-			text = text[0:command_breakpoint].lower() + text[command_breakpoint:]
+			msg.content = text[0:command_breakpoint].lower() + text[command_breakpoint:]
 	await bot.process_commands(msg)
 	
 ### LOGIN AND RUN #############################################################
