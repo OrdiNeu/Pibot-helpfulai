@@ -66,6 +66,12 @@ async def on_message(msg):
 		print("<" + msg.channel.name + "> : " + msg.author.name + ": " + msg.content)
 	else:
 		print("(PM) : "  + msg.author.name + ": " + msg.content)
+		
+	# lowercase the first word of the command (if it starts with the prefix)
+	if msg.startswith(tuple(COMMAND_PREFIX)):
+		command_breakpoint = msg.find(" ")
+		if command_breakpoint > 0:	# I.e. there was a space
+			msg = msg[0:command_breakpoint].lower() + msg[command_breakpoint:]
 	await bot.process_commands(msg)
 	
 ### LOGIN AND RUN #############################################################
