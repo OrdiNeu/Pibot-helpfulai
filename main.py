@@ -31,6 +31,8 @@ bot = commands.Bot(
 	help_attrs=HELP_ATTRS
 	)
 	
+RESTART_EXIT_CODE = 4
+
 ### DISCORD CLIENT EVENT HANDLERS #############################################
 @bot.event
 async def on_command_error(error, ctx):
@@ -96,4 +98,4 @@ if __name__ == '__main__':
 			bot.run(token)
 		except ConnectionResetError:
 			# Likely kicked out for inactivity: reconnect
-			time.sleep(5)
+			return RESTART_EXIT_CODE;
