@@ -93,9 +93,9 @@ if __name__ == '__main__':
 			bot.load_extension(extension)
 		except Exception as e:
 			print('Failed to load extension {}\n{}: {}'.format(extension, type(e).__name__, e))
-	while True:
-		try:
-			bot.run(token)
-		except ConnectionResetError:
-			# Likely kicked out for inactivity: reconnect
-			return RESTART_EXIT_CODE;
+	try:
+		bot.run(token)
+	except ConnectionResetError:
+		# Likely kicked out for inactivity: tell shell script to restart everything
+		# (Since discord.py doesn't really like rerunning bot.run)
+		sys.exit(RESTART_EXIT_CODE)
