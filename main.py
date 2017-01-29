@@ -21,7 +21,8 @@ EXTENSIONS = [
 	'exts.admin',
 	'exts.Netrunner',
 	'exts.Arkham',
-	'exts.LOTR'
+	'exts.LOTR',
+	'exts.SkullsNRoses'
 	]
 
 bot = commands.Bot(
