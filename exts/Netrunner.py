@@ -1,6 +1,7 @@
 # Netrunner extension for pibot
 ### PREAMBLE ##################################################################
 import re
+from unidecode import unidecode
 
 import discord
 import requests
@@ -16,7 +17,7 @@ class Netrunner:
 	@commands.command(aliases=['netrunner'])
 	async def nr(self, *, cardname : str):
 		"""Netrunner card lookup"""
-		m_query = cardname.lower()
+		m_query = unidecode(cardname.lower())
 		
 		# Auto-correct some card names (and inside jokes)
 		query_corrections = {
