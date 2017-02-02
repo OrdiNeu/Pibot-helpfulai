@@ -17,7 +17,7 @@ class Netrunner:
 	@commands.command(aliases=['netrunner'])
 	async def nr(self, *, cardname : str):
 		"""Netrunner card lookup"""
-		m_query = unidecode(cardname.lower())
+		m_query = cardname.lower()
 		
 		# Auto-correct some card names (and inside jokes)
 		query_corrections = {
@@ -43,7 +43,7 @@ class Netrunner:
 			m_response = query_redirects[m_query]
 		else:
 			# Otherwise find and handle card names
-			m_cards = [c for c in requests.get('https://netrunnerdb.com/api/2.0/public/cards').json()['data'] if c['title'].lower().__contains__(m_query)]
+			m_cards = [c for c in requests.get('https://netrunnerdb.com/api/2.0/public/cards').json()['data'] if unidecode(c['title'].lower()).__contains__(m_query)]
 			for x in range(0, len(m_cards)):
 				if m_query == m_cards[x]['title'].lower():
 					m_response = "http://netrunnerdb.com/card_image/" + m_cards[x]['code'] + ".png"
