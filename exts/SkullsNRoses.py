@@ -81,7 +81,6 @@ class Skulls:
 	
 	def __init__(self, bot):
 		### TODO: Grab a ref to the client so we can send DMs
-		self.client = 
 		self.bot = bot
 		self.activeGames = {}
 		
@@ -92,6 +91,7 @@ class Skulls:
 	async def snr(self, ctx):
 		"""Begins a game of Skulls N Roses"""
 		game_name = self.getGameName(ctx.message)
+		author = ctx.message.author.name
 		
 		# Prevent two games going on in one channel
 		if game_name in self.activeGames.keys():
@@ -99,18 +99,18 @@ class Skulls:
 			return
 		
 		# Begin the  game
-		self.activeGames[] = SkullsSession(ctx.message.author)
+		self.activeGames[] = SkullsSession(author)
 		await self.bot.say(
-			ctx.message.author + " wants to play a round of Skulls 'N Roses!\n" + \
+			author + " wants to play a round of Skulls 'N Roses!\n" + \
 			"Please say !down if you would like to play\n" + \
-			ctx.message.author + " can say !start to begin the round"
+			author + " can say !start to begin the round"
 			)
 	
 	@commands.command(pass_context = True)
 	async def ante(self, ctx, tile : str):
 		"""Play a tile from hand in an active game"""
 		game_name = self.getGameName(ctx.message)
-		author = ctx.message.author
+		author = ctx.message.author.name
 		
 		# Do nothing if no game is active
 		if game_name not in self.activeGames.keys():
@@ -141,7 +141,7 @@ class Skulls:
 	@commands.command(pass_context = True)
 	async def bet(self, ctx):
 		game_name = self.getGameName(ctx.message)
-		author = ctx.message.author
+		author = ctx.message.author.name
 		
 		# Do nothing if no game is active
 		if game_name not in self.activeGames.keys():
@@ -157,7 +157,7 @@ class Skulls:
 	@commands.command(pass_context = True)
 	async def start(self, ctx):
 		game_name = self.getGameName(ctx.message)
-		author = ctx.message.author
+		author = ctx.message.author.name
 		
 		# Do nothing if no game is active
 		if game_name not in self.activeGames.keys():
@@ -177,7 +177,7 @@ class Skulls:
 	async def remind(self, ctx):
 		""" Remind a user what tiles they have """
 		game_name = self.getGameName(ctx.message)
-		author = ctx.message.author
+		author = ctx.message.author.name
 		
 		if game_name not in self.activeGames.keys():
 			return
@@ -188,13 +188,13 @@ class Skulls:
 		pile_idx = range(0, len(session.piles[author]))
 		zipped_hand = zip(pile_idx, session.piles[author])
 		message += "\n".join(str(i[0]) + ": " + i[1] for i in zipped_hand)
-		await self.client.send_message(ctx.author, message)
+		await self.bot.send_message(ctx.author, message)
 	
 	@commands.command(pass_context = True)
 	async def down(self, ctx):
 		# Add a player to the current game
 		game_name = self.getGameName(ctx.message)
-		author = ctx.message.author
+		author = ctx.message.author.name
 		
 		# Do nothing if no game is active
 		if game_name not in self.activeGames.keys():
