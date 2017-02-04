@@ -79,6 +79,8 @@ class SkullsSession:
 			if self.curPlayer >= len(self.players):
 				self.phase = PHASE_ANTEING
 				return(INIT_PHASE_OVER)
+		else:
+			return(WRONG_GAME_PHASE)
 	
 	def playerBet(self, player, amount):
 		"""Bet a certain amount"""
@@ -160,14 +162,17 @@ class Skulls:
 			await self.bot.say(author + ": We are currently in the betting around: no more antes can be placed.")
 			return
 		
+		# Handle every possible return value
 		retval = session.playerAnte(author, tile)
-		if retval == PLAYER_HAS_NO_SUCH_ANTE:# TODO: fix this line
+		if retval == PLAYER_HAS_NO_SUCH_ANTE:
 			await self.bot.say(author + ": that is not a valid tile\n" + \
 								"Your tiles have been DM'd to you")
 			await self.remind(ctx)
+		elif retval == WRONG_GAME_PHASE:
+			await self.bot.say("No antes can be placed right now.")
 		elif retval == WRONG_PLAYER_RESPONDED:
 			await self.bot.say(author + ": it is not your turn.\n")
-			await self.whichplayer(ctx)
+			await self.whoseturn(ctx)
 		elif retval == PLAYER_ALREADY_ANTED:
 			await self.bot.say("You have already laid your starting tile. Please wait for the rest of the players.")
 		else:
@@ -175,7 +180,7 @@ class Skulls:
 			if retval == INIT_PHASE_OVER:
 				await self.bot.say("The game has begun!")
 			elif session.phase == PHASE_ANTEING:
-				await self.whichplayer(ctx)
+				await self.whoseturn(ctx)
 	
 	@commands.command(pass_context = True)
 	async def bet(self, ctx, amount):
@@ -204,7 +209,7 @@ class Skulls:
 			await self.bot.say("You must bet more than the last bet of " + str(session.lastBet))
 		elif retval == 0:
 			await self.bot.say(author + " has bet " + amount + "!")
-			await self.whichplayer(ctx)
+			await self.whoseturn(ctx)
 		
 	@commands.command(pass_context = True)
 	async def start(self, ctx):
@@ -224,7 +229,7 @@ class Skulls:
 		message += " ".join(session.players)
 		
 		await self.bot.say(message)
-		await self.whichplayer(ctx)
+		await self.whoseturn(ctx)
 	
 	@commands.command(aliases = ['remindme'], pass_context = True)
 	async def remind(self, ctx):
