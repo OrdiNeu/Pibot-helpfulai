@@ -68,7 +68,7 @@ class SkullsSession:
 			self.curPlayer += 1
 			self.curPlayer %= len(self.players)
 			return(0)
-		else if self.phase == PHASE_INITANTE:
+		elif self.phase == PHASE_INITANTE:
 			if len(self.piles[player.name]) > 0:
 				return(PLAYER_ALREADY_ANTED)
 				
@@ -149,7 +149,7 @@ class Skulls:
 			return
 		
 		# Begin the  game
-		self.activeGames[] = SkullsSession(author)
+		self.activeGames[game_name] = SkullsSession(author)
 		await self.bot.say(
 			author + " wants to play a round of Skulls 'N Roses!\n" + \
 			"Please say !down if you would like to play.\n" + \
