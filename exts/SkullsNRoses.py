@@ -15,6 +15,8 @@ BET_TOO_LOW = -4
 PLAYER_ALREADY_ANTED = -5
 INIT_PHASE_OVER = -6
 WRONG_GAME_PHASE = -7
+NOT_ENOUGH_PLAYERS = -8
+MAX_BET_OFFERED = -9
 
 PHASE_WAITING = 0
 PHASE_INITANTE = 1
@@ -99,6 +101,15 @@ class SkullsSession:
 		self.phase = PHASE_BETTING
 		return(0)
 	
+	def startGame(self, player):
+		"""Start the game, checking that the given player is first"""
+		if self.players[0] != player:
+			return(WRONG_PLAYER_RESPONDED)
+		if len(self.players) < 2:
+			return(NOT_ENOUGH_PLAYERS)
+		self.phase = PHASE_INITANTE
+		return(0)
+	
 	def getDefaultHand(self):
 		"""Return a starting hand for the player"""
 		return [
@@ -112,7 +123,7 @@ class SkullsSession:
 		return self.players[self.curPlayer]
 	def getRoseWord(self):
 		return("Rose")
-	def getSKullWord(self):
+	def getSkullWord(self):
 		return("Skull")
 
 class Skulls:
@@ -134,15 +145,15 @@ class Skulls:
 		
 		# Prevent two games going on in one channel
 		if game_name in self.activeGames.keys():
-			await self.bot.say("Sorry, only one game of Skulls N Roses can be initialized per channel")
+			await self.bot.say("Sorry, only one game of Skulls N Roses can be initialized per channel.")
 			return
 		
 		# Begin the  game
 		self.activeGames[] = SkullsSession(author)
 		await self.bot.say(
 			author + " wants to play a round of Skulls 'N Roses!\n" + \
-			"Please say !down if you would like to play\n" + \
-			author + " can say !start to begin the round"
+			"Please say !down if you would like to play.\n" + \
+			author + " can say !start to begin the round."
 			)
 	
 	@commands.command(pass_context = True)
@@ -222,17 +233,28 @@ class Skulls:
 		
 		session = self.activeGames[game_name]
 		
-		# Begin the game
-		session.phase = PHASE_ANTEING
+		retval = session.startGame(author)
 		
-		message = "The game has begun! The players are: "
-		message += " ".join(session.players)
-		
-		await self.bot.say(message)
-		await self.whoseturn(ctx)
+		if retval == NOT_ENOUGH_PLAYERS:
+			await self.bot.say("Not enough players for a game!")
+		elif retval == WRONG_PLAYER_RESPONDED:
+			await self.bot.say("Only " + session.players[0] + " can !start the game.")
+		elif retval == WRONG_GAME_PHASE:
+			await self.bot.say("This game has already begun.")
+		elif retval == 0:
+			message = "The game has begun! The players are: "
+			message += " ".join(session.players)
+			message += "\n Your hands have been DM'd to you.\n"
+			message += "Please use !bet (number) to place your first tile.\n"
+			message += "The game will automatically progress once everyone has placed one."
+			await self.bot.say(message)
+			
+			# Tell all players their hand
+			for (player in session.players.keys):
+				await self.remind(ctx, who = player)
 	
 	@commands.command(aliases = ['remindme'], pass_context = True)
-	async def remind(self, ctx):
+	async def remind(self, ctx, who = ""):
 		""" Remind a user what tiles they have """
 		game_name = self.getGameName(ctx.message)
 		author = ctx.message.author.name

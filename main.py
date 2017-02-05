@@ -33,6 +33,7 @@ bot = commands.Bot(
 	)
 	
 RESTART_EXIT_CODE = 4
+ERR_EXIT_CODE = 1
 
 ### DISCORD CLIENT EVENT HANDLERS #############################################
 @bot.event
@@ -100,3 +101,6 @@ if __name__ == '__main__':
 		# Likely kicked out for inactivity: tell shell script to restart everything
 		# (Since discord.py doesn't really like rerunning bot.run)
 		sys.exit(RESTART_EXIT_CODE)
+	except Exception as e:
+		print('Error {}: {}'.format(type(e).__name__, e))
+		sys.exit(ERR_EXIT_CODE)
