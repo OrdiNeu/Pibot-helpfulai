@@ -23,7 +23,6 @@ class Netrunner:
 		query_corrections = {
 			"smc": "self-modifying code",
 			"jesus": "jackson howard",
-			"sot": "same old thing",
 			"nyan": "noise",
 			"neh": "near earth hub",
 			"sot": "same old thing",
