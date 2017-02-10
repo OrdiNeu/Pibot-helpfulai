@@ -9,8 +9,6 @@ import requests
 from discord.ext import commands
 
 
-
-
 class Netrunner:
     """Netrunner related commands"""
 
@@ -45,7 +43,8 @@ class Netrunner:
             "sot": "same old thing",
             "tilde": "blackat",
             "neko": "blackat",
-            "ordineu": "exile"
+            "ordineu": "exile",
+            ":stoned:": "blackstone"
         }
         if m_query in query_corrections.keys():
             m_query = query_corrections[m_query]
@@ -62,24 +61,13 @@ class Netrunner:
                 self.refresh_nr_api()
             # Otherwise find and handle card names
             m_cards = [c for c in self.nr_api if unidecode(c['title'].lower()).__contains__(m_query)]
-            for x in range(0, len(m_cards)):
-                if m_query == m_cards[x]['title'].lower():
-                    m_response = "http://netrunnerdb.com/card_image/" + m_cards[x]['code'] + ".png"
-            if len(m_cards) == 1:
-                m_response = "http://netrunnerdb.com/card_image/" + m_cards[0]['code'] + ".png"
-            elif len(m_cards) == 0:
-                m_response = "Sorry, I cannot seem to find any card with these parameters."
+            if len(m_cards) == 0:
+                m_response += "Sorry, I cannot seem to find any card with these parameters:\n"
+                m_response += "http://netrunnerdb.com/find/?q=" + m_query.replace(" ", "+")
             else:
-                m_response = "http://netrunnerdb.com/find/?q=" + m_query.replace(" ", "+")
+                for card in m_cards[:10]:
+                    m_response += "http://netrunnerdb.com/card_image/" + card['code'] + ".png\n"
         await self.bot.say(m_response)
-
-    @commands.command(aliases=['legnetrunner'])
-    async def lnr(self, cardname: str):
-        """Leg's experimental Netrunner card lookup"""
-        m_query = unidecode(cardname.lower())
-        m_query.rsplit()
-        if not self.init_api:
-            self.refresh_nr_api()
 
 
 def setup(bot):
