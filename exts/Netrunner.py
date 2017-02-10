@@ -73,7 +73,7 @@ class Netrunner:
                 m_response = "http://netrunnerdb.com/find/?q=" + m_query.replace(" ", "+")
         await self.bot.say(m_response)
 
-    @commands.command(aliases=['netrunner'])
+    @commands.command(aliases=['legnetrunner'])
     async def lnr(self, cardname: str):
         """Leg's experimental Netrunner card lookup"""
         m_query = unidecode(cardname.lower())
