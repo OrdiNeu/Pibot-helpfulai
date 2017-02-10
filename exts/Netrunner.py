@@ -61,7 +61,7 @@ class Netrunner:
             # Otherwise find and handle card names
             m_cards = [c for c in self.nr_api if unidecode(c['title'].lower()).__contains__(m_query)]
             if len(m_cards) == 0:
-                m_response += "Sorry, I cannot seem to find any card with these parameters."
+                m_response += "Sorry, I cannot seem to find any card with these parameters:\n"
                 m_response += "http://netrunnerdb.com/find/?q=" + m_query.replace(" ", "+")
             else:
                 for card in m_cards[:10]:
