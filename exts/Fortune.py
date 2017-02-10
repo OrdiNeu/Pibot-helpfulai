@@ -39,7 +39,7 @@ class Fortune:
             self.check_fortune(fort, 86, 95): "Great! Nothing could go wrong for you today",
             self.check_fortune(fort, 96, 100): "Perfect! Confess your love, Nothing could go wrong!"
         }
-        await self.bot.say(fortune)
+        await self.bot.say(fortune[True])
 
 
 def setup(bot):
