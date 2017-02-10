@@ -40,14 +40,16 @@ ERR_EXIT_CODE = 1
 ### DISCORD CLIENT EVENT HANDLERS #############################################
 @bot.event
 async def on_command_error(error, ctx):
+	author = ctx.message.author
     if isinstance(error, commands.NoPrivateMessage):
-        await bot.send_message(ctx.message.author, 'This command cannot be used in private messages.')
+        await bot.send_message(author, 'This command cannot be used in private messages.')
     elif isinstance(error, commands.DisabledCommand):
-        await bot.send_message(ctx.message.author, 'Sorry. This command is disabled and cannot be used.')
+        await bot.send_message(author, 'Sorry. This command is disabled and cannot be used.')
     elif isinstance(error, commands.CommandInvokeError):
-        print('In {0.command.qualified_name}:'.format(ctx), file=sys.stderr)
-        traceback.print_tb(error.original.__traceback__)
-        print('{0.__class__.__name__}: {0}'.format(error.original), file=sys.stderr)
+        await bot.send_message(author, 'In {0.command.qualified_name}:'.format(ctx), file=sys.stderr)
+        tb_msg = "\n".join(traceback.extract_tb(error.original.__traceback__))
+		await bot.send_message(author, tb_msg)
+        await bot.send_message(author, '{0.__class__.__name__}: {0}'.format(error.original), file=sys.stderr)
 
 
 @bot.event
