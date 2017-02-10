@@ -43,7 +43,8 @@ class Netrunner:
             "sot": "same old thing",
             "tilde": "blackat",
             "neko": "blackat",
-            "ordineu": "exile"
+            "ordineu": "exile",
+            ":stoned:": "blackstone"
         }
         if m_query in query_corrections.keys():
             m_query = query_corrections[m_query]
