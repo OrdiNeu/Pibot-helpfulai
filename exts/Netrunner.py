@@ -9,8 +9,6 @@ import requests
 from discord.ext import commands
 
 
-
-
 class Netrunner:
     """Netrunner related commands"""
 
@@ -72,7 +70,6 @@ class Netrunner:
             else:
                 m_response = "http://netrunnerdb.com/find/?q=" + m_query.replace(" ", "+")
         await self.bot.say(m_response)
-
 
 
 def setup(bot):
