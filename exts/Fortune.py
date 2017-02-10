@@ -25,7 +25,7 @@ class Fortune:
             return False
 
     @commands.command(aliases=['fortune'])
-    async def fortune(self, variable: str):
+    async def fortune(self):
         fort = random.randrange(0, 100)
         fortune = {
             self.check_fortune(fort, 0,  5): "Wurst! Your luck is terrible",
