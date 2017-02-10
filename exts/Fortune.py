@@ -25,9 +25,7 @@ class Fortune:
             return False
 
     @commands.command(aliases=['fortune'])
-    async def fortune(self, *, variable: str):
-        """Netrunner card lookup"""
-       # Auto-correct some card names (and inside jokes)
+    async def fortune(self, variable: str):
         fort = random.randrange(0, 100)
         fortune = {
             self.check_fortune(fort, 0,  5): "Wurst! Your luck is terrible",
