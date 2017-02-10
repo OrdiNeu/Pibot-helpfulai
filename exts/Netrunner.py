@@ -60,14 +60,12 @@ class Netrunner:
                 self.refresh_nr_api()
             # Otherwise find and handle card names
             m_cards = [c for c in self.nr_api if unidecode(c['title'].lower()).__contains__(m_query)]
-            for card in m_cards[:10]:
-                m_response += "http://netrunnerdb.com/card_image/" + card['code'] + ".png\n"
-            if len(m_cards) == 1:
-                m_response = "http://netrunnerdb.com/card_image/" + m_cards[0]['code'] + ".png"
-            elif len(m_cards) == 0:
-                m_response = "Sorry, I cannot seem to find any card with these parameters."
+            if len(m_cards) == 0:
+                m_response += "Sorry, I cannot seem to find any card with these parameters."
+                m_response += "http://netrunnerdb.com/find/?q=" + m_query.replace(" ", "+")
             else:
-                m_response = "http://netrunnerdb.com/find/?q=" + m_query.replace(" ", "+")
+                for card in m_cards[:10]:
+                    m_response += "http://netrunnerdb.com/card_image/" + card['code'] + ".png\n"
         await self.bot.say(m_response)
 
 
