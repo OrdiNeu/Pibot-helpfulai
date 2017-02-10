@@ -60,9 +60,9 @@ class Netrunner:
                 self.refresh_nr_api()
             # Otherwise find and handle card names
             m_cards = [c for c in self.nr_api if unidecode(c['title'].lower()).__contains__(m_query)]
-            for x in range(0, len(m_cards)):
-                if m_query == m_cards[x]['title'].lower():
-                    m_response = "http://netrunnerdb.com/card_image/" + m_cards[x]['code'] + ".png"
+            for x, card in enumerate( m_cards):
+                if m_query in card[x]['title'].lower():
+                    m_response += "http://netrunnerdb.com/card_image/" + m_cards[x]['code'] + ".png\n"
             if len(m_cards) == 1:
                 m_response = "http://netrunnerdb.com/card_image/" + m_cards[0]['code'] + ".png"
             elif len(m_cards) == 0:
