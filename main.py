@@ -40,7 +40,7 @@ ERR_EXIT_CODE = 1
 ### DISCORD CLIENT EVENT HANDLERS #############################################
 @bot.event
 async def on_command_error(error, ctx):
-	author = ctx.message.author
+    author = ctx.message.author
     if isinstance(error, commands.NoPrivateMessage):
         await bot.send_message(author, 'This command cannot be used in private messages.')
     elif isinstance(error, commands.DisabledCommand):
