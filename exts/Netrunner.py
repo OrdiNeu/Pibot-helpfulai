@@ -33,7 +33,7 @@ class Netrunner:
 
     @staticmethod
     def replace_api_text_with_emoji(api_string):
-        api_string = re.sub("(\[click\])", ":clock7:", api_string)
+        api_string = re.sub("(\[click\])", "🕖", api_string)
         return emoji.emojize(api_string)
 
     @staticmethod
