@@ -54,10 +54,11 @@ class Netrunner:
         return trace_tag_g
 
     def replace_api_text_with_emoji(self, api_string):
-        api_string = re.sub("(\[click\])", "🕖", api_string)
-        api_string = re.sub("(\[credit\])", "💰", api_string)
-        api_string = re.sub("(\[subroutine\])", "↳", api_string)
-        api_string = self.parse_trace_tag(api_string)
+        if isinstance(api_string, str):
+            api_string = re.sub("(\[click\])", "🕖", api_string)
+            api_string = re.sub("(\[credit\])", "💰", api_string)
+            api_string = re.sub("(\[subroutine\])", "↳", api_string)
+            api_string = self.parse_trace_tag(api_string)
         return api_string
 
     @staticmethod
