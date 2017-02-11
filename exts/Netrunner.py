@@ -17,13 +17,13 @@ class Netrunner:
         self.nr_api = [{}]
         self.init_api = False
         self.nets_help = "!nets command syntax:\n" \
-                         "*!nets help:* this listing\n" \
-                         "*!nets keys* list the keys that this database supports\n" \
-                         "*!nets \"key:value\"* where key is a valid entry of the api, " \
+                         "**!nets help:** this listing\n" \
+                         "**!nets keys** list the keys that this database supports\n" \
+                         "**!nets \"key:value\"** where key is a valid entry of the api, " \
                          "and value is an exact match.\n" + \
                          "any number of key:value pairs may be specified (space seperated), and the output will " \
                          "always include this key\n" + \
-                         "!nets \"key:value\" \"key\" where the second \" bounded, space delineated keys are " \
+                         "**!nets \"key:value\" \"key\"** where the second \" bounded, space delineated keys are " \
                          "additional values to print, but not match on (title and text are always printed)"
         self.api_keys = "list of keys: (not all cards have all keys!)\ntitle, text, cost, strength, " \
                         "keywords, type_code, faction_cost, memory_cost, trash_cost, advancement_cost," \
@@ -103,11 +103,12 @@ class Netrunner:
             m_response += "I see: \"{0}\", but I don't understand\n".format(cardname)
             m_response += self.nets_help
         else:
-            if command.group(1) is not None or command.group(3) is None:
+            if command.group(1) is not None or (command.group(3) is None and command.group(2) is None):
                 # if the user asks for help, or doesn't specify the expected arguments, print help
                 m_response += self.nets_help
             else:
                 if command.group(2) is not None:
+                    # if the user specifies they're looking for keys listing print that and stop
                     m_response += self.api_keys
                 else:
                     for key_val in re.sub('\"(.*?)\s*\"', "\g<1>", command.group(3)).split(" "):
