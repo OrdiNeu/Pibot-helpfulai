@@ -250,7 +250,7 @@ class Skulls:
             await self.bot.say(message)
 
             # Tell all players their hand
-            for (player in session.players.keys):
+            for player in session.players.keys():
                 await self.remind(ctx, who = player)
 
     @commands.command(aliases = ['remindme'], pass_context = True)

@@ -111,6 +111,11 @@ class Admin:
         os.system("import -window root screenshot.png")
         await self.bot.send_file(ctx.message.channel, "screenshot.png")
 
+    @commands.command(pass_context=True, hidden=True)
+    async def test_error(self, ctx):
+        print("Test error")
+        a = {}
+        print(a['1'])
 
 def setup(bot):
     bot.add_cog(Admin(bot))
