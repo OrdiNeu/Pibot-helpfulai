@@ -16,19 +16,19 @@ class Netrunner:
         self.bot = bot
         self.nr_api = [{}]
         self.init_api = False
-        self.nets_help = \
-        "!nets command syntax:\n" + \
-        "!nets help: this listing\n" + \
-        "!nets \"key:value\" where key is a valid entry of the api, and value is an exact match.\n" + \
-        " any number of key:value pairs may be specified (space seperated), and the output will always " + \
-        "include this key\n" + \
-        "!nets \"key:value\" \"key\" where the second \" bounded, space deliniated keys are additional values to " +  \
-        "print, but not match on (title and text are always printed)"
-        "list of keys: (not all cards have all keys!)\n"
-        "title, text, cost, strength, keywords, type_code, faction_cost, " \
-        "memory_cost, trash_cost, advancement_cost, agenda_points, code, side_code, faction_code, \n" \
-        "pack_code, position, quantity, uniqueness, " \
-        "base_link, influence_limit, deck_limit, minimum_deck_size,  flavor, illustrator,"
+        self.nets_help = "!nets command syntax:\n" \
+                         "*!nets help:* this listing\n" \
+                         "*!nets keys* list the keys that this database supports\n" \
+                         "*!nets \"key:value\"* where key is a valid entry of the api, " \
+                         "and value is an exact match.\n" + \
+                         "any number of key:value pairs may be specified (space seperated), and the output will " \
+                         "always include this key\n" + \
+                         "!nets \"key:value\" \"key\" where the second \" bounded, space delineated keys are " \
+                         "additional values to print, but not match on (title and text are always printed)"
+        self.api_keys = "list of keys: (not all cards have all keys!)\ntitle, text, cost, strength, " \
+                        "keywords, type_code, faction_cost, memory_cost, trash_cost, advancement_cost," \
+                        " agenda_points, code, side_code, faction_code, \npack_code, position, quantity, " \
+                        "uniqueness, base_link, influence_limit, deck_limit, minimum_deck_size,  flavor, illustrator"
 
 
 
@@ -92,38 +92,43 @@ class Netrunner:
         if not self.init_api:
             self.refresh_nr_api()
         """This should give me a list of key:str.value to search by"""
-        command = re.search('(!nets)\s*(help!*)*\s*(".*?")\s*(".*?")*', cardname)
-        # command should build a re group with (0) full line
+        command = re.search('(!nets)*\s*(help!*)*\s*(keys*)*\s*(".*?")\s*(".*?")*', cardname)
+        # command should build a re group with
+        # (0) full line
         # (1) !nets or equivalent
         # (2) 'help' or 'help!' or None if not specified
-        # (3) '"key:value"' section or None if not specified
-        # (4) '"key"' print section or None if not specified
+        # (3) 'keys' list all keys command or None if not specified
+        # (4) '"key:value"' section or None if not specified
+        # (5) '"key"' print section or None if not specified
         if command is None:
             m_response += "I see: \"{0}\", but I don't understand\n".format(cardname)
             m_response += self.nets_help
         else:
-            if command.group(2) is not None or command.group(3) is None:
+            if command.group(2) is not None or command.group(4) is None:
                 # if the user asks for help, or doesn't specify the expected arguments, print help
-                m_response = self.nets_help
+                m_response += self.nets_help
             else:
-                for key_val in re.sub('\"(.*?)\s*\"', "\g<1>", command.group(3)).split(" "):
-                    # each key_val in our second parameter is split into sanitized key:value key_val iterators
-                    split_val = key_val.split(":")
-                    m_criteria_list.append((split_val[0], split_val[1].lower()))
-                if command.group(4) is not None:
-                    for field in re.sub('\"(.*?)\s*\"', "\g<1>", command.group(4)).split(" "):
-                        if field not in print_fields:
-                            print_fields.append(field)
-                m_match_list = self.search_text(m_criteria_list)
-                if len(m_match_list) == 0:
-                    m_response = "Search criteria returned 0 results"
+                if command.group(3) is not None:
+                    m_response += self.api_keys
                 else:
-                    for card in m_match_list:
-                        m_response += "```\n"
-                        for c_key in print_fields:
-                            if c_key in card.keys():
-                                m_response += "{0}:\"{1}\"\n".format(c_key, card[c_key])
-                        m_response += "```\n"
+                    for key_val in re.sub('\"(.*?)\s*\"', "\g<1>", command.group(4)).split(" "):
+                        # each key_val in our second parameter is split into sanitized key:value key_val iterators
+                        split_val = key_val.split(":")
+                        m_criteria_list.append((split_val[0], split_val[1].lower()))
+                    if command.group(5) is not None:
+                        for field in re.sub('\"(.*?)\s*\"', "\g<1>", command.group(5)).split(" "):
+                            if field not in print_fields:
+                                print_fields.append(field)
+                    m_match_list = self.search_text(m_criteria_list)
+                    if len(m_match_list) == 0:
+                        m_response = "Search criteria returned 0 results"
+                    else:
+                        for card in m_match_list:
+                            m_response += "```\n"
+                            for c_key in print_fields:
+                                if c_key in card.keys():
+                                    m_response += "{0}:\"{1}\"\n".format(c_key, card[c_key])
+                            m_response += "```\n"
         if len(m_response) >= 2000:
             # truncate message if it exceed the character limit
             m_response = m_response[:1990] + "\n..."
