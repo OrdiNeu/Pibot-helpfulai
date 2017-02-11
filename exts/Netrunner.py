@@ -21,9 +21,9 @@ class Netrunner:
     criteria should be list of str.key:str.value tuples to be checked for exist in for each card
     """
     def search_text(self, criteria):
-        m_response = ""
+        m_match = []
         card_match = True
-        for s_card in sorted(self.nr_api, key=lambda card: card['title']):
+        for i, s_card in enumerate(self.nr_api):
             card_match = True
             for c_key, c_value in criteria:
                 if c_key in s_card.keys():
@@ -41,19 +41,21 @@ class Netrunner:
                                 break
                                 # print("match on " + c_value)
                     except ValueError:
-                        m_response += "Value error parsing search!" + s_card['code'] + "\n"
-                        return m_response
+                        return []
+                        # m_response += "Value error parsing search!" + s_card['code'] + "\n"
+                        # return m_response
                         # print("ValueError on value from search " +
                         #  c_key + " for " + c_value + " on " + s_card['code'])
                 else:
                     card_match = False
                     break
             if card_match:
-                m_response += "http://netrunnerdb.com/card_image/" + s_card['code'] + ".png\n"
-        return m_response
+                m_match.append(s_card)
+        return m_match
 
     def refresh_nr_api(self):
-        self.nr_api = [c for c in requests.get('https://netrunnerdb.com/api/2.0/public/cards').json()['data']]
+        self.nr_api = sorted([c for c in requests.get('https://netrunnerdb.com/api/2.0/public/cards').json()['data']],
+                             key=lambda card: card['title'])
         self.init_api = True
 
     """
@@ -68,7 +70,7 @@ class Netrunner:
     """
     @commands.command(name="legnr", aliases=['nets'])
     async def leg(self, *, cardname: str):
-        m_response = ""
+        m_response = []
         m_criteria_list = []
         #if not self.init_api:
         #    self.refresh_nr_api()
@@ -78,7 +80,14 @@ class Netrunner:
         for key_val in f_crit:
             split_val = key_val.split(":")
             m_criteria_list.append((split_val[0], split_val[1]))
-        m_response += self.search_text(m_criteria_list)
+        m_match_list = self.search_text(m_criteria_list)
+        if len(m_match_list) == 0:
+            m_response = "Search criteria returned 0 results"
+        else:
+            m_response += "```\n"
+            for card in m_response:
+                m_response += "title:\"{0}\" text:\"{1}\"\n".format(card['title'], card['text'])
+            m_response += "```"
         await self.bot.say(m_response)
 
     @commands.command(aliases=['netrunner'])
