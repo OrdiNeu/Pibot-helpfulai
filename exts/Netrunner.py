@@ -79,22 +79,24 @@ class Netrunner:
 
         # f_crit = cardname.split("\"", 2)[1].split(" ")
         f_crit = cardname.split("\"")
-        for field in f_crit[3]:
-            if field not in print_fields:
-                print_fields.append(field)
+
         for key_val in f_crit[1].split(" "):
             split_val = key_val.split(":")
             m_criteria_list.append((split_val[0], split_val[1].lower()))
+        if len(f_crit) >= 3:
+            for field in f_crit[3]:
+                if field not in print_fields:
+                    print_fields.append(field)
         m_match_list = self.search_text(m_criteria_list)
         if len(m_match_list) == 0:
             m_response = "Search criteria returned 0 results"
         else:
             # m_response += "```\n"
             for card in m_match_list:
-                m_response += "```\ntitle:\"{0}\"\ntext:\"{1}\"\n".format(card['title'], card['text'])
+                m_response += "```\n"  # title:\"{0}\"\ntext:\"{1}\"\n".format(card['title'], card['text'])
                 for c_key, c_value in m_criteria_list:
-                    if c_key not in print_fields:
-                        m_response += "{0}:\"{1}\" \"\n".format(c_key, card[c_key])
+                    #if c_key not in print_fields:
+                    m_response += "{0}:\"{1}\" \"\n".format(c_key, card[c_key])
                 m_response += "```\n"
                 # m_response += "title:\"" + card['title'] + "\" text:\"" + card['text'] + "\"\n"
             # m_response += "```"
