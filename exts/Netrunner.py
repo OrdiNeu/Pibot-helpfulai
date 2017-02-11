@@ -17,17 +17,69 @@ class Netrunner:
         self.nr_api = [{}]
         self.init_api = False
 
+    """
+    criteria should be list of str.key:str.value tuples to be checked for exist in for each card
+    """
     def search_text(self, criteria):
         m_response = ""
+        card_match = True
         for s_card in sorted(self.nr_api, key=lambda card: card['title']):
-            if 'text' in s_card.keys():
-                if criteria in s_card['text']:
-                    m_response += "http://netrunnerdb.com/card_image/" + s_card['code'] + ".png\n"
+            card_match = True
+            for c_key, c_value in criteria:
+                if c_key in s_card.keys():
+                    try:
+                        if isinstance(s_card[c_key], int):
+                            if not int(c_value) == s_card[c_key]:
+                                card_match = False
+                                break
+                        elif s_card[c_key] is None:
+                            break
+                            # print("None value from search for on " + s_card['code'])
+                        else:
+                            if not c_value in unidecode(s_card[c_key]).lower():
+                                card_match = False
+                                break
+                                # print("match on " + c_value)
+                    except ValueError:
+                        m_response += "Value error parsing search!" + s_card['code'] + "\n"
+                        return m_response
+                        # print("ValueError on value from search " +
+                        #  c_key + " for " + c_value + " on " + s_card['code'])
+                else:
+                    card_match = False
+                    break
+            if card_match:
+                m_response += "http://netrunnerdb.com/card_image/" + s_card['code'] + ".png\n"
         return m_response
 
     def refresh_nr_api(self):
         self.nr_api = [c for c in requests.get('https://netrunnerdb.com/api/2.0/public/cards').json()['data']]
         self.init_api = True
+
+    """
+    Experimental section to test string parsing
+    I want to turn
+    !nr "title:deja influence:"
+    title:value|text:value|influence:number
+    by default?
+    but also still support
+    !nr <title>
+    <card image link>
+    """
+    @commands.command(name="legnr", aliases=['nets'])
+    async def leg(self, *, cardname: str):
+        m_response = ""
+        m_criteria_list = []
+        #if not self.init_api:
+        #    self.refresh_nr_api()
+        """This should give me a list of key:str.value to search by"""
+
+        f_crit = cardname.split("\"", 2)[1].split(" ")
+        for key_val in f_crit:
+            split_val = key_val.split(":")
+            m_criteria_list.append((split_val[0], split_val[1]))
+        m_response += self.search_text(m_criteria_list)
+        await self.bot.say(m_response)
 
     @commands.command(aliases=['netrunner'])
     async def nr(self, *, cardname: str):
