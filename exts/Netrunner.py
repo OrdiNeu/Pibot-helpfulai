@@ -98,29 +98,32 @@ class Netrunner:
         # (2) 'help' or 'help!' or None if not specified
         # (3) '"key:value"' section or None if not specified
         # (4) '"key"' print section or None if not specified
-
-        if command.group(2) is not None or command.group(3) is None:
-            # if the user asks for help, or doesn't specify the expected arguments, print help
-            m_response = self.nets_help
+        if command is None:
+            m_response += "I see: \"{0}\", but I don't understand\n".format(cardname)
+            m_response += self.nets_help
         else:
-            for key_val in re.sub('\"(.*?)\s*\"', "\g<1>", command.group(3)).split(" "):
-                # each key_val in our second parameter is split into sanitized key:value key_val iterators
-                split_val = key_val.split(":")
-                m_criteria_list.append((split_val[0], split_val[1].lower()))
-            if command.group(4) is not None:
-                for field in re.sub('\"(.*?)\s*\"', "\g<1>", command.group(4)).split(" "):
-                    if field not in print_fields:
-                        print_fields.append(field)
-            m_match_list = self.search_text(m_criteria_list)
-            if len(m_match_list) == 0:
-                m_response = "Search criteria returned 0 results"
+            if command.group(2) is not None or command.group(3) is None:
+                # if the user asks for help, or doesn't specify the expected arguments, print help
+                m_response = self.nets_help
             else:
-                for card in m_match_list:
-                    m_response += "```\n"
-                    for c_key in print_fields:
-                        if c_key in card.keys():
-                            m_response += "{0}:\"{1}\"\n".format(c_key, card[c_key])
-                    m_response += "```\n"
+                for key_val in re.sub('\"(.*?)\s*\"', "\g<1>", command.group(3)).split(" "):
+                    # each key_val in our second parameter is split into sanitized key:value key_val iterators
+                    split_val = key_val.split(":")
+                    m_criteria_list.append((split_val[0], split_val[1].lower()))
+                if command.group(4) is not None:
+                    for field in re.sub('\"(.*?)\s*\"', "\g<1>", command.group(4)).split(" "):
+                        if field not in print_fields:
+                            print_fields.append(field)
+                m_match_list = self.search_text(m_criteria_list)
+                if len(m_match_list) == 0:
+                    m_response = "Search criteria returned 0 results"
+                else:
+                    for card in m_match_list:
+                        m_response += "```\n"
+                        for c_key in print_fields:
+                            if c_key in card.keys():
+                                m_response += "{0}:\"{1}\"\n".format(c_key, card[c_key])
+                        m_response += "```\n"
         if len(m_response) >= 2000:
             # truncate message if it exceed the character limit
             m_response = m_response[:1990] + "\n..."
