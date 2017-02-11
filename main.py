@@ -111,3 +111,6 @@ if __name__ == '__main__':
     except Exception as e:
         print('Error {}: {}'.format(type(e).__name__, e))
         sys.exit(ERR_EXIT_CODE)
+
+    # It really shouldn't get to this point, so we're going to restart and see what happens
+    sys.exit(RESTART_EXIT_CODE)
