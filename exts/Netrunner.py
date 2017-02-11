@@ -72,22 +72,23 @@ class Netrunner:
     async def leg(self, *, cardname: str):
         m_response = []
         m_criteria_list = []
-        #if not self.init_api:
-        #    self.refresh_nr_api()
+        if not self.init_api:
+            self.refresh_nr_api()
         """This should give me a list of key:str.value to search by"""
 
         f_crit = cardname.split("\"", 2)[1].split(" ")
         for key_val in f_crit:
             split_val = key_val.split(":")
-            m_criteria_list.append((split_val[0], split_val[1]))
+            m_criteria_list.append((split_val[0], split_val[1].lower()))
         m_match_list = self.search_text(m_criteria_list)
         if len(m_match_list) == 0:
             m_response = "Search criteria returned 0 results"
         else:
-            m_response += "```\n"
+            # m_response += "```\n"
             for card in m_response:
-                m_response += "title:\"{0}\" text:\"{1}\"\n".format(card['title'], card['text'])
-            m_response += "```"
+                # m_response += "title:\"{0}\" text:\"{1}\"\n".format(card['title'], card['text'])
+                m_response += "title:\"" + card['title'] + "\" text:\"" + card['text'] + "\"\n"
+            # m_response += "```"
         await self.bot.say(m_response)
 
     @commands.command(aliases=['netrunner'])
