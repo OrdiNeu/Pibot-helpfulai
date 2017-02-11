@@ -34,8 +34,8 @@ class Netrunner:
     @staticmethod
     def replace_api_text_with_emoji(api_string):
         api_string = re.sub("(\[click\])", "🕖", api_string)
-		api_string = re.sub("(\[credit\])", "💰", api_string)
-        return emoji.emojize(api_string)
+        api_string = re.sub("(\[credit\])", "💰", api_string)
+        return api_string
 
     @staticmethod
     def replace_emoji_with_api_text(emoji_string):
