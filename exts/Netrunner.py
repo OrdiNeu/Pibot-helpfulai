@@ -92,7 +92,7 @@ class Netrunner:
         if not self.init_api:
             self.refresh_nr_api()
         """This should give me a list of key:str.value to search by"""
-        command = re.search('\s*(help!*)*\s*(keys*)*\s*(".*?")\s*(".*?")*', cardname)
+        command = re.search('\s*(help!*)*\s*(keys*)*\s*(".*?")*\s*(".*?")*', cardname)
         # command should build a re group with
         # (0) full line
         # (1) 'help' or 'help!' or None if not specified
