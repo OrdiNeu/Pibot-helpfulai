@@ -70,7 +70,7 @@ class Netrunner:
     """
     @commands.command(name="legnr", aliases=['nets'])
     async def leg(self, *, cardname: str):
-        m_response = []
+        m_response = ""
         m_criteria_list = []
         if not self.init_api:
             self.refresh_nr_api()
@@ -85,9 +85,9 @@ class Netrunner:
             m_response = "Search criteria returned 0 results"
         else:
             # m_response += "```\n"
-            for card in m_response:
-                # m_response += "title:\"{0}\" text:\"{1}\"\n".format(card['title'], card['text'])
-                m_response += "title:\"" + card['title'] + "\" text:\"" + card['text'] + "\"\n"
+            for card in m_match_list:
+                m_response += "title:\"{0}\" text:\"{1}\"\n".format(card['title'], card['text'])
+                #m_response += "title:\"" + card['title'] + "\" text:\"" + card['text'] + "\"\n"
             # m_response += "```"
         await self.bot.say(m_response)
 
