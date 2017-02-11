@@ -44,7 +44,7 @@ class Netrunner:
             "tilde": "blackat",
             "neko": "blackat",
             "ordineu": "exile",
-            ":stoned:": "blackstone"
+            "<:stoned:259424190111678464>": "blackstone"
         }
         if m_query in query_corrections.keys():
             m_query = query_corrections[m_query]
