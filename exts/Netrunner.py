@@ -85,7 +85,7 @@ class Netrunner:
             m_response = "Search criteria returned 0 results"
         else:
             # m_response += "```\n"
-            for card in m_match_list:
+            for card in m_match_list[:10]:
                 m_response += "```\ntitle:\"{0}\" text:\"{1}\"\n```\n".format(card['title'], card['text'])
                 #m_response += "title:\"" + card['title'] + "\" text:\"" + card['text'] + "\"\n"
             # m_response += "```"
