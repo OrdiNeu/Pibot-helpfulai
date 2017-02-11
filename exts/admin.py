@@ -16,12 +16,20 @@ from .utils import checks
 # Exit code to let the force reloader know to reload from git
 GIT_RELOAD_EXIT_CODE = 5
 
+# File to store the channel id scavenge was called from
+SCAVENGE_FILE_NAME = 'scavenge_channel.txt'
 
 class Admin:
     """Admin-only commands that make the bot dynamic."""
 
     def __init__(self, bot):
         self.bot = bot
+        # Check for the existance of the scavenge file
+        if os.path.isfile(SCAVENGE_FILE_NAME):
+            with open(SCAVENGE_FILE_NAME, 'r') as f:
+                channel_id = self.bot.get_channel(f.read())
+                await self.bot.send_message(channel_id, "Back")
+            os.remove(SCAVENGE_FILE_NAME)
 
     @commands.command(hidden=True)
     @checks.is_admin()
@@ -89,11 +97,13 @@ class Admin:
 
         await self.bot.say(python.format(result))
 
-    @commands.command(hidden=True)
+    @commands.command(hidden=True, pass_context=True)
     @checks.is_admin()
-    async def scavenge(self):
+    async def scavenge(self, ctx):
         """Restarts the bot, and tries to pull the latest version of itself from git"""
         await self.bot.say('brb')
+        with open(SCAVENGE_FILE_NAME, 'w') as f
+            f.write(ctx.message.channel.id)
         sys.exit(GIT_RELOAD_EXIT_CODE)  # Expect our helper script to do the git reloading
 
     @commands.command(hidden=True)
