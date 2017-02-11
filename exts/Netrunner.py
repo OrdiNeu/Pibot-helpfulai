@@ -77,8 +77,12 @@ class Netrunner:
             self.refresh_nr_api()
         """This should give me a list of key:str.value to search by"""
 
-        f_crit = cardname.split("\"", 2)[1].split(" ")
-        for key_val in f_crit:
+        # f_crit = cardname.split("\"", 2)[1].split(" ")
+        f_crit = cardname.split("\"")
+        for field in f_crit[3]:
+            if field not in print_fields:
+                print_fields.append(field)
+        for key_val in f_crit[1].split(" "):
             split_val = key_val.split(":")
             m_criteria_list.append((split_val[0], split_val[1].lower()))
         m_match_list = self.search_text(m_criteria_list)
