@@ -25,10 +25,10 @@ class Netrunner:
                          "always include this key\n" + \
                          "**!nets \"key:value\" \"key\"** where the second \" bounded, space delineated keys are " \
                          "additional values to print, but not match on (title and text are always printed)"
-        self.api_keys = "list of keys: (not all cards have all keys!)\ntitle, text, cost, strength, " \
-                        "keywords, type_code, faction_cost, memory_cost, trash_cost, advancement_cost," \
-                        " agenda_points, code, side_code, faction_code, \npack_code, position, quantity, " \
-                        "uniqueness, base_link, influence_limit, deck_limit, minimum_deck_size,  flavor, illustrator"
+        self.api_keys = "list of keys: (not all cards have all keys!)\n```title, text, cost, strength, " \
+                        "keywords, type_code,\n uniqueness, faction_cost, memory_cost, trash_cost, advancement_cost," \
+                        " agenda_points,\nside_code, faction_code, pack_code, position, quantity, \n" \
+                        "base_link, influence_limit, deck_limit, minimum_deck_size,  flavor, illustrator, code```"
 
 
 
