@@ -36,6 +36,8 @@ bot = commands.Bot(
 RESTART_EXIT_CODE = 4
 ERR_EXIT_CODE = 1
 
+# File to store the channel id scavenge was called from
+SCAVENGE_FILE_NAME = 'scavenge_channel.txt'
 
 ### DISCORD CLIENT EVENT HANDLERS #############################################
 @bot.event
@@ -63,6 +65,13 @@ async def on_ready():
         sys.exit(0)
     if not hasattr(bot, 'uptime'):
         bot.uptime = datetime.datetime.utcnow()
+    # Check for the existance of the scavenge file
+    if os.path.isfile(SCAVENGE_FILE_NAME):
+        with open(SCAVENGE_FILE_NAME, 'r') as f:
+            channel_id = bot.get_channel(f.read())
+            await bot.send_message(channel_id, "Back")
+        os.remove(SCAVENGE_FILE_NAME)
+
 
 
 @bot.event

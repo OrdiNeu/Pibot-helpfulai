@@ -25,17 +25,6 @@ class Admin:
 
     def __init__(self, bot):
         self.bot = bot
-        loop = asyncio.get_event_loop()
-        loop.run_until_complete(self.scavenge_check())
-        loop.close()
-    
-    async def scavenge_check(self):
-        # Check for the existance of the scavenge file
-        if os.path.isfile(SCAVENGE_FILE_NAME):
-            with open(SCAVENGE_FILE_NAME, 'r') as f:
-                channel_id = self.bot.get_channel(f.read())
-                await bot.send_message(channel_id, "Back")
-            os.remove(SCAVENGE_FILE_NAME)
 
     @commands.command(hidden=True)
     @checks.is_admin()
