@@ -54,7 +54,7 @@ class Netrunner:
         return trace_tag_g
 
     def parse_strong_tag(self, api_string):
-        strong_g = re.sub("(<strong>)(.*)(</strong>)", "**\g<2>**", api_string)
+        strong_g = re.sub("(<strong>)(.*?)(</strong>)", "**\g<2>**", api_string)
         return strong_g
 
     def replace_api_text_with_emoji(self, api_string):
