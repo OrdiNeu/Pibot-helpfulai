@@ -92,31 +92,30 @@ class Netrunner:
         if not self.init_api:
             self.refresh_nr_api()
         """This should give me a list of key:str.value to search by"""
-        command = re.search('(!nets)*\s*(help!*)*\s*(keys*)*\s*(".*?")\s*(".*?")*', cardname)
+        command = re.search('\s*(help!*)*\s*(keys*)*\s*(".*?")\s*(".*?")*', cardname)
         # command should build a re group with
         # (0) full line
-        # (1) !nets or equivalent
-        # (2) 'help' or 'help!' or None if not specified
-        # (3) 'keys' list all keys command or None if not specified
-        # (4) '"key:value"' section or None if not specified
-        # (5) '"key"' print section or None if not specified
+        # (1) 'help' or 'help!' or None if not specified
+        # (2) 'keys' list all keys command or None if not specified
+        # (3) '"key:value"' section or None if not specified
+        # (4) '"key"' print section or None if not specified
         if command is None:
             m_response += "I see: \"{0}\", but I don't understand\n".format(cardname)
             m_response += self.nets_help
         else:
-            if command.group(2) is not None or command.group(4) is None:
+            if command.group(1) is not None or command.group(3) is None:
                 # if the user asks for help, or doesn't specify the expected arguments, print help
                 m_response += self.nets_help
             else:
-                if command.group(3) is not None:
+                if command.group(2) is not None:
                     m_response += self.api_keys
                 else:
-                    for key_val in re.sub('\"(.*?)\s*\"', "\g<1>", command.group(4)).split(" "):
+                    for key_val in re.sub('\"(.*?)\s*\"', "\g<1>", command.group(3)).split(" "):
                         # each key_val in our second parameter is split into sanitized key:value key_val iterators
                         split_val = key_val.split(":")
                         m_criteria_list.append((split_val[0], split_val[1].lower()))
-                    if command.group(5) is not None:
-                        for field in re.sub('\"(.*?)\s*\"', "\g<1>", command.group(5)).split(" "):
+                    if command.group(4) is not None:
+                        for field in re.sub('\"(.*?)\s*\"', "\g<1>", command.group(4)).split(" "):
                             if field not in print_fields:
                                 print_fields.append(field)
                     m_match_list = self.search_text(m_criteria_list)
