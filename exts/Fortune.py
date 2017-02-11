@@ -15,7 +15,7 @@ class Fortune:
 
     def __init__(self, bot):
         self.bot = bot
-        self.fortuned_users = []
+        self.fortuned_users = {}
 
     @staticmethod
     def check_fortune(val, minum, maxum):
@@ -24,9 +24,13 @@ class Fortune:
         else:
             return False
 
-    @commands.command(aliases=['fortune'])
-    async def fortune(self):
-        fort = random.randrange(0, 100)
+    @commands.command(pass_context = True)
+    async def fortune(self, ctx):
+        """Grabs your fortune for the day!"""
+        author_id = ctx.message.author.id
+        if not author_id in self.fortuned_users.keys():
+            self.fortuned_users[author_id] = random.randrange(0, 100)
+        fort = self.fortuned_users[author_id]
         fortune = {
             self.check_fortune(fort, 0,  5): "Wurst! Your luck is terrible",
             self.check_fortune(fort, 6,  15): "Awful! hopefully it won't be too bad",
