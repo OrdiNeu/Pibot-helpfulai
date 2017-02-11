@@ -50,14 +50,23 @@ class Netrunner:
         return ret_string
 
     def parse_trace_tag(self, api_string):
-        trace_tag_g = re.sub("(<trace>Trace )(\d)(</trace>)", self.transform_trace, api_string)
+        trace_tag_g = re.sub("(<trace>Trace )(\d)(</trace>)", self.transform_trace, api_string, re.I)
         return trace_tag_g
 
+    def parse_strong_tag(self, api_string):
+        strong_g = re.sub("(<strong>)(.*?)(</strong>)", "**\g<2>**", api_string)
+        return strong_g
+
     def replace_api_text_with_emoji(self, api_string):
-        api_string = re.sub("(\[click\])", "🕖", api_string)
-        api_string = re.sub("(\[credit\])", "💰", api_string)
-        api_string = re.sub("(\[subroutine\])", "↳", api_string)
-        api_string = self.parse_trace_tag(api_string)
+        if isinstance(api_string, str):
+            api_string = re.sub("(\[click\])", "🕖", api_string)
+            api_string = re.sub("(\[recurring-credit\])", "💰⮐", api_string)
+            api_string = re.sub("(\[credit\])", "💰", api_string)
+            api_string = re.sub("(\[subroutine\])", "↳", api_string)
+            api_string = re.sub("(\[trash\])", "🗑", api_string)
+            api_string = re.sub("(\[mu\])", "μ", api_string)
+            api_string = self.parse_trace_tag(api_string)
+            api_string = self.parse_strong_tag(api_string)
         return api_string
 
     @staticmethod
