@@ -1,5 +1,6 @@
 # Shamelessly stolen from Rapptz's RoboDanny github because it's useful
 # PREAMBLE ####################################################################
+import asyncio
 import os
 import sys
 
