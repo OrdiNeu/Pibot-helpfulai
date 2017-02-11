@@ -5,6 +5,7 @@ from unidecode import unidecode
 
 import discord
 import requests
+import emoji
 
 from discord.ext import commands
 
@@ -26,7 +27,7 @@ class Netrunner:
                          "**!nets \"key:value\" \"key\"** where the second \" bounded, space delineated keys are " \
                          "additional values to print, but not match on (title and text are always printed)"
         self.api_keys = "list of keys: (not all cards have all keys!)\n```title, text, cost, strength, " \
-                        "keywords, type_code,\n uniqueness, faction_cost, memory_cost, trash_cost, advancement_cost," \
+                        "keywords, type_code,\nuniqueness, faction_cost, memory_cost, trash_cost, advancement_cost," \
                         " agenda_points,\nside_code, faction_code, pack_code, position, quantity, \n" \
                         "base_link, influence_limit, deck_limit, minimum_deck_size,  flavor, illustrator, code```"
 
@@ -88,12 +89,12 @@ class Netrunner:
     async def leg(self, *, cardname: str):
         """
         !nets command syntax:
-        **!nets help:** this listing
-        **!nets keys** list the keys that this database supports
-        **!nets \"key:value\"** where key is a valid entry of the api, and value is an exact match.
-            any number of key:value pairs may be specified (space seperated),
+        !nets help: this listing
+        !nets keys list the keys that this database supports
+        !nets \"key:value\" where key is a valid entry of the api, and value is an exact match.
+            any number of key:value pairs may be specified (space separated),
             and the output will always include this key.
-        **!nets \"key:value\" \"key\"** where the second \" bounded, space delineated keys are
+        !nets \"key:value\" \"key\" where the second \" bounded, space delineated keys are
         additional values to print, but not match on ('title' and 'text' and search criteria are always printed)
         """
         m_response = ""
@@ -133,7 +134,7 @@ class Netrunner:
                                 print_fields.append(field)
                     m_match_list = self.search_text(m_criteria_list)
                     if len(m_match_list) == 0:
-                        m_response = "Search criteria returned 0 results"
+                        m_response = "Search criteria returned 0 results " + emoji.emojize(":clock:")
                     else:
                         for card in m_match_list:
                             m_response += "```\n"
@@ -143,7 +144,7 @@ class Netrunner:
                             m_response += "```\n"
         if len(m_response) >= 2000:
             # truncate message if it exceed the character limit
-            m_response = m_response[:1990] + "\n..."
+            m_response = m_response[:1990] + "\ncont..."
         await self.bot.say(m_response)
 
     @commands.command(aliases=['netrunner'])
