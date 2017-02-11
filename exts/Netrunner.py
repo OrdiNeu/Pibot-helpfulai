@@ -96,8 +96,7 @@ class Netrunner:
                 m_response += "```\n"  # title:\"{0}\"\ntext:\"{1}\"\n".format(card['title'], card['text'])
                 for c_key in print_fields:
                     if c_key in card.keys():
-                        #if c_key not in print_fields:
-                        m_response += "{0}:\"{1}\"\n".format(c_key, card[c_key])
+                        m_response += "**{0}**:\"{1}\"\n".format(c_key, card[c_key])
                 m_response += "```\n"
                 # m_response += "title:\"" + card['title'] + "\" text:\"" + card['text'] + "\"\n"
             # m_response += "```"
