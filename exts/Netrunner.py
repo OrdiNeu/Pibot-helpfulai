@@ -31,8 +31,15 @@ class Netrunner:
                         " agenda_points,\nside_code, faction_code, pack_code, position, quantity, \n" \
                         "base_link, influence_limit, deck_limit, minimum_deck_size,  flavor, illustrator, code```"
 
+    @staticmethod
+    def replace_api_text_with_emoji(api_string):
+        re.sub("\[click\]", ":clock7:", api_string)
+        return api_string
 
-
+    @staticmethod
+    def replace_emoji_with_api_text(emoji_string):
+        re.sub(":clock7:", "\[click\]", emoji_string)
+        return emoji_string
 
     """
     criteria should be list of str.key:str.value tuples to be checked for exist in for each card
@@ -134,13 +141,14 @@ class Netrunner:
                                 print_fields.append(field)
                     m_match_list = self.search_text(m_criteria_list)
                     if len(m_match_list) == 0:
-                        m_response = "Search criteria returned 0 results " + emoji.emojize(":clock:")
+                        m_response = "Search criteria returned 0 results"
                     else:
                         for card in m_match_list:
                             m_response += "```\n"
                             for c_key in print_fields:
                                 if c_key in card.keys():
-                                    m_response += "{0}:\"{1}\"\n".format(c_key, card[c_key])
+                                    m_response += "{0}:\"{1}\"\n".format(
+                                        c_key, self.replace_api_text_with_emoji(card[c_key]))
                             m_response += "```\n"
         if len(m_response) >= 2000:
             # truncate message if it exceed the character limit
