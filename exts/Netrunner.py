@@ -86,6 +86,16 @@ class Netrunner:
     """
     @commands.command(name="legnr", aliases=['nets'])
     async def leg(self, *, cardname: str):
+        """
+        !nets command syntax:
+        **!nets help:** this listing
+        **!nets keys** list the keys that this database supports
+        **!nets \"key:value\"** where key is a valid entry of the api, and value is an exact match.
+            any number of key:value pairs may be specified (space seperated),
+            and the output will always include this key.
+        **!nets \"key:value\" \"key\"** where the second \" bounded, space delineated keys are
+        additional values to print, but not match on ('title' and 'text' and search criteria are always printed)
+        """
         m_response = ""
         m_criteria_list = []
         print_fields = ['title', 'text']
@@ -115,6 +125,8 @@ class Netrunner:
                         # each key_val in our second parameter is split into sanitized key:value key_val iterators
                         split_val = key_val.split(":")
                         m_criteria_list.append((split_val[0], split_val[1].lower()))
+                        if split_val[0] not in print_fields:
+                            print_fields.append(split_val[0])
                     if command.group(4) is not None:
                         for field in re.sub('\"(.*?)\s*\"', "\g<1>", command.group(4)).split(" "):
                             if field not in print_fields:
