@@ -96,7 +96,7 @@ class Admin:
     @checks.is_admin()
     async def scavenge(self, ctx):
         """Restarts the bot, and tries to pull the latest version of itself from git"""
-        await self.bot.say('brb')
+        await self.bot.say('Fire...')
         with open(SCAVENGE_FILE_NAME, 'w') as f:
             f.write(ctx.message.channel.id)
         sys.exit(GIT_RELOAD_EXIT_CODE)  # Expect our helper script to do the git reloading
