@@ -41,6 +41,8 @@ ERR_EXIT_CODE = 1
 @bot.event
 async def on_command_error(error, ctx):
     author = ctx.message.author
+    print("on_command_error called")
+    await bot.send_message(author, 'on_command_error called')
     if isinstance(error, commands.NoPrivateMessage):
         await bot.send_message(author, 'This command cannot be used in private messages.')
     elif isinstance(error, commands.DisabledCommand):
