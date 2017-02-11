@@ -83,8 +83,8 @@ class Netrunner:
         for key_val in f_crit[1].split(" "):
             split_val = key_val.split(":")
             m_criteria_list.append((split_val[0], split_val[1].lower()))
-        if len(f_crit) >= 3:
-            for field in f_crit[3]:
+        if len(f_crit) >= 4:
+            for field in f_crit[3].split(" "):
                 if field not in print_fields:
                     print_fields.append(field)
         m_match_list = self.search_text(m_criteria_list)
