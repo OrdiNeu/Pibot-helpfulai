@@ -50,7 +50,7 @@ class Netrunner:
         return ret_string
 
     def parse_trace_tag(self, api_string):
-        trace_tag_g = re.sub("(<trace>Trace )(\d)(</trace>)", self.transform_trace, api_string, re.I)
+        trace_tag_g = re.sub("(<trace>Trace )(\d)(</trace>)", self.transform_trace, api_string, flags=re.I)
         return trace_tag_g
 
     def parse_strong_tag(self, api_string):
