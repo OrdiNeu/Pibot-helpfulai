@@ -26,7 +26,7 @@ class Fortune:
         else:
             return False
 
-    async def get_fortune(self, id):
+    async def get_fortune(self, author_id):
         """Grab today's fortune for the given user"""
         # Refresh the fortunes if the day changes
         if datetime.date.today() != self.last_check:
