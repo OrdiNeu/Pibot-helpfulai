@@ -47,8 +47,7 @@ async def on_command_error(error, ctx):
         await bot.send_message(author, 'Sorry. This command is disabled and cannot be used.')
     elif isinstance(error, commands.CommandInvokeError):
         await bot.send_message(author, 'In {0.command.qualified_name}:'.format(ctx))
-        tb_msg = "\n".join(traceback.extract_tb(error.original.__traceback__))
-        await bot.send_message(author, tb_msg)
+        await bot.send_message(author, traceback.format_tb(error.original.__traceback__))
         await bot.send_message(author, '{0.__class__.__name__}: {0}'.format(error.original))
 
 
