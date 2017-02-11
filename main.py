@@ -50,7 +50,12 @@ async def on_command_error(error, ctx):
     elif isinstance(error, commands.CommandInvokeError):
         msg = '```\n'
         msg += 'In {0.command.qualified_name}:'.format(ctx)
-        msg += traceback.format_tb(error.original.__traceback__)
+        # Traceback is acting strangely...
+        tb_msg = traceback.format_tb(error.original.__traceback__)
+        if isinstance(tb_msg, list):
+            msg += " ".join(tb_msg)
+        else:
+            msg += tb_msg
         msg += '{0.__class__.__name__}: {0}'.format(error.original)
         msg += '\n```'
         await bot.send_message(channel, msg)
