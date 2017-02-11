@@ -39,7 +39,7 @@ class Fortune:
     @commands.command(pass_context = True)
     async def fortune(self, ctx):
         """Grabs your fortune for the day!"""
-        fort = self.get_fortune(ctx.message.author.id)
+        fort = await self.get_fortune(ctx.message.author.id)
         fortune = {
             self.check_fortune(fort, 0,  5): "Wurst! Your luck is terrible",
             self.check_fortune(fort, 6,  15): "Awful! hopefully it won't be too bad",
