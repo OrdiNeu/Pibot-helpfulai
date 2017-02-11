@@ -32,10 +32,32 @@ class Netrunner:
                         "base_link, influence_limit, deck_limit, minimum_deck_size,  flavor, illustrator, code```"
 
     @staticmethod
-    def replace_api_text_with_emoji(api_string):
+    def transform_trace(re_obj):
+        ss_conv = {
+            '0': '⁰',
+            '1': '¹',
+            '2': '²',
+            '3': '³',
+            '4': '⁴',
+            '5': '⁵',
+            '6': '⁶',
+            '7': '⁷',
+            '8': '⁸',
+            '9': '⁹',
+        }
+        ret_string = "Trace"
+        ret_string += ss_conv[re_obj.group(2)] + " -"
+        return ret_string
+
+    def parse_trace_tag(self, api_string):
+        trace_tag_g = re.sub("(<trace>Trace )(\d)(</trace>)", self.transform_trace, api_string)
+        return trace_tag_g
+
+    def replace_api_text_with_emoji(self, api_string):
         api_string = re.sub("(\[click\])", "🕖", api_string)
         api_string = re.sub("(\[credit\])", "💰", api_string)
         api_string = re.sub("(\[subroutine\])", "↳", api_string)
+        api_string = self.parse_trace_tag(api_string)
         return api_string
 
     @staticmethod
@@ -49,6 +71,7 @@ class Netrunner:
     """
     criteria should be list of str.key:str.value tuples to be checked for exist in for each card
     """
+
     def search_text(self, criteria):
         m_match = []
         card_match = True
@@ -97,6 +120,7 @@ class Netrunner:
     !nr <title>
     <card image link>
     """
+
     @commands.command(name="legnr", aliases=['nets'])
     async def leg(self, *, cardname: str):
         """
