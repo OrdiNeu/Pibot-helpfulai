@@ -42,7 +42,7 @@ SCAVENGE_FILE_NAME = 'scavenge_channel.txt'
 ### DISCORD CLIENT EVENT HANDLERS #############################################
 @bot.event
 async def on_command_error(error, ctx):
-    channel = ctx.message.author
+    channel = ctx.message.channel
     if isinstance(error, commands.NoPrivateMessage):
         await bot.send_message(channel, 'This command cannot be used in private messages.')
     elif isinstance(error, commands.DisabledCommand):
