@@ -148,7 +148,8 @@ class Netrunner:
         """
         m_response = ""
         m_criteria_list = []
-        print_fields = ['uniqueness', 'title', 'text', 'cost', 'keywords', 'faction_code', 'faction_cost', 'trash_cost']
+        print_fields = ['uniqueness', 'title', 'text', 'cost', 'keywords', 'faction_code', 'faction_cost', 'trash_cost',
+                        'type_code']
         extra_type_fields = {
             'agenda': ('advancement_cost', 'agenda_points',),
             'identity': ('base_link', 'influence_limit', 'deck_limit', 'minimum_deck_size',),
