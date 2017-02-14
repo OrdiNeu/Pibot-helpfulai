@@ -74,7 +74,11 @@ class Netrunner:
         emoji_string = emoji.demojize(emoji_string)
         emoji_string = re.sub("🕖", "\[click\]", emoji_string)
         emoji_string = re.sub("💰", "\[credit\]", emoji_string)
+        emoji_string = re.sub("💰⮐", "\[recurring-credit\)", emoji_string)
         emoji_string = re.sub("↳", "\[subroutine\)", emoji_string)
+        emoji_string = re.sub("🗑", "\[trash\)", emoji_string)
+        emoji_string = re.sub("μ", "\[mu\)", emoji_string)
+
         return emoji_string
 
     """
@@ -144,7 +148,14 @@ class Netrunner:
         """
         m_response = ""
         m_criteria_list = []
-        print_fields = ['title', 'text']
+        print_fields = ['uniqueness', 'title', 'text', 'cost', 'keywords', 'faction_code', 'faction_cost', 'trash_cost']
+        extra_type_fields = {
+            'agenda': ('advancement_cost', 'agenda_points',),
+            'identity': ('base_link', 'influence_limit', 'deck_limit', 'minimum_deck_size',),
+            'program': ('memory_cost', 'strength'),
+            'ice': ('strength'),
+        }
+        special_fields = ['code', 'uniqueness']
         if not self.init_api:
             self.refresh_nr_api()
         """This should give me a list of key:str.value to search by"""
@@ -170,7 +181,7 @@ class Netrunner:
                     for key_val in re.sub('\"(.*?)\s*\"', "\g<1>", command.group(3)).split(" "):
                         # each key_val in our second parameter is split into sanitized key:value key_val iterators
                         split_val = key_val.split(":")
-                        m_criteria_list.append((split_val[0], split_val[1].lower()))
+                        m_criteria_list.append((split_val[0], split_val[1].lower().strip('\'')))
                         if split_val[0] not in print_fields:
                             print_fields.append(split_val[0])
                     if command.group(4) is not None:
@@ -182,11 +193,23 @@ class Netrunner:
                         m_response = "Search criteria returned 0 results"
                     else:
                         for card in m_match_list:
+                            # we have a card, so let's add the default type fields, if any by type
+                            if card['type_code'] in extra_type_fields:
+                                for extra_field in extra_type_fields[card['type_code']]:
+                                    if extra_field not in print_fields:
+                                        print_fields.append(extra_field)
                             m_response += "```\n"
                             for c_key in print_fields:
                                 if c_key in card.keys():
-                                    m_response += "{0}:\"{1}\"\n".format(
-                                        c_key, self.replace_api_text_with_emoji(card[c_key]))
+                                    if c_key not in special_fields:
+                                        m_response += "{0}:\"{1}\"\n".format(
+                                            c_key, self.replace_api_text_with_emoji(card[c_key]))
+                                    else:
+                                        if c_key in 'uniqueness' and card[c_key] is True:
+                                            m_response += '🔹:'
+                                        if c_key in 'code':
+                                            m_response += "http://netrunnerdb.com/card_image/{0].png\n".format(
+                                                card[c_key])
                             m_response += "```\n"
         if len(m_response) >= 2000:
             # truncate message if it exceed the character limit
