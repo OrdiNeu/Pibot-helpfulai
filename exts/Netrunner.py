@@ -209,7 +209,7 @@ class Netrunner:
                                         if c_key in 'uniqueness' and card[c_key] is True:
                                             m_response += '🔹:'
                                         if c_key in 'code':
-                                            m_response += "http://netrunnerdb.com/card_image/{0].png\n".format(
+                                            m_response += "http://netrunnerdb.com/card_image/{0}.png\n".format(
                                                 card[c_key])
                             m_response += "```\n"
         if len(m_response) >= 2000:
