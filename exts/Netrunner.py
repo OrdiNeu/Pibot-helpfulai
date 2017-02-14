@@ -197,7 +197,7 @@ class Netrunner:
                             if card['type_code'] in extra_type_fields:
                                 for extra_field in extra_type_fields[card['type_code']]:
                                     if extra_field not in print_fields:
-                                        print_fields.append(extra_field)
+                                        print_fields.insert(3, extra_field)
                             m_response += "```\n"
                             for c_key in print_fields:
                                 if c_key in card.keys():
