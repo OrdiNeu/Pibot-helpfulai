@@ -18,8 +18,8 @@ class Netrunner:
         self.nr_api = [{}]
         self.init_api = False
         self.nets_help = "!nets command syntax:\n" \
-                         "**!nets help:** this listing\n" \
-                         "**!nets keys** list the keys that this database supports\n" \
+                         "**!nets help!:** this listing\n" \
+                         "**!nets keys!** list the keys that this database supports\n" \
                          "**!nets \"key:value\"** where key is a valid entry of the api, " \
                          "and value is an exact match.\n" + \
                          "any number of key:value pairs may be specified (space seperated), and the output will " \
@@ -138,8 +138,8 @@ class Netrunner:
     async def leg(self, *, cardname: str):
         """
         !nets command syntax:
-        !nets help: this listing
-        !nets keys list the keys that this database supports
+        !nets help!: this listing
+        !nets keys! list the keys that this database supports
         !nets \"key:value\" where key is a valid entry of the api, and value is an exact match.
             any number of key:value pairs may be specified (space separated),
             and the output will always include this key.
@@ -160,33 +160,48 @@ class Netrunner:
         if not self.init_api:
             self.refresh_nr_api()
         """This should give me a list of key:str.value to search by"""
-        command = re.search('\s*(help!*)*\s*(keys*)*\s*(".*?")*\s*(".*?")*', cardname)
+        # command = re.search('\s*(help!)*\s*(keys!)*\s*(.*?)*\s*(".*?")*', cardname)
+        param_parse = re.search('''\s*(help!)*\s*(keys!)*\s*([^"]*)(".*")*.*''', cardname)
+        # first we parse into the search criteria or help command, or the field param
+        # (0) full line
+        # (1) "help!" or None if not specified
+        # (2) 'keys!' list all keys command or None if not specified
+        # (3) value and/or 'value value' and/or key:'value'
+        # (4) "extra_key other_extra_key"
+
+        title_preview = re.search('''([\w\s\']*)(?![\w\:])([\w\:\s\']*)''', param_parse.group(3))
+
         # command should build a re group with
         # (0) full line
-        # (1) 'help' or 'help!' or None if not specified
-        # (2) 'keys' list all keys command or None if not specified
-        # (3) '"key:value"' section or None if not specified
-        # (4) '"key"' print section or None if not specified
-        if command is None:
+        # (1) cheat for first title params up to negative lookback to first word with ':' in it
+        # (2) 'title:value pairs beyond first implicit title'
+        #   value value' and/or 'key:value"' section or None if not specified
+        extra_search = re.sub('\"(.*?)\s*\"', "\g<1>", title_preview.group(2)).split(" ")
+        # I need to fix up this one, it's not splitting properly yet
+        command = re.search('''((?:\w(?!\s+')+|\s(?!\s*'))+\w)\s*(.*)\s*''', cardname)
+
+        if param_parse is None:
             m_response += "I see: \"{0}\", but I don't understand\n".format(cardname)
             m_response += self.nets_help
         else:
-            if command.group(1) is not None or (command.group(3) is None and command.group(2) is None):
+            if param_parse.group(1) is not None or (param_parse.group(3) is None and param_parse.group(2) is None):
                 # if the user asks for help, or doesn't specify the expected arguments, print help
                 m_response += self.nets_help
             else:
-                if command.group(2) is not None:
+                if param_parse.group(2) is not None:
                     # if the user specifies they're looking for keys listing print that and stop
                     m_response += self.api_keys
                 else:
-                    for key_val in re.sub('\"(.*?)\s*\"', "\g<1>", command.group(3)).split(" "):
+                    # for key_val in re.sub('\"(.*?)\s*\"', "\g<1>", command.group(3)).split(" "):
+                    m_criteria_list.append(('title', title_preview.groups()[0].strip("\' ").lower()))
+                    for key_tup in title_preview.groups()[1:]:
                         # each key_val in our second parameter is split into sanitized key:value key_val iterators
-                        split_val = key_val.split(":")
+                        split_val = key_tup.split(":")
                         m_criteria_list.append((split_val[0], split_val[1].lower().strip('\'')))
                         if split_val[0] not in print_fields:
                             print_fields.append(split_val[0])
-                    if command.group(4) is not None:
-                        for field in re.sub('\"(.*?)\s*\"', "\g<1>", command.group(4)).split(" "):
+                    if param_parse.group(4) is not None:
+                        for field in re.sub('\"(.*?)\s*\"', "\g<1>", param_parse.group(4)).split(" "):
                             if field not in print_fields:
                                 print_fields.append(field)
                     m_match_list = self.search_text(m_criteria_list)
