@@ -197,6 +197,8 @@ class Netrunner:
                     for key_tup in title_preview.groups()[1:]:
                         # each key_val in our second parameter is split into sanitized key:value key_val iterators
                         split_val = key_tup.split(":")
+                        if len(split_val) != 2:
+                            continue
                         m_criteria_list.append((split_val[0], split_val[1].lower().strip('\'')))
                         if split_val[0] not in print_fields:
                             print_fields.append(split_val[0])
