@@ -18,6 +18,7 @@ class Netrunner:
         self.bot = bot
         self.nr_api = [{}]
         self.init_api = False
+        self.max_message_len = 1990
         self.nets_help = "!nets command syntax:\n" \
                          "**!nets help!:** this listing\n" \
                          "**!nets keys!** list the keys that this database supports\n" \
@@ -211,27 +212,33 @@ class Netrunner:
                         m_response = "Search criteria returned 0 results"
                     else:
                         for card in m_match_list:
+                            c_response = ""
                             # we have a card, so let's add the default type fields, if any by type
                             if card['type_code'] in extra_type_fields:
                                 for extra_field in extra_type_fields[card['type_code']]:
                                     if extra_field not in print_fields:
                                         print_fields.insert(3, extra_field)
-                            m_response += "```\n"
+                            c_response += "```\n"
                             for c_key in print_fields:
                                 if c_key in card.keys():
                                     if c_key not in special_fields:
-                                        m_response += "{0}:\"{1}\"\n".format(
+                                        c_response += "{0}:\"{1}\"\n".format(
                                             c_key, self.replace_api_text_with_emoji(card[c_key]))
                                     else:
                                         if c_key in 'uniqueness' and card[c_key] is True:
-                                            m_response += '🔹:'
+                                            c_response += '🔹:'
                                         if c_key in 'code':
-                                            m_response += "http://netrunnerdb.com/card_image/{0}.png\n".format(
+                                            c_response += "http://netrunnerdb.com/card_image/{0}.png\n".format(
                                                 card[c_key])
-                            m_response += "```\n"
-        if len(m_response) >= 2000:
+                            c_response += "```\n"
+                            if (len(m_response) + len(c_response)) >= (self.max_message_len - 10):
+                                m_response += "\ncont..."
+                                break
+                            else:
+                                m_response += c_response
+        if len(m_response) >= self.max_message_len:
             # truncate message if it exceed the character limit
-            m_response = m_response[:1990] + "\ncont..."
+            m_response = m_response[:self.max_message_len - 10] + "\ncont..."
         await self.bot.say(m_response)
 
     @commands.command(aliases=['netrunner'])
@@ -304,10 +311,15 @@ class Netrunner:
                     for number, card_id in [(v, k) for(k, v) in decklist_data[0]['cards'].items()]:
                         #for number, card_id, in num_card_tup:
                         card_title = self.search_text([('code', card_id)])[0]['title']
-                        m_response += "{0}x {1}\n".format(number, card_title)
+                        response_addr = "{0}x {1}\n".format(number, card_title)
+                        if (len(m_response) + len(response_addr)) >= self.max_message_len:
+                            m_response += "cont..."
+                            break
+                        else:
+                            m_response += response_addr
                 except JSONDecodeError as badUrlError:
                     m_response = "Unhandled error in search!"
-        await self.bot.say(m_response)
+        await self.bot.say(m_response[:2000])
 
 def setup(bot):
     bot.add_cog(Netrunner(bot))
