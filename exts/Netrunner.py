@@ -211,7 +211,7 @@ class Netrunner:
                     if len(m_match_list) == 0:
                         m_response = "Search criteria returned 0 results"
                     else:
-                        for card in m_match_list:
+                        for i, card in enumerate(m_match_list):
                             c_response = ""
                             # we have a card, so let's add the default type fields, if any by type
                             if card['type_code'] in extra_type_fields:
@@ -231,8 +231,8 @@ class Netrunner:
                                             c_response += "http://netrunnerdb.com/card_image/{0}.png\n".format(
                                                 card[c_key])
                             c_response += "```\n"
-                            if (len(m_response) + len(c_response)) >= (self.max_message_len - 10):
-                                m_response += "\ncont..."
+                            if (len(m_response) + len(c_response)) >= (self.max_message_len - 20):
+                                m_response += "\n[{0}/{1}]\n".format(i, len(m_match_list))
                                 break
                             else:
                                 m_response += c_response
