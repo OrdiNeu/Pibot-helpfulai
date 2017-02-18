@@ -298,7 +298,8 @@ class Netrunner:
                     decklist_data = [c for c in requests.get(m_api_prefex + decklist_id).json()['data']]
                     # decklist_data[0]['cards'] is a dict with card_id keys to counts {'10005': 1}
                     m_response += "{0}\n".format(decklist_data[0]['name'])
-                    m_response += "{0}\n".format(self.search_text([('code', "{0}".format(decklist_data[0]['id']))]))
+                    id_search_tuple_list = [('code', "{0}".format(decklist_data[0]['id']))]
+                    m_response += "{0}\n".format(self.search_text(id_search_tuple_list)[0]['title'])
                     # build a list of tuples in the pairs, value(number of card), key (id of card)
                     for number, card_id in [(v, k) for(k, v) in decklist_data[0]['cards'].items()]:
                         #for number, card_id, in num_card_tup:
