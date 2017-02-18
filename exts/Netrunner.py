@@ -299,7 +299,7 @@ class Netrunner:
                     # decklist_data[0]['cards'] is a dict with card_id keys to counts {'10005': 1}
                     m_response += "{0}\n".format(decklist_data[0]['name'])
                     m_response += "{0}\n".format(self.search_text([('code', "{0}".format(decklist_data[0]['id']))]))
-                    for num_card_tup in decklist_data[0]['cards'].items():
+                    for num_card_tup in [(v, k) for(k, v) in decklist_data[0]['cards'].items()]:
                         for number, card_id, in num_card_tup:
                             card_title = self.search_text([('code', card_id)])[0]['title']
                             m_response += "{0}x {1}\n".format(number, card_title)
