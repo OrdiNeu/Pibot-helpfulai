@@ -277,8 +277,10 @@ class Netrunner:
                 m_response += "Sorry, I cannot seem to find any card with these parameters:\n"
                 m_response += "http://netrunnerdb.com/find/?q=" + m_query.replace(" ", "+")
             else:
-                for card in m_cards[:10]:
+                for i, card in enumerate(m_cards[:5]):
                     m_response += "http://netrunnerdb.com/card_image/" + card['code'] + ".png\n"
+                if len(m_cards) > 5:
+                    m_response += "[{0}/{1}]".format(5, len(m_cards))
         await self.bot.say(m_response)
 
     @commands.command(aliases=['nd'])
