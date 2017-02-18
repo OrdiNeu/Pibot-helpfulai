@@ -49,10 +49,11 @@ class Arkham:
                 m_response += "Sorry, I cannot seem to find any card with these parameters:\n"
                 m_response += "http://arkhamdb.com/find/?q=" + m_query.replace(" ", "+")
             else:
-                for i, card in enumerate(m_cards)[:5]:
+                for i, card in enumerate(m_cards[:5]):
                     m_response = "http://arkhamdb.com{0}\n".format(card['imagesrc'])
-                m_response += "[{0}/{1}]".format(i + 1, len(m_cards))
-        await self.bot.say(m_response)
+                if len(m_cards) > 5:
+                    m_response += "[{0}/{1}]".format(5, len(m_cards))
+        await self.bot.say(m_response[:2000])
 
 
 def setup(bot):
