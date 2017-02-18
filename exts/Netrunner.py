@@ -6,6 +6,7 @@ from unidecode import unidecode
 import discord
 import requests
 import emoji
+from json.decoder import JSONDecodeError
 
 from discord.ext import commands
 
@@ -84,7 +85,6 @@ class Netrunner:
     """
     criteria should be list of str.key:str.value tuples to be checked for exist in for each card
     """
-
     def search_text(self, criteria):
         m_match = []
         card_match = True
@@ -273,6 +273,38 @@ class Netrunner:
                 for card in m_cards[:10]:
                     m_response += "http://netrunnerdb.com/card_image/" + card['code'] + ".png\n"
         await self.bot.say(m_response)
+
+    @commands.command(aliases=['nd'])
+    async def deck(self, *, decklist: str):
+        m_response = ""
+        m_api_prefex = "https://netrunnerdb.com/api/2.0/public/decklist/"
+        m_decklist = unidecode(decklist.lower())
+        re_decklist_id = re.search("(https://netrunnerdb\.com/en/decklist/)(\d+)(/.*)")
+        if re_decklist_id is None:
+            m_response += "I see: \"{0}\", but I don't understand\n".format(m_decklist)
+        else:
+            if re_decklist_id.group(2) is None:
+                m_response += "I see: \"{0}\", but I don't understand\n".format(m_decklist)
+            else:
+                if not self.init_api:
+                    self.refresh_nr_api()
+                # decklist_id = "41160"
+                decklist_id = re_decklist_id.group(2)
+                # make a request for the id of the decklist posted in the commandline
+                # should get a result array, 1 len
+                # dict in array, dict_keys(['id', 'date_creation', 'date_update', 'name',
+                # 'description', 'user_id', 'user_name', 'tournament_badge', 'cards'])
+                try:
+                    decklist_data = [c for c in requests.get(m_api_prefex + decklist_id).json()['data']]
+                    # decklist_data[0]['cards'] is a dict with card_id keys to counts {'10005': 1}
+                    m_response += "{0]\n".format(decklist_data[0]['name'])
+                    m_response += "{0]\n".format(self.search_text('code:' + decklist_data[0]['id'][0]['title']))
+                    for num_card_tup in decklist_data[0]['cards'].items():
+                        for number, card_id, in num_card_tup:
+                            card_title = self.search_text('code:' + card_id)[0]['title']
+                            m_response += "{0}x {1}\n".format(number, card_title)
+                except JSONDecodeError as badUrlError:
+                    m_response = "Unhandled error in search!"
 
 
 def setup(bot):
