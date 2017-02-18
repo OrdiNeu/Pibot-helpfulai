@@ -306,7 +306,7 @@ class Netrunner:
                         m_response += "{0}x {1}\n".format(number, card_title)
                 except JSONDecodeError as badUrlError:
                     m_response = "Unhandled error in search!"
-
+        await self.bot.say(m_response)
 
 def setup(bot):
     bot.add_cog(Netrunner(bot))
