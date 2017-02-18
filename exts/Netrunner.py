@@ -279,7 +279,7 @@ class Netrunner:
         m_response = ""
         m_api_prefex = "https://netrunnerdb.com/api/2.0/public/decklist/"
         m_decklist = unidecode(decklist.lower())
-        re_decklist_id = re.search("(https://netrunnerdb\.com/en/decklist/)(\d+)(/.*)")
+        re_decklist_id = re.search("(https://netrunnerdb\.com/en/decklist/)(\d+)(/.*)", decklist)
         if re_decklist_id is None:
             m_response += "I see: \"{0}\", but I don't understand\n".format(m_decklist)
         else:
