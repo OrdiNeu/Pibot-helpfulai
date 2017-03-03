@@ -43,7 +43,7 @@ class Fortune:
         fortune = {
             self.check_fortune(fort, 0,  5): "Wurst! Your luck is terrible",
             self.check_fortune(fort, 6,  15): "Awful! hopefully it won't be too bad",
-            self.check_fortune(fort, 16, 35): "Bad!, stay at hope and have some tea",
+            self.check_fortune(fort, 16, 35): "Bad!, stay at home and have some tea",
             self.check_fortune(fort, 36, 50): "Not too bad, but better stay home to be safe",
             self.check_fortune(fort, 51, 65): "Things could be better",
             self.check_fortune(fort, 66, 85): "Things are looking up, spend time with friends to make it even better",
