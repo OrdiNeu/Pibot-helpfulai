@@ -1,19 +1,14 @@
 # Launch script for the Helpful AI running on OrdiNeu's RaspberryPi
-### PREAMBLE ##################################################################
-import asyncio
+# PREAMBLE ####################################################################
 import datetime
 import os
-import random
 import sys
-import time
 import traceback
 
-import discord
 from discord.ext import commands
 import json
-import requests
 
-### CONSTANTS #################################################################
+# CONSTANTS ###################################################################
 COMMAND_PREFIX = ['?', '!']
 DESCRIPTION = 'OrdiNeu\'s Discord bot for the Netrunner channel.'
 HELP_ATTRS = {'hidden': True}
@@ -22,7 +17,6 @@ EXTENSIONS = [
     'exts.Netrunner',
     'exts.Arkham',
     'exts.LOTR',
-    'exts.SkullsNRoses',
     'exts.Fortune'
 ]
 
@@ -39,14 +33,20 @@ ERR_EXIT_CODE = 1
 # File to store the channel id scavenge was called from
 SCAVENGE_FILE_NAME = 'scavenge_channel.txt'
 
-### DISCORD CLIENT EVENT HANDLERS #############################################
+# DISCORD CLIENT EVENT HANDLERS ###############################################
 @bot.event
 async def on_command_error(error, ctx):
     channel = ctx.message.channel
     if isinstance(error, commands.NoPrivateMessage):
-        await bot.send_message(channel, 'This command cannot be used in private messages.')
+        await bot.send_message(
+            channel,
+            'This command cannot be used in private messages.'
+            )
     elif isinstance(error, commands.DisabledCommand):
-        await bot.send_message(channel, 'Sorry. This command is disabled and cannot be used.')
+        await bot.send_message(
+            channel,
+            'Sorry. This command is disabled and cannot be used.'
+            )
     elif isinstance(error, commands.CommandInvokeError):
         msg = '```\n'
         msg += 'In {0.command.qualified_name}:'.format(ctx)
@@ -67,7 +67,7 @@ async def on_ready():
     print(bot.user.display_name)
     print(bot.user.id)
     print('------')
-    # Login successful: if we're debugging the main script we can exit now with successful
+    # If we're debugging the main script we can exit now with successful
     if len(sys.argv) > 1 and sys.argv[1] == 'debug':
         sys.exit(0)
     if not hasattr(bot, 'uptime'):
@@ -79,8 +79,6 @@ async def on_ready():
             await bot.send_message(channel_id, "... and ichor...")
         os.remove(SCAVENGE_FILE_NAME)
 
-
-
 @bot.event
 async def on_message(msg):
     # Ignore messages from bots
@@ -88,21 +86,22 @@ async def on_message(msg):
         return
 
     # Log the message
-    if msg.channel.name != None:
-        print("<" + msg.channel.name + "> : " + msg.author.name + ": " + msg.content)
+    if msg.channel.name is not None:
+        print(
+            "<" + msg.channel.name + "> " + msg.author.name + ": "
+            + msg.content)
     else:
         print("(PM) : " + msg.author.name + ": " + msg.content)
 
     # lowercase the first word of the command (if it starts with the prefix)
     if msg.content.startswith(tuple(COMMAND_PREFIX)):
         text = msg.content
-        command_breakpoint = text.find(" ")
-        if command_breakpoint > 0:  # I.e. there was a space
-            msg.content = text[0:command_breakpoint].lower() + text[command_breakpoint:]
+        prefix_end = text.find(" ")
+        if prefix_end > 0:  # I.e. there was a space
+            msg.content = text[0:prefix_end].lower() + text[prefix_end:]
     await bot.process_commands(msg)
 
-
-### LOGIN AND RUN #############################################################
+# LOGIN AND RUN ###############################################################
 def load_credentials():
     with open('../pibot-discord-cred.json') as f:
         return json.load(f)
@@ -118,16 +117,21 @@ if __name__ == '__main__':
         try:
             bot.load_extension(extension)
         except Exception as e:
-            print('Failed to load extension {}\n{}: {}'.format(extension, type(e).__name__, e))
+            print(
+                'Failed to load extension {}\n{}: {}'.format(
+                    extension,
+                    type(e).__name__,
+                    e)
+                )
     try:
         bot.run(token)
     except ConnectionResetError:
-        # Likely kicked out for inactivity: tell shell script to restart everything
+        # Likely kicked out for inactivity: tell shell script to restart
         # (Since discord.py doesn't really like rerunning bot.run)
         sys.exit(RESTART_EXIT_CODE)
     except Exception as e:
         print('Error {}: {}'.format(type(e).__name__, e))
         sys.exit(ERR_EXIT_CODE)
 
-    # It really shouldn't get to this point, so we're going to restart and see what happens
+    # It shouldn't get to this point, so just try to restart
     sys.exit(RESTART_EXIT_CODE)
