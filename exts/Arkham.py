@@ -16,7 +16,7 @@ class Arkham:
         self.init_api = False
 
     def refresh_ah_api(self):
-        self.ah_api = sorted([c for c in requests.get('https://arkhamdb.com/api/public/cards').json()],
+        self.ah_api = sorted([c for c in requests.get('https://arkhamdb.com/api/public/cards?encounter=1').json()],
                              key=lambda card: card['name'])
         self.init_api = True
 
