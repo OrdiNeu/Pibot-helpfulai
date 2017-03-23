@@ -134,7 +134,7 @@ class Netrunner:
                 if parser_dictionary[key] is not None:
                     if key not in print_fields:
                         print_fields.append(key)
-                    m_criteria_list.append((key, parser_dictionary[key].strip()))
+                    m_criteria_list.append((key, parser_dictionary[key]))
         m_match_list = self.search_text(m_criteria_list)
 
         if len(m_match_list) == 0:
