@@ -6,6 +6,7 @@ from unidecode import unidecode
 import discord
 import requests
 import emoji
+import argparse
 from json.decoder import JSONDecodeError
 
 from discord.ext import commands
@@ -50,6 +51,124 @@ class Netrunner:
         ret_string = "Trace"
         ret_string += ss_conv[re_obj.group(2)] + " -"
         return ret_string
+
+    @commands.command(name="flag_nets", aliases=['flag_nets'])
+    async def arg_parse_nets(self, *, string_to_parse: str):
+        m_response = ""
+        m_criteria_list = []
+        print_fields = ['uniqueness', 'title', 'text', 'cost', 'keywords', 'faction_code', 'faction_cost', 'trash_cost',
+                        'type_code']
+        extra_type_fields = {
+            'agenda': ('advancement_cost', 'agenda_points',),
+            'identity': ('base_link', 'influence_limit', 'deck_limit', 'minimum_deck_size',),
+            'program': ('memory_cost', 'strength'),
+            'ice': ('strength'),
+        }
+        special_fields = ['code', 'uniqueness']
+        nets_parser = argparse.ArgumentParser(
+            prog='nets', description='args are processed as title, unless prefaced by a flag')
+        # These first flags capture multiple words that follow, rather than the first word
+        concat_categories = ['title', 'text', 'keywords', 'flavor_text', 'illustrator']
+        nets_parser.add_argument(
+            nargs="+", action="append", dest="title")
+        nets_parser.add_argument(
+            '--text', '-x', nargs="+", action='append', dest="text", help="-x any number of words")
+        nets_parser.add_argument(
+            '--subtype', '-s', nargs="+", action='append', dest="keywords", help="-s any number of subtypes")
+        nets_parser.add_argument(
+            '--flavor', '-a', nargs="+", action='append', dest="flavor_text", help="-a any number of words")
+        nets_parser.add_argument(
+            '--illustrator', '-i', nargs="+", action='append', dest="illustrator", help="-i any number of words")
+        # These flags capture a single type from a single word
+        single_categories = [
+            'type_code', 'faction_code', 'side_code', 'cost', 'advancement_cost', 'memory_cost',
+            'faction_cost', 'strength', 'agenda_points', 'base_link', 'deck_limit', 'minimum_deck_size',
+            'trash_cost', 'unique']
+        nets_parser.add_argument(
+            '--type', '-t', action='store', dest="type_code", help="-t a single type to search for")
+        nets_parser.add_argument(
+            '--faction', '-f', action='store', dest="faction_code", help="-f a single faction to search for")
+        nets_parser.add_argument(
+            '--side', '-d', action='store', dest="side_code", help="-d a single side to search for")
+        nets_parser.add_argument(
+            '--cost', '-o', action='store', type=int, dest="cost", help="-o exact cost as integer")
+        nets_parser.add_argument(
+            '--advancement-cost', '-g', action='store', type=int, dest="advancement_cost",
+            help="-g exact advancement cost as integer")
+        nets_parser.add_argument(
+            '--memory-usage', '-m', action='store', type=int, dest="memory_cost")
+        nets_parser.add_argument(
+            '--influence', '-n', action='store', type=int, dest="faction_cost")
+        nets_parser.add_argument(
+            '--strength', '-p', action='store', type=int, dest="strength")
+        nets_parser.add_argument(
+            '--agenda-points', '-v', action='store', type=int, dest="agenda_points")
+        nets_parser.add_argument(
+            '--base-link', '-l', action='store', type=int, dest="base_link")
+        nets_parser.add_argument(
+            '--deck-limit', '-q', action='store', type=int, dest="deck_limit")
+        nets_parser.add_argument(
+            '--minimum-deck-size', '-z', action='store', type=int, dest="minimum_deck_size")
+        nets_parser.add_argument(
+            '--trash', '-b', action='store', type=int, dest="trash_cost")
+        nets_parser.add_argument(
+            '--unique', '-u', action='store', type=bool, dest="unique")
+        args = nets_parser.parse_args(string_to_parse)
+        # return args
+        parser_dictionary = vars(args)
+        # run through each key that we need to build up a list of words to check for exact existence, and add them to the
+        # list, if they're in the args
+        for key in parser_dictionary.keys():
+            # first build up the parameters that need to be concatonated
+            if key in concat_categories:
+                if parser_dictionary[key] is not None:
+                    if key not in print_fields:
+                        print_fields.append(key)
+                    concat_string = ""
+                    for word_list in parser_dictionary[key]:
+                        for word in word_list:
+                            concat_string += word + " "
+                    m_criteria_list.append((key, concat_string.strip()))
+            # then check the lists that are done literally
+            if key in single_categories:
+                if parser_dictionary[key] is not None:
+                    if key not in print_fields:
+                        print_fields.append(key)
+                    m_criteria_list.append((key, parser_dictionary[key].strip()))
+        m_match_list = self.search_text(m_criteria_list)
+
+        if len(m_match_list) == 0:
+            m_response = "Search criteria returned 0 results"
+        else:
+            for i, card in enumerate(m_match_list):
+                c_response = ""
+                # we have a card, so let's add the default type fields, if any by type
+                if card['type_code'] in extra_type_fields:
+                    for extra_field in extra_type_fields[card['type_code']]:
+                        if extra_field not in print_fields:
+                            print_fields.insert(3, extra_field)
+                c_response += "```\n"
+                for c_key in print_fields:
+                    if c_key in card.keys():
+                        if c_key not in special_fields:
+                            c_response += "{0}:\"{1}\"\n".format(
+                                c_key, self.replace_api_text_with_emoji(card[c_key]))
+                        else:
+                            if c_key in 'uniqueness' and card[c_key] is True:
+                                c_response += '🔹:'
+                            if c_key in 'code':
+                                c_response += "http://netrunnerdb.com/card_image/{0}.png\n".format(
+                                    card[c_key])
+                c_response += "```\n"
+                if (len(m_response) + len(c_response)) >= (self.max_message_len - 20):
+                    m_response += "\n[{0}/{1}]\n".format(i, len(m_match_list))
+                    break
+                else:
+                    m_response += c_response
+        if len(m_response) >= self.max_message_len:
+            # truncate message if it exceed the character limit
+            m_response = m_response[:self.max_message_len - 10] + "\ncont..."
+        await self.bot.say(m_response)
 
     def parse_trace_tag(self, api_string):
         trace_tag_g = re.sub("(<trace>Trace )(\d)(</trace>)", self.transform_trace, api_string, flags=re.I)
@@ -310,8 +429,8 @@ class Netrunner:
                     # id_search_tuple_list = [('code', "{0}".format(decklist_data[0]['id']))]
                     # m_response += "{0}\n".format(self.search_text(id_search_tuple_list)[0]['title'])
                     # build a list of tuples in the pairs, value(number of card), key (id of card)
-                    for number, card_id in [(v, k) for(k, v) in decklist_data[0]['cards'].items()]:
-                        #for number, card_id, in num_card_tup:
+                    for number, card_id in [(v, k) for (k, v) in decklist_data[0]['cards'].items()]:
+                        # for number, card_id, in num_card_tup:
                         card_title = self.search_text([('code', card_id)])[0]['title']
                         response_addr = "{0}x {1}\n".format(number, card_title)
                         if (len(m_response) + len(response_addr)) >= self.max_message_len:
@@ -322,6 +441,7 @@ class Netrunner:
                 except JSONDecodeError as badUrlError:
                     m_response = "Unhandled error in search!"
         await self.bot.say(m_response[:2000])
+
 
 def setup(bot):
     bot.add_cog(Netrunner(bot))
