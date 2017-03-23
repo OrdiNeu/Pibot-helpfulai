@@ -135,6 +135,8 @@ class Netrunner:
                     if key not in print_fields:
                         print_fields.append(key)
                     m_criteria_list.append((key, parser_dictionary[key]))
+        if not self.init_api:
+            self.refresh_nr_api()
         m_match_list = self.search_text(m_criteria_list)
 
         if len(m_match_list) == 0:
