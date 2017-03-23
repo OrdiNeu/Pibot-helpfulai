@@ -101,6 +101,24 @@ class Admin:
             f.write(ctx.message.channel.id)
         sys.exit(GIT_RELOAD_EXIT_CODE)  # Expect our helper script to do the git reloading
 
+    @commands.command(hidden=True, pass_context=True, aliases=['st'])
+    @checks.is_admin()
+    async def status(self, ctx):
+        """Attempts to reload every module and tells us if the module loaded correctly"""
+        status_msg = ""
+        for extension in tuple(self.bot.extensions):
+            try:
+                status_msg += extension + ": "
+                self.bot.unload_extension(extension)
+                self.bot.load_extension(extension)
+            except Exception as e:
+                status_msg += '\N{PISTOL}'
+                status_msg += '{}: {}'.format(type(e).__name__, e)
+            else:
+                status_msg += '\N{OK HAND SIGN}'
+            status_msg += "\n"
+        await self.bot.say(status_msg)
+
     @commands.command(hidden=True)
     @checks.is_admin()
     async def locate(self):
