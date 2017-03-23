@@ -78,6 +78,21 @@ async def on_ready():
             channel_id = bot.get_channel(f.read())
             await bot.send_message(channel_id, "... and ichor...")
         os.remove(SCAVENGE_FILE_NAME)
+        status_msg = ""
+
+        # Also get the status of our extensions
+        for extension in tuple(bot.extensions):
+            try:
+                status_msg += extension + ": "
+                bot.unload_extension(extension)
+                bot.load_extension(extension)
+            except Exception as e:
+                status_msg += '\N{PISTOL}'
+                status_msg += '{}: {}'.format(type(e).__name__, e)
+            else:
+                status_msg += '\N{OK HAND SIGN}'
+            status_msg += "\n"
+        await bot.say(status_msg)
 
 @bot.event
 async def on_message(msg):
