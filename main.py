@@ -92,7 +92,7 @@ async def on_ready():
             else:
                 status_msg += '\N{OK HAND SIGN}'
             status_msg += "\n"
-        await bot.say(status_msg)
+        await bot.send_message(channel_id, status_msg)
 
 @bot.event
 async def on_message(msg):
