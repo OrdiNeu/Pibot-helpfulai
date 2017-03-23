@@ -113,7 +113,7 @@ class Netrunner:
             '--trash', '-b', action='store', type=int, dest="trash_cost")
         nets_parser.add_argument(
             '--unique', '-u', action='store', type=bool, dest="unique")
-        args = nets_parser.parse_args(string_to_parse)
+        args = nets_parser.parse_args(string_to_parse.split())
         # return args
         parser_dictionary = vars(args)
         # run through each key that we need to build up a list of words to check for exact existence,
@@ -138,7 +138,8 @@ class Netrunner:
         m_match_list = self.search_text(m_criteria_list)
 
         if len(m_match_list) == 0:
-            m_response = "Search criteria returned 0 results"
+            m_response = "Search criteria returned 0 results\n"
+            m_response += string_to_parse
         else:
             for i, card in enumerate(m_match_list):
                 c_response = ""
