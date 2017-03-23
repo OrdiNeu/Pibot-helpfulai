@@ -116,8 +116,8 @@ class Netrunner:
         args = nets_parser.parse_args(string_to_parse)
         # return args
         parser_dictionary = vars(args)
-        # run through each key that we need to build up a list of words to check for exact existence, and add them to the
-        # list, if they're in the args
+        # run through each key that we need to build up a list of words to check for exact existence,
+        # and add them to the list, if they're in the args
         for key in parser_dictionary.keys():
             # first build up the parameters that need to be concatonated
             if key in concat_categories:
