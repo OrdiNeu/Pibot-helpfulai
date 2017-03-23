@@ -52,7 +52,7 @@ class Netrunner:
         ret_string += ss_conv[re_obj.group(2)] + " -"
         return ret_string
 
-    @commands.command(name="flag_nets", aliases=['flag_nets'])
+    @commands.command(name="flag_test", aliases=['flag_nets'])
     async def arg_parse_nets(self, *, string_to_parse: str):
         m_response = ""
         m_criteria_list = []
