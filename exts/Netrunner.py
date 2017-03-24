@@ -91,7 +91,7 @@ class Netrunner:
         ret_string += ss_conv[re_obj.group(2)] + " -"
         return ret_string
 
-    @commands.command(name="flag_test", aliases=['flag_nets'])
+    @commands.command(name="flag_test", aliases=['nets'])
     async def arg_parse_nets(self, *, string_to_parse: str):
         m_response = ""
         m_criteria_list = []
@@ -281,7 +281,7 @@ class Netrunner:
     <card image link>
     """
 
-    @commands.command(name="legnr", aliases=['nets'])
+    @commands.command(name="old_nets", aliases=['leg_nets'])
     async def leg(self, *, cardname: str):
         """
         !nets command syntax:
