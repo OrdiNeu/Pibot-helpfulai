@@ -107,7 +107,7 @@ class Netrunner:
         nets_parser = DiscordArgParse(prog='flag_nets')
         # These first flags capture multiple words that follow, rather than the first word
         concat_categories = ['title', 'text', 'keywords', 'flavor_text', 'illustrator']
-        nets_parser.add_argument(nargs="+", action="append", dest="title")
+        nets_parser.add_argument(nargs="*", action="append", dest="title")
         nets_parser.add_argument('--text', '-x', nargs="+", action='append', dest="text")
         nets_parser.add_argument('--subtype', '-s', nargs="+", action='append', dest="keywords")
         nets_parser.add_argument('--flavor', '-a', nargs="+", action='append', dest="flavor_text")
@@ -484,7 +484,7 @@ def test_arg_parse_nets(string_to_parse: str):
     nets_parser = DiscordArgParse(prog='nets', description='args are processed as title, unless prefaced by a flag')
     # These first flags capture multiple words that follow, rather than the first word
     concat_categories = ['title', 'text', 'keywords', 'flavor_text', 'illustrator']
-    nets_parser.add_argument(nargs="+", action="append", dest="title")
+    nets_parser.add_argument(nargs="*", action="append", dest="title")
     nets_parser.add_argument('--text', '-x', nargs="+", action='append', dest="text")
     nets_parser.add_argument('--subtype', '-s', nargs="+", action='append', dest="keywords")
     nets_parser.add_argument('--flavor', '-a', nargs="+", action='append', dest="flavor_text")
