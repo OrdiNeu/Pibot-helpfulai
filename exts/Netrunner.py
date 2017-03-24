@@ -7,9 +7,48 @@ import discord
 import requests
 import emoji
 import argparse
+from argparse import HelpFormatter
+from argparse import ArgumentParser
 from json.decoder import JSONDecodeError
-
 from discord.ext import commands
+
+
+class DiscordArgparseParseError(Exception):
+    def __init__(self, value):
+        self.value = value
+
+    def __str__(self):
+        return repr(self.value)
+
+
+class DiscordArgParse(ArgumentParser):
+    def __init__(
+            self,
+            prog=None,
+            usage=None,
+            description=None,
+            epilog=None,
+            parents=[],
+            formatter_class=HelpFormatter,
+            prefix_chars='-',
+            fromfile_prefix_chars=None,
+            argument_default=None,
+            conflict_handler='error',
+            add_help=True,
+            allow_abbrev=True):
+        self.exit_message = ""
+        super(DiscordArgParse, self).__init__(
+            prog, usage, description, epilog, parents, formatter_class, prefix_chars, fromfile_prefix_chars,
+            argument_default, conflict_handler, add_help, allow_abbrev)
+
+    def exit(self, status=0, message=None):
+        raise (DiscordArgparseParseError(message))
+
+    def print_usage(self, file=None):
+        self.exit_message = self.format_usage()
+
+    def print_help(self, file=None):
+        self.exit_message = self.format_help()
 
 
 class Netrunner:
@@ -65,109 +104,93 @@ class Netrunner:
             'ice': ('strength'),
         }
         special_fields = ['code', 'uniqueness']
-        nets_parser = argparse.ArgumentParser(
-            prog='nets', description='args are processed as title, unless prefaced by a flag')
+        nets_parser = DiscordArgParse(prog='flag_nets')
         # These first flags capture multiple words that follow, rather than the first word
         concat_categories = ['title', 'text', 'keywords', 'flavor_text', 'illustrator']
-        nets_parser.add_argument(
-            nargs="+", action="append", dest="title")
-        nets_parser.add_argument(
-            '--text', '-x', nargs="+", action='append', dest="text", help="-x any number of words")
-        nets_parser.add_argument(
-            '--subtype', '-s', nargs="+", action='append', dest="keywords", help="-s any number of subtypes")
-        nets_parser.add_argument(
-            '--flavor', '-a', nargs="+", action='append', dest="flavor_text", help="-a any number of words")
-        nets_parser.add_argument(
-            '--illustrator', '-i', nargs="+", action='append', dest="illustrator", help="-i any number of words")
+        nets_parser.add_argument(nargs="+", action="append", dest="title")
+        nets_parser.add_argument('--text', '-x', nargs="+", action='append', dest="text")
+        nets_parser.add_argument('--subtype', '-s', nargs="+", action='append', dest="keywords")
+        nets_parser.add_argument('--flavor', '-a', nargs="+", action='append', dest="flavor_text")
+        nets_parser.add_argument('--illustrator', '-i', nargs="+", action='append', dest="illustrator")
         # These flags capture a single type from a single word
-        single_categories = [
-            'type_code', 'faction_code', 'side_code', 'cost', 'advancement_cost', 'memory_cost',
-            'faction_cost', 'strength', 'agenda_points', 'base_link', 'deck_limit', 'minimum_deck_size',
-            'trash_cost', 'unique']
-        nets_parser.add_argument(
-            '--type', '-t', action='store', dest="type_code", help="-t a single type to search for")
-        nets_parser.add_argument(
-            '--faction', '-f', action='store', dest="faction_code", help="-f a single faction to search for")
-        nets_parser.add_argument(
-            '--side', '-d', action='store', dest="side_code", help="-d a single side to search for")
-        nets_parser.add_argument(
-            '--cost', '-o', action='store', type=int, dest="cost", help="-o exact cost as integer")
-        nets_parser.add_argument(
-            '--advancement-cost', '-g', action='store', type=int, dest="advancement_cost",
-            help="-g exact advancement cost as integer")
-        nets_parser.add_argument(
-            '--memory-usage', '-m', action='store', type=int, dest="memory_cost")
-        nets_parser.add_argument(
-            '--influence', '-n', action='store', type=int, dest="faction_cost")
-        nets_parser.add_argument(
-            '--strength', '-p', action='store', type=int, dest="strength")
-        nets_parser.add_argument(
-            '--agenda-points', '-v', action='store', type=int, dest="agenda_points")
-        nets_parser.add_argument(
-            '--base-link', '-l', action='store', type=int, dest="base_link")
-        nets_parser.add_argument(
-            '--deck-limit', '-q', action='store', type=int, dest="deck_limit")
-        nets_parser.add_argument(
-            '--minimum-deck-size', '-z', action='store', type=int, dest="minimum_deck_size")
-        nets_parser.add_argument(
-            '--trash', '-b', action='store', type=int, dest="trash_cost")
-        nets_parser.add_argument(
-            '--unique', '-u', action='store', type=bool, dest="unique")
-        args = nets_parser.parse_args(string_to_parse.split())
-        # return args
-        parser_dictionary = vars(args)
-        # run through each key that we need to build up a list of words to check for exact existence,
-        # and add them to the list, if they're in the args
-        for key in parser_dictionary.keys():
-            # first build up the parameters that need to be concatonated
-            if key in concat_categories:
-                if parser_dictionary[key] is not None:
-                    if key not in print_fields:
-                        print_fields.append(key)
-                    concat_string = ""
-                    for word_list in parser_dictionary[key]:
-                        for word in word_list:
-                            concat_string += word + " "
-                    m_criteria_list.append((key, concat_string.strip()))
-            # then check the lists that are done literally
-            if key in single_categories:
-                if parser_dictionary[key] is not None:
-                    if key not in print_fields:
-                        print_fields.append(key)
-                    m_criteria_list.append((key, parser_dictionary[key]))
-        if not self.init_api:
-            self.refresh_nr_api()
-        m_match_list = self.search_text(m_criteria_list)
-
-        if len(m_match_list) == 0:
-            m_response = "Search criteria returned 0 results\n"
-            m_response += string_to_parse
-        else:
-            for i, card in enumerate(m_match_list):
-                c_response = ""
-                # we have a card, so let's add the default type fields, if any by type
-                if card['type_code'] in extra_type_fields:
-                    for extra_field in extra_type_fields[card['type_code']]:
-                        if extra_field not in print_fields:
-                            print_fields.insert(3, extra_field)
-                c_response += "```\n"
-                for c_key in print_fields:
-                    if c_key in card.keys():
-                        if c_key not in special_fields:
-                            c_response += "{0}:\"{1}\"\n".format(
-                                c_key, self.replace_api_text_with_emoji(card[c_key]))
-                        else:
-                            if c_key in 'uniqueness' and card[c_key] is True:
-                                c_response += '🔹:'
-                            if c_key in 'code':
-                                c_response += "http://netrunnerdb.com/card_image/{0}.png\n".format(
-                                    card[c_key])
-                c_response += "```\n"
-                if (len(m_response) + len(c_response)) >= (self.max_message_len - 20):
-                    m_response += "\n[{0}/{1}]\n".format(i, len(m_match_list))
-                    break
-                else:
-                    m_response += c_response
+        single_categories = ['type_code', 'faction_code', 'side_code', 'cost', 'advancement_cost', 'memory_cost',
+                             'faction_cost', 'strength', 'agenda_points', 'base_link', 'deck_limit',
+                             'minimum_deck_size',
+                             'trash_cost', 'unique']
+        nets_parser.add_argument('--type', '-t', action='store', dest="type_code")
+        nets_parser.add_argument('--faction', '-f', action='store', dest="faction_code")
+        nets_parser.add_argument('--side', '-d', action='store', dest="side_code")
+        nets_parser.add_argument('--cost', '-o', action='store', type=int, dest="cost")
+        nets_parser.add_argument('--advancement-cost', '-g', action='store', type=int, dest="advancement_cost", )
+        nets_parser.add_argument('--memory-usage', '-m', action='store', type=int, dest="memory_cost")
+        nets_parser.add_argument('--influence', '-n', action='store', type=int, dest="faction_cost")
+        nets_parser.add_argument('--strength', '-p', action='store', type=int, dest="strength")
+        nets_parser.add_argument('--agenda-points', '-v', action='store', type=int, dest="agenda_points")
+        nets_parser.add_argument('--base-link', '-l', action='store', type=int, dest="base_link")
+        nets_parser.add_argument('--deck-limit', '-q', action='store', type=int, dest="deck_limit")
+        nets_parser.add_argument('--minimum-deck-size', '-z', action='store', type=int, dest="minimum_deck_size")
+        nets_parser.add_argument('--trash', '-b', action='store', type=int, dest="trash_cost")
+        nets_parser.add_argument('--unique', '-u', action='store', type=bool, dest="unique")
+        try:
+            args = nets_parser.parse_args(string_to_parse.split())
+            # return args
+            parser_dictionary = vars(args)
+            # run through each key that we need to build up a list of words to check for exact existence,
+            # and add them to the list, if they're in the args
+            for key in parser_dictionary.keys():
+                # first build up the parameters that need to be concatonated
+                if key in concat_categories:
+                    if parser_dictionary[key] is not None:
+                        if key not in print_fields:
+                            print_fields.append(key)
+                        concat_string = ""
+                        for word_list in parser_dictionary[key]:
+                            for word in word_list:
+                                concat_string += word + " "
+                        m_criteria_list.append((key, concat_string.strip()))
+                # then check the lists that are done literally
+                if key in single_categories:
+                    if parser_dictionary[key] is not None:
+                        if key not in print_fields:
+                            print_fields.append(key)
+                        m_criteria_list.append((key, parser_dictionary[key]))
+            if not self.init_api:
+                self.refresh_nr_api()
+            m_match_list = self.search_text(m_criteria_list)
+            if len(m_match_list) == 0:
+                m_response = "Search criteria returned 0 results\n"
+                m_response += string_to_parse
+            else:
+                for i, card in enumerate(m_match_list):
+                    c_response = ""
+                    # we have a card, so let's add the default type fields, if any by type
+                    if card['type_code'] in extra_type_fields:
+                        for extra_field in extra_type_fields[card['type_code']]:
+                            if extra_field not in print_fields:
+                                print_fields.insert(3, extra_field)
+                    c_response += "```\n"
+                    for c_key in print_fields:
+                        if c_key in card.keys():
+                            if c_key not in special_fields:
+                                c_response += "{0}:\"{1}\"\n".format(
+                                    c_key, self.replace_api_text_with_emoji(card[c_key]))
+                            else:
+                                if c_key in 'uniqueness' and card[c_key] is True:
+                                    c_response += '🔹:'
+                                if c_key in 'code':
+                                    c_response += "http://netrunnerdb.com/card_image/{0}.png\n".format(
+                                        card[c_key])
+                    c_response += "```\n"
+                    if (len(m_response) + len(c_response)) >= (self.max_message_len - 20):
+                        m_response += "\n[{0}/{1}]\n".format(i, len(m_match_list))
+                        break
+                    else:
+                        m_response += c_response
+        except DiscordArgparseParseError as dape:
+            if dape.value is not None:
+                m_response += dape.value
+            if nets_parser.exit_message is not None:
+                m_response += nets_parser.exit_message
         if len(m_response) >= self.max_message_len:
             # truncate message if it exceed the character limit
             m_response = m_response[:self.max_message_len - 10] + "\ncont..."
@@ -208,6 +231,7 @@ class Netrunner:
     """
     criteria should be list of str.key:str.value tuples to be checked for exist in for each card
     """
+
     def search_text(self, criteria):
         m_match = []
         card_match = True
@@ -444,6 +468,56 @@ class Netrunner:
                 except JSONDecodeError as badUrlError:
                     m_response = "Unhandled error in search!"
         await self.bot.say(m_response[:2000])
+
+
+def test_arg_parse_nets(string_to_parse: str):
+    m_response = ""
+    m_criteria_list = []
+    print_fields = ['uniqueness', 'title', 'text', 'cost', 'keywords', 'faction_code', 'faction_cost', 'trash_cost',
+                    'type_code']
+    extra_type_fields = {
+        'agenda': ('advancement_cost', 'agenda_points',),
+        'identity': ('base_link', 'influence_limit', 'deck_limit', 'minimum_deck_size',),
+        'program': ('memory_cost', 'strength'),
+        'ice': ('strength'), }
+    special_fields = ['code', 'uniqueness']
+    nets_parser = DiscordArgParse(prog='nets', description='args are processed as title, unless prefaced by a flag')
+    # These first flags capture multiple words that follow, rather than the first word
+    concat_categories = ['title', 'text', 'keywords', 'flavor_text', 'illustrator']
+    nets_parser.add_argument(nargs="+", action="append", dest="title")
+    nets_parser.add_argument('--text', '-x', nargs="+", action='append', dest="text")
+    nets_parser.add_argument('--subtype', '-s', nargs="+", action='append', dest="keywords")
+    nets_parser.add_argument('--flavor', '-a', nargs="+", action='append', dest="flavor_text")
+    nets_parser.add_argument('--illustrator', '-i', nargs="+", action='append', dest="illustrator")
+    # These flags capture a single type from a single word
+    single_categories = ['type_code', 'faction_code', 'side_code', 'cost', 'advancement_cost', 'memory_cost',
+                         'faction_cost', 'strength', 'agenda_points', 'base_link', 'deck_limit', 'minimum_deck_size',
+                         'trash_cost', 'unique']
+    nets_parser.add_argument('--type', '-t', action='store', dest="type_code")
+    nets_parser.add_argument('--faction', '-f', action='store', dest="faction_code")
+    nets_parser.add_argument('--side', '-d', action='store', dest="side_code")
+    nets_parser.add_argument('--cost', '-o', action='store', type=int, dest="cost")
+    nets_parser.add_argument('--advancement-cost', '-g', action='store', type=int, dest="advancement_cost", )
+    nets_parser.add_argument('--memory-usage', '-m', action='store', type=int, dest="memory_cost")
+    nets_parser.add_argument('--influence', '-n', action='store', type=int, dest="faction_cost")
+    nets_parser.add_argument('--strength', '-p', action='store', type=int, dest="strength")
+    nets_parser.add_argument('--agenda-points', '-v', action='store', type=int, dest="agenda_points")
+    nets_parser.add_argument('--base-link', '-l', action='store', type=int, dest="base_link")
+    nets_parser.add_argument('--deck-limit', '-q', action='store', type=int, dest="deck_limit")
+    nets_parser.add_argument('--minimum-deck-size', '-z', action='store', type=int, dest="minimum_deck_size")
+    nets_parser.add_argument('--trash', '-b', action='store', type=int, dest="trash_cost")
+    nets_parser.add_argument('--unique', '-u', action='store', type=bool, dest="unique")
+    try:
+        args = nets_parser.parse_args(string_to_parse.split())
+        parser_dictionary = vars(args)
+        m_response += str(args)
+    except DiscordArgparseParseError as se:
+        if se.value is not None:
+            m_response += se.value
+        if nets_parser.exit_message is not None:
+            m_response += nets_parser.exit_message
+    # return args
+    return m_response
 
 
 def setup(bot):
