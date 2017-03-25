@@ -120,7 +120,7 @@ class Netrunner:
         nets_parser.add_argument('--type', '-t', action='store', dest="type_code")
         nets_parser.add_argument('--faction', '-f', action='store', dest="faction_code")
         nets_parser.add_argument('--side', '-d', action='store', dest="side_code")
-        nets_parser.add_argument('--set', '-e', action='store', type=int, dest="pack_code")
+        nets_parser.add_argument('--set', '-e', action='store', dest="pack_code")
         nets_parser.add_argument('--cost', '-o', action='store', type=int, dest="cost")
         nets_parser.add_argument('--advancement-cost', '-g', action='store', type=int, dest="advancement_cost", )
         nets_parser.add_argument('--memory-usage', '-m', action='store', type=int, dest="memory_cost")
