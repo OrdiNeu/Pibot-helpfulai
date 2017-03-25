@@ -116,7 +116,7 @@ class Netrunner:
         single_categories = ['type_code', 'faction_code', 'side_code', 'cost', 'advancement_cost', 'memory_cost',
                              'faction_cost', 'strength', 'agenda_points', 'base_link', 'deck_limit',
                              'minimum_deck_size',
-                             'trash_cost', 'unique']
+                             'trash_cost', 'unique', 'pack_code']
         nets_parser.add_argument('--type', '-t', action='store', dest="type_code")
         nets_parser.add_argument('--faction', '-f', action='store', dest="faction_code")
         nets_parser.add_argument('--side', '-d', action='store', dest="side_code")
