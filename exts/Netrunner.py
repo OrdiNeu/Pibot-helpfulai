@@ -121,6 +121,7 @@ class Netrunner:
         nets_parser.add_argument('--faction', '-f', action='store', dest="faction_code")
         nets_parser.add_argument('--side', '-d', action='store', dest="side_code")
         nets_parser.add_argument('--set', '-e', action='store', dest="pack_code")
+        nets_parser.add_argument('--nrdb_code', action='store', dest="code")
         nets_parser.add_argument('--cost', '-o', action='store', type=int, dest="cost")
         nets_parser.add_argument('--advancement-cost', '-g', action='store', type=int, dest="advancement_cost", )
         nets_parser.add_argument('--memory-usage', '-m', action='store', type=int, dest="memory_cost")
@@ -131,7 +132,6 @@ class Netrunner:
         nets_parser.add_argument('--deck-limit', '-q', action='store', type=int, dest="deck_limit")
         nets_parser.add_argument('--minimum-deck-size', '-z', action='store', type=int, dest="minimum_deck_size")
         nets_parser.add_argument('--trash', '-b', action='store', type=int, dest="trash_cost")
-        nets_parser.add_argument('--nrdb_code', action='store', type=int, dest="code")
         nets_parser.add_argument('--unique', '-u', action='store', type=bool, dest="unique")
         try:
             args = nets_parser.parse_args(string_to_parse.split())
