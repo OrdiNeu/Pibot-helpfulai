@@ -131,6 +131,7 @@ class Netrunner:
         nets_parser.add_argument('--deck-limit', '-q', action='store', type=int, dest="deck_limit")
         nets_parser.add_argument('--minimum-deck-size', '-z', action='store', type=int, dest="minimum_deck_size")
         nets_parser.add_argument('--trash', '-b', action='store', type=int, dest="trash_cost")
+        nets_parser.add_argument('--nrdb_code', action='store', type=int, dest="code")
         nets_parser.add_argument('--unique', '-u', action='store', type=bool, dest="unique")
         try:
             args = nets_parser.parse_args(string_to_parse.split())
