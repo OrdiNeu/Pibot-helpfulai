@@ -153,7 +153,7 @@ class Netrunner:
                             for word in word_list:
                                 concat_string += word + " "
                         if key in "title":
-                            m_criteria_list = self.apply_title_transform_jokes(m_criteria_list.strip())
+                            m_criteria_list = self.apply_title_transform_jokes(concat_string.strip())
                         m_criteria_list.append((key, concat_string.strip()))
                 # then check the lists that are done literally
                 if key in single_categories:
@@ -303,7 +303,7 @@ class Netrunner:
         }
         if card_title_criteria in query_corrections.keys():
             card_title_criteria = query_corrections[card_title_criteria]
-        return(card_title_criteria)
+        return card_title_criteria
 
     """
     Experimental section to test string parsing
