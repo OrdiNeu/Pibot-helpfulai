@@ -153,7 +153,7 @@ class Netrunner:
                             for word in word_list:
                                 concat_string += word + " "
                         if key in "title":
-                            m_criteria_list = self.apply_title_transform_jokes(concat_string.strip())
+                            concat_string = self.apply_title_transform_jokes(concat_string.strip())
                         m_criteria_list.append((key, concat_string.strip()))
                 # then check the lists that are done literally
                 if key in single_categories:
