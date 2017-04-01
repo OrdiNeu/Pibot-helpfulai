@@ -265,7 +265,7 @@ class Netrunner:
                             break
                             # print("None value from search for on " + s_card['code'])
                         else:
-                            if not c_value in unidecode(s_card[c_key]).lower():
+                            if not unidecode(c_value.lower()) in unidecode(s_card[c_key]).lower():
                                 card_match = False
                                 break
                                 # print("match on " + c_value)
@@ -299,7 +299,7 @@ class Netrunner:
             "tilde": "blackat",
             "neko": "blackat",
             "ordineu": "exile",
-            "<:stoned:259424190111678464>": "blackstone"
+            "<:stoned:259424190111678464>": "mr. Stone"
         }
         if card_title_criteria in query_corrections.keys():
             card_title_criteria = query_corrections[card_title_criteria]
