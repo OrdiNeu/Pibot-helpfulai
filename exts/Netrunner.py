@@ -131,10 +131,11 @@ class Netrunner:
         nets_parser.add_argument('--base-link', '-l', action='store', type=int, dest="base_link")
         nets_parser.add_argument('--deck-limit', '-q', action='store', type=int, dest="deck_limit")
         nets_parser.add_argument('--minimum-deck-size', '-z', action='store', type=int, dest="minimum_deck_size")
-        nets_parser.add_argument('--trash', '-b', action='store', type=int, dest="trash_cost")
-        nets_parser.add_argument('--unique', '-u', action='store', type=bool, dest="unique")
+        nets_parser.add_argument('-b', '--trash',  action='store', type=int, dest="trash_cost")
+        nets_parser.add_argument('-u', '--unique',  action='store', type=bool, dest="unique")
         # special flags
         nets_parser.add_argument('--title-only', action='store_true', dest="title-only")
+        nets_parser.add_argument('--image-only', action='store_true', dest="image-only")
         try:
             args = nets_parser.parse_args(string_to_parse.split())
             # return args
@@ -165,34 +166,41 @@ class Netrunner:
                 m_response = "Search criteria returned 0 results\n"
                 m_response += string_to_parse
             else:
-                for i, card in enumerate(m_match_list):
-                    c_response = ""
-                    # we have a card, so let's add the default type fields, if any by type
-                    if card['type_code'] in extra_type_fields:
-                        for extra_field in extra_type_fields[card['type_code']]:
-                            if extra_field not in print_fields:
-                                print_fields.insert(3, extra_field)
-                    # if the flag is set, skip all text info
-                    if parser_dictionary["title-only"]:
-                        print_fields = ['title']
-                    c_response += "```\n"
-                    for c_key in print_fields:
-                        if c_key in card.keys():
-                            if c_key not in special_fields:
-                                c_response += "{0}:\"{1}\"\n".format(
-                                    c_key, self.replace_api_text_with_emoji(card[c_key]))
-                            else:
-                                if c_key in 'uniqueness' and card[c_key] is True:
-                                    c_response += '🔹:'
-                                if c_key in 'code':
-                                    c_response += "http://netrunnerdb.com/card_image/{0}.png\n".format(
-                                        card[c_key])
-                    c_response += "```\n"
-                    if (len(m_response) + len(c_response)) >= (self.max_message_len - 20):
-                        m_response += "\n[{0}/{1}]\n".format(i, len(m_match_list))
-                        break
-                    else:
-                        m_response += c_response
+                #  figure out how we're going to respond, if we're images only, skip parsing and use this.
+                if parser_dictionary["image-only"]:
+                    for i, card in enumerate(m_match_list[:5]):
+                        m_response += "http://netrunnerdb.com/card_image/" + card['code'] + ".png\n"
+                    if len(m_match_list) > 5:
+                        m_response += "[{0}/{1}]".format(5, len(m_match_list))
+                else:
+                    for i, card in enumerate(m_match_list):
+                        c_response = ""
+                        # we have a card, so let's add the default type fields, if any by type
+                        if card['type_code'] in extra_type_fields:
+                            for extra_field in extra_type_fields[card['type_code']]:
+                                if extra_field not in print_fields:
+                                    print_fields.insert(3, extra_field)
+                        # if the flag is set, skip all text info
+                        if parser_dictionary["title-only"]:
+                            print_fields = ['title']
+                        c_response += "```\n"
+                        for c_key in print_fields:
+                            if c_key in card.keys():
+                                if c_key not in special_fields:
+                                    c_response += "{0}:\"{1}\"\n".format(
+                                        c_key, self.replace_api_text_with_emoji(card[c_key]))
+                                else:
+                                    if c_key in 'uniqueness' and card[c_key] is True:
+                                        c_response += '🔹:'
+                                    if c_key in 'code':
+                                        c_response += "http://netrunnerdb.com/card_image/{0}.png\n".format(
+                                            card[c_key])
+                        c_response += "```\n"
+                        if (len(m_response) + len(c_response)) >= (self.max_message_len - 20):
+                            m_response += "\n[{0}/{1}]\n".format(i, len(m_match_list))
+                            break
+                        else:
+                            m_response += c_response
         except DiscordArgparseParseError as dape:
             if dape.value is not None:
                 m_response += dape.value
