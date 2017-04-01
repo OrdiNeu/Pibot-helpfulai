@@ -134,7 +134,7 @@ class Netrunner:
         nets_parser.add_argument('--trash', '-b', action='store', type=int, dest="trash_cost")
         nets_parser.add_argument('--unique', '-u', action='store', type=bool, dest="unique")
         # special flags
-        nets_parser.add_argument('--title-only', action='store', dest="title-only")
+        nets_parser.add_argument('--title-only', action='store', type=bool, default=False, dest="title-only")
         try:
             args = nets_parser.parse_args(string_to_parse.split())
             # return args
@@ -173,7 +173,7 @@ class Netrunner:
                             if extra_field not in print_fields:
                                 print_fields.insert(3, extra_field)
                     # if the flag is set, skip all text info
-                    if "title-only" in parser_dictionary.keys():
+                    if parser_dictionary["title-only"]:
                         print_fields = ['title']
                     c_response += "```\n"
                     for c_key in print_fields:
