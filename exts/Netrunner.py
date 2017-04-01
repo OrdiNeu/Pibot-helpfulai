@@ -117,22 +117,22 @@ class Netrunner:
                              'faction_cost', 'strength', 'agenda_points', 'base_link', 'deck_limit',
                              'minimum_deck_size',
                              'trash_cost', 'unique', 'pack_code']
-        nets_parser.add_argument('--type', '-t', action='store', dest="type_code")
-        nets_parser.add_argument('--faction', '-f', action='store', dest="faction_code")
-        nets_parser.add_argument('--side', '-d', action='store', dest="side_code")
-        nets_parser.add_argument('--set', '-e', action='store', dest="pack_code")
+        nets_parser.add_argument('-t', '--type', action='store', dest="type_code")
+        nets_parser.add_argument('-f', '--faction', action='store', dest="faction_code")
+        nets_parser.add_argument('-d', '--side', action='store', dest="side_code")
+        nets_parser.add_argument('-e', '--set', action='store', dest="pack_code")
         nets_parser.add_argument('--nrdb_code', action='store', dest="code")
-        nets_parser.add_argument('--cost', '-o', action='store', type=int, dest="cost")
-        nets_parser.add_argument('--advancement-cost', '-g', action='store', type=int, dest="advancement_cost", )
-        nets_parser.add_argument('--memory-usage', '-m', action='store', type=int, dest="memory_cost")
-        nets_parser.add_argument('--influence', '-n', action='store', type=int, dest="faction_cost")
-        nets_parser.add_argument('--strength', '-p', action='store', type=int, dest="strength")
-        nets_parser.add_argument('--agenda-points', '-v', action='store', type=int, dest="agenda_points")
-        nets_parser.add_argument('--base-link', '-l', action='store', type=int, dest="base_link")
-        nets_parser.add_argument('--deck-limit', '-q', action='store', type=int, dest="deck_limit")
-        nets_parser.add_argument('--minimum-deck-size', '-z', action='store', type=int, dest="minimum_deck_size")
-        nets_parser.add_argument('-b', '--trash',  action='store', type=int, dest="trash_cost")
-        nets_parser.add_argument('-u', '--unique',  action='store', type=bool, dest="unique")
+        nets_parser.add_argument('-o', '--cost', action='store', type=int, dest="cost")
+        nets_parser.add_argument('-g', '--advancement-cost', action='store', type=int, dest="advancement_cost", )
+        nets_parser.add_argument('-m', '--memory-usage', action='store', type=int, dest="memory_cost")
+        nets_parser.add_argument('-n', '--influence', action='store', type=int, dest="faction_cost")
+        nets_parser.add_argument('-p', '--strength', action='store', type=int, dest="strength")
+        nets_parser.add_argument('-v', '--agenda-points', action='store', type=int, dest="agenda_points")
+        nets_parser.add_argument('-l', '--base-link', action='store', type=int, dest="base_link")
+        nets_parser.add_argument('-q', '--deck-limit', action='store', type=int, dest="deck_limit")
+        nets_parser.add_argument('-z', '--minimum-deck-size', action='store', type=int, dest="minimum_deck_size")
+        nets_parser.add_argument('-b', '--trash', action='store', type=int, dest="trash_cost")
+        nets_parser.add_argument('-u', '--unique', action='store', type=bool, dest="unique")
         # special flags
         nets_parser.add_argument('--title-only', action='store_true', dest="title-only")
         nets_parser.add_argument('--image-only', action='store_true', dest="image-only")
@@ -152,6 +152,8 @@ class Netrunner:
                         for word_list in parser_dictionary[key]:
                             for word in word_list:
                                 concat_string += word + " "
+                        if key in "title":
+                            m_criteria_list = self.apply_title_transform_jokes(m_criteria_list.strip())
                         m_criteria_list.append((key, concat_string.strip()))
                 # then check the lists that are done literally
                 if key in single_categories:
@@ -285,6 +287,24 @@ class Netrunner:
                              key=lambda card: card['title'])
         self.init_api = True
 
+    @staticmethod
+    def apply_title_transform_jokes(card_title_criteria):
+        # Auto-correct some card names (and inside jokes)
+        query_corrections = {
+            "smc": "self-modifying code",
+            "jesus": "jackson howard",
+            "nyan": "noise",
+            "neh": "near earth hub",
+            "sot": "same old thing",
+            "tilde": "blackat",
+            "neko": "blackat",
+            "ordineu": "exile",
+            "<:stoned:259424190111678464>": "blackstone"
+        }
+        if card_title_criteria in query_corrections.keys():
+            card_title_criteria = query_corrections[card_title_criteria]
+        return(card_title_criteria)
+
     """
     Experimental section to test string parsing
     I want to turn
@@ -295,7 +315,6 @@ class Netrunner:
     !nr <title>
     <card image link>
     """
-
     @commands.command(name="old_nets", aliases=['leg_nets'])
     async def leg(self, *, cardname: str):
         """
