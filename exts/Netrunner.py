@@ -134,7 +134,7 @@ class Netrunner:
         nets_parser.add_argument('--trash', '-b', action='store', type=int, dest="trash_cost")
         nets_parser.add_argument('--unique', '-u', action='store', type=bool, dest="unique")
         # special flags
-        nets_parser.add_argument('--title-only', action='store', type=bool, default=False, dest="title-only")
+        nets_parser.add_argument('--title-only', action='store_true', dest="title-only")
         try:
             args = nets_parser.parse_args(string_to_parse.split())
             # return args
