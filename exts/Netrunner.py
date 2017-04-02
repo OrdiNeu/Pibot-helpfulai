@@ -59,19 +59,13 @@ class Netrunner:
         self.nr_api = [{}]
         self.init_api = False
         self.max_message_len = 1990
-        self.nets_help = "!nets command syntax:\n" \
-                         "**!nets help!:** this listing\n" \
-                         "**!nets keys!** list the keys that this database supports\n" \
-                         "**!nets \"key:value\"** where key is a valid entry of the api, " \
-                         "and value is an exact match.\n" + \
-                         "any number of key:value pairs may be specified (space seperated), and the output will " \
-                         "always include this key\n" + \
-                         "**!nets \"key:value\" \"key\"** where the second \" bounded, space delineated keys are " \
-                         "additional values to print, but not match on (title and text are always printed)"
+        self.nets_help = "!nets command syntax:!nets --help or -h for flags listing\n"
         self.api_keys = "list of keys: (not all cards have all keys!)\n```title, text, cost, strength, " \
                         "keywords, type_code,\nuniqueness, faction_cost, memory_cost, trash_cost, advancement_cost," \
                         " agenda_points,\nside_code, faction_code, pack_code, position, quantity, \n" \
                         "base_link, influence_limit, deck_limit, minimum_deck_size,  flavor, illustrator, code```"
+        self.type_code_sort = {'identity':0,'agenda':1, 'asset':2, 'upgrade':3, 'operation':4, 'ice':5, 'event':6,
+                               'hardware':7, 'resource':8, 'program':9}
 
     @staticmethod
     def transform_trace(re_obj):
@@ -248,6 +242,16 @@ class Netrunner:
     """
     criteria should be list of str.key:str.value tuples to be checked for exist in for each card
     """
+
+    def sort_cards(self, cards):
+        # input should be a list of full card dictionaries to be sorted
+        # first sort by title
+        cards = sorted(cards, key=lambda card: card['title'])
+        # I should pre-sort the cards by sub types, before adding them to type major sort
+        # todo add that before this line.
+        # next sort by type
+        cards = sorted(cards, key=lambda card: self.type_code_sort[card['type_code']])
+        return cards
 
     def search_text(self, criteria):
         m_match = []
@@ -468,7 +472,8 @@ class Netrunner:
         m_response = ""
         m_api_prefex = "https://netrunnerdb.com/api/2.0/public/decklist/"
         m_decklist = unidecode(decklist.lower())
-        re_decklist_id = re.search("(https://netrunnerdb\.com/en/decklist/)(\d+)(/.*)", decklist)
+        re_decklist_id = re.search("(https://netrunnerdb\.com/en/decklist/)(\d+)(/.*)", m_decklist)
+        card_sort_list = []
         if re_decklist_id is None:
             m_response += "I see: \"{0}\", but I don't understand\n".format(m_decklist)
         else:
@@ -492,8 +497,14 @@ class Netrunner:
                     # build a list of tuples in the pairs, value(number of card), key (id of card)
                     for number, card_id in [(v, k) for (k, v) in decklist_data[0]['cards'].items()]:
                         # for number, card_id, in num_card_tup:
-                        card_title = self.search_text([('code', card_id)])[0]['title']
-                        response_addr = "{0}x {1}\n".format(number, card_title)
+                        card = self.search_text([('code', card_id)])[0]
+                        # add a key to the dictionary with the number of instances, to use later
+                        card['number'] = number
+                        card_sort_list.append(card)
+                        # card_title = self.search_text([('code', card_id)])[0]['title']
+                    card_sort_list = self.sort_cards(card_sort_list)
+                    for card in card_sort_list:
+                        response_addr = "{0}x {1}\n".format(card['number'], card['title'])
                         if (len(m_response) + len(response_addr)) >= self.max_message_len:
                             m_response += "cont..."
                             break
