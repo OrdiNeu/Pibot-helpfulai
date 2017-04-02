@@ -474,7 +474,7 @@ class Netrunner:
         m_decklist = unidecode(decklist.lower())
         re_decklist_id = re.search("(https://netrunnerdb\.com/en/decklist/)(\d+)(/.*)", m_decklist)
         card_sort_list = []
-        last_type = ""
+        last_type = "identity"
         if re_decklist_id is None:
             m_response += "I see: \"{0}\", but I don't understand\n".format(m_decklist)
         else:
@@ -507,8 +507,8 @@ class Netrunner:
                     for card in card_sort_list:
                         response_addr = ""
                         if last_type not in card['type_code']:
+                            response_addr += "**{0}**\n".format(card['type_code'])
                             last_type = card['type_code']
-                            response_addr += "**{0}**\n".format(last_type)
                         response_addr += "{0}x {1}\n".format(card['number'], card['title'])
                         if (len(m_response) + len(response_addr)) >= self.max_message_len:
                             m_response += "cont..."
