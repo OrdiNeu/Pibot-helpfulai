@@ -508,7 +508,7 @@ class Netrunner:
                         response_addr = ""
                         if last_type not in card['type_code']:
                             last_type = card['type_code']
-                            response_addr = "**{0}**\n".format(last_type)
+                            response_addr += "**{0}**\n".format(last_type)
                         response_addr += "{0}x {1}\n".format(card['number'], card['title'])
                         if (len(m_response) + len(response_addr)) >= self.max_message_len:
                             m_response += "cont..."
