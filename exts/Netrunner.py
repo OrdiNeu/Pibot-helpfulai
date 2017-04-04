@@ -520,8 +520,8 @@ class Netrunner:
                 m_response += self.deck_parse(re_decklist_id.group(2))
             await self.bot.say(m_response[:2000])
 
-    @commands.command(aliases=['rnrand'])
-    async def rand_deck(self, *, params:str):
+    @commands.command(aliases=['ndrand'])
+    async def rand_deck(self):
         today = time.strftime("%Y-%m-%d")
         decks = [c for c in requests.get(
             'https://netrunnerdb.com/api/2.0/public/decklists/by_date/%s' % today).json()['data']]
