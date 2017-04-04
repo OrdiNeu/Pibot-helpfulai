@@ -522,13 +522,17 @@ class Netrunner:
 
     @commands.command(aliases=['ndrand'])
     async def rand_deck(self):
+        m_response = ""
         today = time.strftime("%Y-%m-%d")
         decks = [c for c in requests.get(
             'https://netrunnerdb.com/api/2.0/public/decklists/by_date/%s' % today).json()['data']]
         selection = random.randrange(len(decks))
-        deck_print_selection = self.deck_parse(str(decks[selection]['id']))
-        await self.bot.say(deck_print_selection[:2000])
-
+        id = str(decks[selection]['id'])
+        hyphen_name = decks[selection]['name'].replace(" ", "-").lower()
+        link = r"https://netrunnerdb.com/en/decklist/" + id + "/" + hyphen_name
+        m_response += link + "\n"
+        m_response += self.deck_parse(id)
+        await self.bot.say(m_response[:2000])
 
 
 def test_arg_parse_nets(string_to_parse: str):
