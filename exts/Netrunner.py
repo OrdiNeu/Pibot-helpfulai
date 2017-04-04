@@ -6,6 +6,8 @@ from unidecode import unidecode
 import discord
 import requests
 import emoji
+import time
+import random
 import argparse
 from argparse import HelpFormatter
 from argparse import ArgumentParser
@@ -467,57 +469,66 @@ class Netrunner:
                     m_response += "[{0}/{1}]".format(5, len(m_cards))
         await self.bot.say(m_response)
 
+    def deck_parse(self, deck_id):
+        m_response = ""
+        m_api_prefex = "https://netrunnerdb.com/api/2.0/public/decklist/"
+        card_sort_list = []
+        last_type = "identity"
+        if not self.init_api:
+            self.refresh_nr_api()
+        try:
+            decklist_data = [c for c in requests.get(m_api_prefex + deck_id).json()['data']]
+            # decklist_data[0]['cards'] is a dict with card_id keys to counts {'10005': 1}
+            m_response += "**{0}**\n".format(decklist_data[0]['name'])
+            # id_search_tuple_list = [('code', "{0}".format(decklist_data[0]['id']))]
+            # m_response += "{0}\n".format(self.search_text(id_search_tuple_list)[0]['title'])
+            # build a list of tuples in the pairs, value(number of card), key (id of card)
+            for number, card_id in [(v, k) for (k, v) in decklist_data[0]['cards'].items()]:
+                # for number, card_id, in num_card_tup:
+                card = self.search_text([('code', card_id)])[0]
+                # add a key to the dictionary with the number of instances, to use later
+                card['number'] = number
+                card_sort_list.append(card)
+                # card_title = self.search_text([('code', card_id)])[0]['title']
+            card_sort_list = self.sort_cards(card_sort_list)
+            for card in card_sort_list:
+                response_addr = ""
+                if last_type not in card['type_code']:
+                    response_addr += "**{0}**\n".format(card['type_code'])
+                    last_type = card['type_code']
+                response_addr += "{0}x {1}\n".format(card['number'], card['title'])
+                if (len(m_response) + len(response_addr)) >= self.max_message_len:
+                    m_response += "cont..."
+                    break
+                else:
+                    m_response += response_addr
+        except JSONDecodeError as badUrlError:
+            m_response = "Unhandled error in search!"
+        return m_response
+
     @commands.command(aliases=['nd'])
     async def deck(self, *, decklist: str):
         m_response = ""
-        m_api_prefex = "https://netrunnerdb.com/api/2.0/public/decklist/"
         m_decklist = unidecode(decklist.lower())
         re_decklist_id = re.search("(https://netrunnerdb\.com/en/decklist/)(\d+)(/.*)", m_decklist)
-        card_sort_list = []
-        last_type = "identity"
         if re_decklist_id is None:
             m_response += "I see: \"{0}\", but I don't understand\n".format(m_decklist)
         else:
             if re_decklist_id.group(2) is None:
                 m_response += "I see: \"{0}\", but I don't understand\n".format(m_decklist)
             else:
-                if not self.init_api:
-                    self.refresh_nr_api()
-                # decklist_id = "41160"
-                decklist_id = re_decklist_id.group(2)
-                # make a request for the id of the decklist posted in the commandline
-                # should get a result array, 1 len
-                # dict in array, dict_keys(['id', 'date_creation', 'date_update', 'name',
-                # 'description', 'user_id', 'user_name', 'tournament_badge', 'cards'])
-                try:
-                    decklist_data = [c for c in requests.get(m_api_prefex + decklist_id).json()['data']]
-                    # decklist_data[0]['cards'] is a dict with card_id keys to counts {'10005': 1}
-                    m_response += "**{0}**\n".format(decklist_data[0]['name'])
-                    # id_search_tuple_list = [('code', "{0}".format(decklist_data[0]['id']))]
-                    # m_response += "{0}\n".format(self.search_text(id_search_tuple_list)[0]['title'])
-                    # build a list of tuples in the pairs, value(number of card), key (id of card)
-                    for number, card_id in [(v, k) for (k, v) in decklist_data[0]['cards'].items()]:
-                        # for number, card_id, in num_card_tup:
-                        card = self.search_text([('code', card_id)])[0]
-                        # add a key to the dictionary with the number of instances, to use later
-                        card['number'] = number
-                        card_sort_list.append(card)
-                        # card_title = self.search_text([('code', card_id)])[0]['title']
-                    card_sort_list = self.sort_cards(card_sort_list)
-                    for card in card_sort_list:
-                        response_addr = ""
-                        if last_type not in card['type_code']:
-                            response_addr += "**{0}**\n".format(card['type_code'])
-                            last_type = card['type_code']
-                        response_addr += "{0}x {1}\n".format(card['number'], card['title'])
-                        if (len(m_response) + len(response_addr)) >= self.max_message_len:
-                            m_response += "cont..."
-                            break
-                        else:
-                            m_response += response_addr
-                except JSONDecodeError as badUrlError:
-                    m_response = "Unhandled error in search!"
-        await self.bot.say(m_response[:2000])
+                m_response += self.deck_parse(re_decklist_id.group(2))
+            await self.bot.say(m_response[:2000])
+
+    @commands.command(aliases=['rnrand'])
+    async def rand_deck(self, *, params:str):
+        today = time.strftime("%Y-%m-%d")
+        decks = [c for c in requests.get(
+            'https://netrunnerdb.com/api/2.0/public/decklists/by_date/%s' % today).json()['data']]
+        selection = random.randrange(len(decks))
+        deck_print_selection = self.deck_parse(decks[selection]['id'])
+        await self.bot.say(deck_print_selection[:2000])
+
 
 
 def test_arg_parse_nets(string_to_parse: str):
