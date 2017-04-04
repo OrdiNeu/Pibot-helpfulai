@@ -526,7 +526,7 @@ class Netrunner:
         decks = [c for c in requests.get(
             'https://netrunnerdb.com/api/2.0/public/decklists/by_date/%s' % today).json()['data']]
         selection = random.randrange(len(decks))
-        deck_print_selection = self.deck_parse(decks[selection]['id'])
+        deck_print_selection = self.deck_parse(str(decks[selection]['id']))
         await self.bot.say(deck_print_selection[:2000])
 
 
