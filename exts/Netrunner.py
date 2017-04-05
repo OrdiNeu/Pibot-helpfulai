@@ -92,7 +92,7 @@ class Netrunner:
     async def arg_parse_nets(self, *, string_to_parse: str):
         m_response = ""
         m_criteria_list = []
-        default_print_fields = ['uniqueness', 'title', 'text', 'cost', 'keywords', 'faction_code', 'faction_cost',
+        default_print_fields = ['uniqueness', 'title', 'cost', 'text', 'keywords', 'faction_code', 'faction_cost',
                                 'trash_cost', 'type_code']
         search_fields_appends = []
         type_fields_appends = []
@@ -235,6 +235,11 @@ class Netrunner:
     def transform_api_items_to_printable_format(self, api_key, value):
         # this function transforms the internal keys used in the api to a more user friendly print format
         value = self.replace_api_text_with_emoji(value)
+        if value is True:
+            unique_str = "🔹"
+        else:
+            unique_str = ""
+
         key_transform = {
             "title": "{0}\n".format(value),
             "text": "\"{0}\"\n".format(value),
@@ -242,7 +247,7 @@ class Netrunner:
             "strength": "str: {0}\n".format(value),
             "keywords": "subtype: {0}\n".format(value),
             "type_code": "type: {0}\n".format(value),
-            "uniqueness": "🔹:",
+            "uniqueness": unique_str,
             "faction_cost": "{0}▪\n".format(value),
             "memory_cost": "MU: {0}\n".format(value),
             "trash_cost": "trash: {0}\n".format(value),
