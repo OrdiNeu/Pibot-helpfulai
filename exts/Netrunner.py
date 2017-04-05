@@ -129,10 +129,13 @@ class Netrunner:
         # special flags
         nets_parser.add_argument('--title-only', action='store_true', dest="title-only")
         nets_parser.add_argument('--image-only', action='store_true', dest="image-only")
+        nets_parser.add_argument('--debug-flags', action='store_true', dest="debug-flags")
         try:
             args = nets_parser.parse_args(string_to_parse.split())
             # return args
             parser_dictionary = vars(args)
+            if parser_dictionary['debug-flags']:
+                m_response += str(args)
             # run through each key that we need to build up a list of words to check for exact existence,
             # and add them to the list, if they're in the args
             for key in parser_dictionary.keys():
