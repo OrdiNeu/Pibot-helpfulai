@@ -42,13 +42,10 @@ class DiscordArgParse(ArgumentParser):
         super(DiscordArgParse, self).__init__(
             prog, usage, description, epilog, parents, formatter_class, prefix_chars, fromfile_prefix_chars,
             argument_default, conflict_handler, add_help, allow_abbrev)
-
     def exit(self, status=0, message=None):
         raise (DiscordArgparseParseError(message))
-
     def print_usage(self, file=None):
         self.exit_message = self.format_usage()
-
     def print_help(self, file=None):
         self.exit_message = self.format_help()
 
@@ -104,7 +101,7 @@ class Netrunner:
         # These first flags capture multiple words that follow, rather than the first word
         concat_categories = ['title', 'text', 'keywords', 'flavor_text', 'illustrator']
         nets_parser.add_argument(nargs="*", action="append", dest="title")
-        nets_parser.add_argument('--text', '-x', action='append', dest="text")
+        nets_parser.add_argument('--text', '-x', nargs="+", action='append', dest="text")
         nets_parser.add_argument('--subtype', '-s', nargs="+", action='append', dest="keywords")
         nets_parser.add_argument('--flavor', '-a', nargs="+", action='append', dest="flavor_text")
         nets_parser.add_argument('--illustrator', '-i', nargs="+", action='append', dest="illustrator")
@@ -550,7 +547,7 @@ def test_arg_parse_nets(string_to_parse: str):
     # These first flags capture multiple words that follow, rather than the first word
     concat_categories = ['title', 'text', 'keywords', 'flavor_text', 'illustrator']
     nets_parser.add_argument(nargs="*", action="append", dest="title")
-    nets_parser.add_argument('--text', '-x', nargs="+", action='append', dest="text")
+    nets_parser.add_argument('--text', '-x', action='append', dest="text")
     nets_parser.add_argument('--subtype', '-s', nargs="+", action='append', dest="keywords")
     nets_parser.add_argument('--flavor', '-a', nargs="+", action='append', dest="flavor_text")
     nets_parser.add_argument('--illustrator', '-i', nargs="+", action='append', dest="illustrator")
