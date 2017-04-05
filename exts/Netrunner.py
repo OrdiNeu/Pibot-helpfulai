@@ -98,7 +98,7 @@ class Netrunner:
         type_fields_appends = []
         extra_type_fields = {
             'agenda': ('advancement_cost', 'agenda_points',),
-            'identity': ('base_link', 'influence_limit', 'deck_limit', 'minimum_deck_size',),
+            'identity': ('base_link', 'minimum_deck_size', 'influence_limit', ),
             'program': ('memory_cost', 'strength'),
             'ice': ('strength'),
         }
@@ -243,18 +243,18 @@ class Netrunner:
         key_transform = {
             "title": "{0}\n".format(value),
             "text": "\"{0}\"\n".format(value),
-            "cost": "cost: {0}\n".format(value),
-            "strength": "str: {0}\n".format(value),
+            "cost": "Cost: {0}\n".format(value),
+            "strength": "Str: {0}\n".format(value),
             "keywords": ": {0}\n".format(value),
             "type_code": "{0}".format(value),
             "uniqueness": unique_str,
-            "faction_cost": "{0}▪\n".format(value),
+            "faction_cost": " {0}▪\n".format(value),
             "memory_cost": "MU: {0}\n".format(value),
-            "trash_cost": "trash: {0}\n".format(value),
+            "trash_cost": "{0}🗑\n".format(value),
             "advancement_cost": "adv: {0}\n".format(value),
             "agenda_points": "AP: {0}\n".format(value),
             "side_code": "side: {0}\n".format(value),
-            "faction_code": "faction: {0}\n".format(value),
+            "faction_code": "faction: {0}".format(value),
             "pack_code": "pack: {0}\n".format(value),
             "position": "position: {0}\n",
             "quantity": "quantity: {0}\n",
