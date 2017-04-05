@@ -93,14 +93,14 @@ class Netrunner:
         m_response = ""
         m_criteria_list = []
         default_print_fields = ['uniqueness', 'base_link', 'title', 'cost', 'type_code', 'keywords', 'text',
-                                'faction_code', 'faction_cost', 'trash_cost', ]
+                                'strength', 'trash_cost', 'faction_code', 'faction_cost', ]
         search_fields_appends = []
         type_fields_appends = []
         extra_type_fields = {
             'agenda': ('advancement_cost', 'agenda_points',),
             'identity': ('minimum_deck_size', 'influence_limit', ),
-            'program': ('memory_cost', 'strength'),
-            'ice': ('strength', ),
+            'program': ('memory_cost', ),
+            # 'ice': ('strength', ),
         }
         special_fields = ['code', 'uniqueness']
         nets_parser = DiscordArgParse(prog='flag_nets')
