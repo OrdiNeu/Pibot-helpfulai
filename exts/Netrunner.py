@@ -139,15 +139,20 @@ class Netrunner:
                 # first build up the parameters that need to be concatonated
                 if key in concat_categories:
                     if parser_dictionary[key] is not None:
+                        # Add the key to the printed result, if it's not already included
                         if key not in print_fields:
                             print_fields.append(key)
-                        concat_string = ""
+                        # search parameters come in key: [['string'], ['other', 'string']
+                        # for an input like: --flag string --flag other string
+                        # we'll treat each --flag {value} as a seperate criteria that must be met, and join the
+                        # 'other' 'string' into a match 'other string' exactly.
                         for word_list in parser_dictionary[key]:
+                            concat_string = ""
                             for word in word_list:
                                 concat_string += word + " "
-                        if key in "title":
-                            concat_string = self.apply_title_transform_jokes(concat_string.strip())
-                        m_criteria_list.append((key, concat_string.strip()))
+                            if key in "title":
+                                concat_string = self.apply_title_transform_jokes(concat_string.strip())
+                            m_criteria_list.append((key, concat_string.strip()))
                 # then check the lists that are done literally
                 if key in single_categories:
                     if parser_dictionary[key] is not None:
@@ -547,7 +552,7 @@ def test_arg_parse_nets(string_to_parse: str):
     # These first flags capture multiple words that follow, rather than the first word
     concat_categories = ['title', 'text', 'keywords', 'flavor_text', 'illustrator']
     nets_parser.add_argument(nargs="*", action="append", dest="title")
-    nets_parser.add_argument('--text', '-x', action='append', dest="text")
+    nets_parser.add_argument('--text', '-x', nargs="+", action='append', dest="text")
     nets_parser.add_argument('--subtype', '-s', nargs="+", action='append', dest="keywords")
     nets_parser.add_argument('--flavor', '-a', nargs="+", action='append', dest="flavor_text")
     nets_parser.add_argument('--illustrator', '-i', nargs="+", action='append', dest="illustrator")
