@@ -92,13 +92,13 @@ class Netrunner:
     async def arg_parse_nets(self, *, string_to_parse: str):
         m_response = ""
         m_criteria_list = []
-        default_print_fields = ['uniqueness', 'title', 'cost', 'type_code', 'keywords', 'text',  'faction_code', 'faction_cost',
-                                'trash_cost', ]
+        default_print_fields = ['uniqueness', 'base_link', 'title', 'cost', 'type_code', 'keywords', 'text',
+                                'faction_code', 'faction_cost', 'trash_cost', ]
         search_fields_appends = []
         type_fields_appends = []
         extra_type_fields = {
             'agenda': ('advancement_cost', 'agenda_points',),
-            'identity': ('base_link', 'minimum_deck_size', 'influence_limit', ),
+            'identity': ('minimum_deck_size', 'influence_limit', ),
             'program': ('memory_cost', 'strength'),
             'ice': ('strength'),
         }
@@ -241,30 +241,30 @@ class Netrunner:
             unique_str = ""
 
         key_transform = {
-            "title": "{0}\n".format(value),
-            "text": "\n\"{0}\"\n".format(value),
-            "cost": "Cost: {0}\n".format(value),
-            "strength": "Str: {0}\n".format(value),
+            "title": "{0}".format(value),
+            "text": "\n\"{0}\"".format(value),
+            "cost": "\nCost: {0}".format(value),
+            "strength": "\nStr: {0}".format(value),
             "keywords": ": {0}".format(value),
-            "type_code": "{0}".format(value),
+            "type_code": "\n{0}".format(value),
             "uniqueness": unique_str,
-            "faction_cost": " {0}▪\n".format(value),
-            "memory_cost": "MU: {0}\n".format(value),
-            "trash_cost": "{0}🗑\n".format(value),
-            "advancement_cost": "adv: {0}\n".format(value),
-            "agenda_points": "AP: {0}\n".format(value),
-            "side_code": "side: {0}\n".format(value),
-            "faction_code": "faction: {0}".format(value),
-            "pack_code": "pack: {0}\n".format(value),
-            "position": "position: {0}\n",
-            "quantity": "quantity: {0}\n",
-            "base_link": "{0}🔁\n".format(value),
-            "influence_limit": "max inf: {0}\n".format(value),
-            "deck_limit": "deck limit: {0}\n".format(value),
-            "minimum_deck_size": "min deck size: {0}\n".format(value),
-            "flavor": "{0}\n".format(value),
-            "illustrator": "illustrator: {0}".format(value),
-            "code": "http://netrunnerdb.com/card_image/{0}.png\n".format(value)
+            "faction_cost": " {0}▪".format(value),
+            "memory_cost": "\nMU: {0}".format(value),
+            "trash_cost": "\n{0}🗑".format(value),
+            "advancement_cost": "\nAdv: {0}".format(value),
+            "agenda_points": "\nAP: {0}".format(value),
+            "side_code": "\nside: {0}".format(value),
+            "faction_code": "\nfaction: {0}".format(value),
+            "pack_code": "\npack: {0}".format(value),
+            "position": "\nposition: {0}".format(value),
+            "quantity": "\nquantity: {0}\n".format(value),
+            "base_link": "{0}🔁".format(value),
+            "influence_limit": "/{0}\n".format(value),
+            "deck_limit": "\ndeck limit: {0}".format(value),
+            "minimum_deck_size": "\ndeck: {0}".format(value),
+            "flavor": "\n{0}".format(value),
+            "illustrator": "\nillustrator: {0}".format(value),
+            "code": "\nhttp://netrunnerdb.com/card_image/{0}.png".format(value)
         }
         return key_transform[api_key]
 
