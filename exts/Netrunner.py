@@ -242,10 +242,10 @@ class Netrunner:
 
         key_transform = {
             "title": "{0}\n".format(value),
-            "text": "\"{0}\"\n".format(value),
+            "text": "\n\"{0}\"\n".format(value),
             "cost": "Cost: {0}\n".format(value),
             "strength": "Str: {0}\n".format(value),
-            "keywords": ": {0}\n".format(value),
+            "keywords": ": {0}".format(value),
             "type_code": "{0}".format(value),
             "uniqueness": unique_str,
             "faction_cost": " {0}▪\n".format(value),
