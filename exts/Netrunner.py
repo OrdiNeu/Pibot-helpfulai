@@ -92,8 +92,8 @@ class Netrunner:
     async def arg_parse_nets(self, *, string_to_parse: str):
         m_response = ""
         m_criteria_list = []
-        default_print_fields = ['uniqueness', 'title', 'cost', 'text', 'keywords', 'faction_code', 'faction_cost',
-                                'trash_cost', 'type_code']
+        default_print_fields = ['uniqueness', 'title', 'cost', 'type_code', 'keywords', 'text',  'faction_code', 'faction_cost',
+                                'trash_cost', ]
         search_fields_appends = []
         type_fields_appends = []
         extra_type_fields = {
@@ -245,8 +245,8 @@ class Netrunner:
             "text": "\"{0}\"\n".format(value),
             "cost": "cost: {0}\n".format(value),
             "strength": "str: {0}\n".format(value),
-            "keywords": "subtype: {0}\n".format(value),
-            "type_code": "type: {0}\n".format(value),
+            "keywords": ": {0}\n".format(value),
+            "type_code": "{0}".format(value),
             "uniqueness": unique_str,
             "faction_cost": "{0}▪\n".format(value),
             "memory_cost": "MU: {0}\n".format(value),
