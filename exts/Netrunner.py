@@ -42,10 +42,13 @@ class DiscordArgParse(ArgumentParser):
         super(DiscordArgParse, self).__init__(
             prog, usage, description, epilog, parents, formatter_class, prefix_chars, fromfile_prefix_chars,
             argument_default, conflict_handler, add_help, allow_abbrev)
+
     def exit(self, status=0, message=None):
         raise (DiscordArgparseParseError(message))
+
     def print_usage(self, file=None):
         self.exit_message = self.format_usage()
+
     def print_help(self, file=None):
         self.exit_message = self.format_help()
 
@@ -63,8 +66,9 @@ class Netrunner:
                         "keywords, type_code,\nuniqueness, faction_cost, memory_cost, trash_cost, advancement_cost," \
                         " agenda_points,\nside_code, faction_code, pack_code, position, quantity, \n" \
                         "base_link, influence_limit, deck_limit, minimum_deck_size,  flavor, illustrator, code```"
-        self.type_code_sort = {'identity':0,'agenda':1, 'asset':2, 'upgrade':3, 'operation':4, 'ice':5, 'event':6,
-                               'hardware':7, 'resource':8, 'program':9}
+        self.type_code_sort = {'identity': 0, 'agenda': 1, 'asset': 2, 'upgrade': 3, 'operation': 4, 'ice': 5,
+                               'event': 6,
+                               'hardware': 7, 'resource': 8, 'program': 9}
 
     @staticmethod
     def transform_trace(re_obj):
@@ -88,8 +92,10 @@ class Netrunner:
     async def arg_parse_nets(self, *, string_to_parse: str):
         m_response = ""
         m_criteria_list = []
-        print_fields = ['uniqueness', 'title', 'text', 'cost', 'keywords', 'faction_code', 'faction_cost', 'trash_cost',
-                        'type_code']
+        default_print_fields = ['uniqueness', 'title', 'text', 'cost', 'keywords', 'faction_code', 'faction_cost',
+                                'trash_cost', 'type_code']
+        search_fields_appends = []
+        type_fields_appends = []
         extra_type_fields = {
             'agenda': ('advancement_cost', 'agenda_points',),
             'identity': ('base_link', 'influence_limit', 'deck_limit', 'minimum_deck_size',),
@@ -135,7 +141,7 @@ class Netrunner:
             # return args
             parser_dictionary = vars(args)
             if parser_dictionary['debug-flags']:
-                m_response += str(args)
+                m_response += str(args) + "\n"
             # run through each key that we need to build up a list of words to check for exact existence,
             # and add them to the list, if they're in the args
             for key in parser_dictionary.keys():
@@ -143,8 +149,8 @@ class Netrunner:
                 if key in concat_categories:
                     if parser_dictionary[key] is not None:
                         # Add the key to the printed result, if it's not already included
-                        if key not in print_fields:
-                            print_fields.append(key)
+                        if key not in default_print_fields:
+                            search_fields_appends.append(key)
                         # search parameters come in key: [['string'], ['other', 'string']
                         # for an input like: --flag string --flag other string
                         # we'll treat each --flag {value} as a seperate criteria that must be met, and join the
@@ -159,8 +165,8 @@ class Netrunner:
                 # then check the lists that are done literally
                 if key in single_categories:
                     if parser_dictionary[key] is not None:
-                        if key not in print_fields:
-                            print_fields.append(key)
+                        if key not in default_print_fields:
+                            search_fields_appends.append(key)
                         m_criteria_list.append((key, parser_dictionary[key]))
             if not self.init_api:
                 self.refresh_nr_api()
@@ -181,23 +187,35 @@ class Netrunner:
                         # we have a card, so let's add the default type fields, if any by type
                         if card['type_code'] in extra_type_fields:
                             for extra_field in extra_type_fields[card['type_code']]:
-                                if extra_field not in print_fields:
-                                    print_fields.insert(3, extra_field)
+                                if extra_field not in default_print_fields:
+                                    type_fields_appends.append(extra_field)
                         # if the flag is set, skip all text info
                         if parser_dictionary["title-only"]:
                             print_fields = ['title']
+                        else:
+                            # our list of fields to print starts with the default list of keys for all cards
+                            print_fields = default_print_fields
+                            # Add any fields that the particular card needs by its type
+                            for field in type_fields_appends:
+                                if field not in print_fields:
+                                    print_fields.append(field)
+                            # add any fields that the user explicitly searched for
+                            for field in search_fields_appends:
+                                if field not in print_fields:
+                                    print_fields.append(field)
                         c_response += "```\n"
                         for c_key in print_fields:
                             if c_key in card.keys():
-                                if c_key not in special_fields:
-                                    c_response += "{0}:\"{1}\"\n".format(
-                                        c_key, self.replace_api_text_with_emoji(card[c_key]))
-                                else:
-                                    if c_key in 'uniqueness' and card[c_key] is True:
-                                        c_response += '🔹:'
-                                    if c_key in 'code':
-                                        c_response += "http://netrunnerdb.com/card_image/{0}.png\n".format(
-                                            card[c_key])
+                                c_response += self.transform_api_items_to_printable_format(c_key, card[c_key])
+                                # if c_key not in special_fields:
+                                #    c_response += "{0}:\"{1}\"\n".format(
+                                #        c_key, self.replace_api_text_with_emoji(card[c_key]))
+                                # else:
+                                #    if c_key in 'uniqueness' and card[c_key] is True:
+                                #        c_response += '🔹:'
+                                #    if c_key in 'code':
+                                #        c_response += "http://netrunnerdb.com/card_image/{0}.png\n".format(
+                                #           card[c_key])
                         c_response += "```\n"
                         if (len(m_response) + len(c_response)) >= (self.max_message_len - 20):
                             m_response += "\n[{0}/{1}]\n".format(i, len(m_match_list))
@@ -213,6 +231,37 @@ class Netrunner:
             # truncate message if it exceed the character limit
             m_response = m_response[:self.max_message_len - 10] + "\ncont..."
         await self.bot.say(m_response)
+
+    def transform_api_items_to_printable_format(self, api_key, value):
+        # this function transforms the internal keys used in the api to a more user friendly print format
+        value = self.replace_api_text_with_emoji(value)
+        key_transform = {
+            "title": "{0}\n".format(value),
+            "text": "\"{0}\"\n".format(value),
+            "cost": "cost: {0}\n".format(value),
+            "strength": "str: {0}\n".format(value),
+            "keywords": "subtype: {0}\n".format(value),
+            "type_code": "type: {0}\n".format(value),
+            "uniqueness": "🔹:",
+            "faction_cost": "{0}▪\n".format(value),
+            "memory_cost": "MU: {0}\n".format(value),
+            "trash_cost": "trash: {0}\n".format(value),
+            "advancement_cost": "adv: {0}\n".format(value),
+            "agenda_points": "AP: {0}\n".format(value),
+            "side_code": "side: {0}\n".format(value),
+            "faction_code": "faction: {0}\n".format(value),
+            "pack_code": "pack: {0}\n".format(value),
+            "position": "position: {0}\n",
+            "quantity": "quantity: {0}\n",
+            "base_link": "{0}🔁\n".format(value),
+            "influence_limit": "max inf: {0}\n".format(value),
+            "deck_limit": "deck limit: {0}\n".format(value),
+            "minimum_deck_size": "min deck size: {0}\n".format(value),
+            "flavor": "{0}\n".format(value),
+            "illustrator": "illustrator: {0}".format(value),
+            "code": "http://netrunnerdb.com/card_image/{0}.png\n".format(value)
+        }
+        return key_transform[api_key]
 
     def parse_trace_tag(self, api_string):
         trace_tag_g = re.sub("(<trace>Trace )(\d)(</trace>)", self.transform_trace, api_string, flags=re.I)
@@ -326,6 +375,7 @@ class Netrunner:
     !nr <title>
     <card image link>
     """
+
     @commands.command(name="old_nets", aliases=['leg_nets'])
     async def leg(self, *, cardname: str):
         """
