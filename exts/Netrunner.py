@@ -100,7 +100,7 @@ class Netrunner:
             'agenda': ('advancement_cost', 'agenda_points',),
             'identity': ('minimum_deck_size', 'influence_limit', ),
             'program': ('memory_cost', 'strength'),
-            'ice': ('strength'),
+            'ice': ('strength', ),
         }
         special_fields = ['code', 'uniqueness']
         nets_parser = DiscordArgParse(prog='flag_nets')
