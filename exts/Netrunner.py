@@ -487,7 +487,11 @@ class Netrunner:
             m_response = m_response[:self.max_message_len - 10] + "\ncont..."
         await self.bot.say(m_response)
 
-    @commands.command(aliases=['netrunner'])
+    @commands.command(aliases=['nr','netrunner'])
+    async def nr_flags(self, *, card_search:str):
+        self.arg_parse_nets(card_search + "--image-only")
+
+    '''@commands.command(aliases=['netrunner'])
     async def nr(self, *, cardname: str):
         """Netrunner card lookup"""
         m_query = unidecode(cardname.lower())
@@ -528,6 +532,7 @@ class Netrunner:
                 if len(m_cards) > 5:
                     m_response += "[{0}/{1}]".format(5, len(m_cards))
         await self.bot.say(m_response)
+'''
 
     def deck_parse(self, deck_id):
         m_response = ""
