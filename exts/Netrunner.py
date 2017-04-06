@@ -493,7 +493,7 @@ class Netrunner:
 
     @commands.command(aliases=['nr', 'netrunner'])
     async def nr_flags(self, *, card_search:str):
-        m_response = self.flag_parse(card_search + "--image-only")
+        m_response = self.flag_parse(card_search + " --image-only")
         await self.bot.say(m_response)
 
     '''@commands.command(aliases=['netrunner'])
