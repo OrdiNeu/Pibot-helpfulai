@@ -70,26 +70,7 @@ class Netrunner:
                                'event': 6,
                                'hardware': 7, 'resource': 8, 'program': 9}
 
-    @staticmethod
-    def transform_trace(re_obj):
-        ss_conv = {
-            '0': '⁰',
-            '1': '¹',
-            '2': '²',
-            '3': '³',
-            '4': '⁴',
-            '5': '⁵',
-            '6': '⁶',
-            '7': '⁷',
-            '8': '⁸',
-            '9': '⁹',
-        }
-        ret_string = "Trace"
-        ret_string += ss_conv[re_obj.group(2)] + " -"
-        return ret_string
-
-    @commands.command(name="flag_test", aliases=['nets'])
-    async def arg_parse_nets(self, *, string_to_parse: str):
+    def flag_parse(self, string_to_parse):
         m_response = ""
         m_criteria_list = []
         default_print_fields = ['uniqueness', 'base_link', 'title', 'cost', 'type_code', 'keywords', 'text',
@@ -98,8 +79,8 @@ class Netrunner:
         type_fields_appends = []
         extra_type_fields = {
             'agenda': ('advancement_cost', 'agenda_points',),
-            'identity': ('minimum_deck_size', 'influence_limit', ),
-            'program': ('memory_cost', ),
+            'identity': ('minimum_deck_size', 'influence_limit',),
+            'program': ('memory_cost',),
             # 'ice': ('strength', ),
         }
         special_fields = ['code', 'uniqueness']
@@ -230,6 +211,11 @@ class Netrunner:
         if len(m_response) >= self.max_message_len:
             # truncate message if it exceed the character limit
             m_response = m_response[:self.max_message_len - 10] + "\ncont..."
+        return m_response
+
+    @commands.command(name="flag_test", aliases=['nets'])
+    async def arg_parse_nets(self, *, string_to_parse: str):
+        m_response = self.flag_parse(string_to_parse)
         await self.bot.say(m_response)
 
     def transform_api_items_to_printable_format(self, api_key, value):
@@ -351,6 +337,24 @@ class Netrunner:
         self.nr_api = sorted([c for c in requests.get('https://netrunnerdb.com/api/2.0/public/cards').json()['data']],
                              key=lambda card: card['title'])
         self.init_api = True
+
+    @staticmethod
+    def transform_trace(re_obj):
+        ss_conv = {
+            '0': '⁰',
+            '1': '¹',
+            '2': '²',
+            '3': '³',
+            '4': '⁴',
+            '5': '⁵',
+            '6': '⁶',
+            '7': '⁷',
+            '8': '⁸',
+            '9': '⁹',
+        }
+        ret_string = "Trace"
+        ret_string += ss_conv[re_obj.group(2)] + " -"
+        return ret_string
 
     @staticmethod
     def apply_title_transform_jokes(card_title_criteria):
@@ -487,9 +491,10 @@ class Netrunner:
             m_response = m_response[:self.max_message_len - 10] + "\ncont..."
         await self.bot.say(m_response)
 
-    @commands.command(aliases=['nr','netrunner'])
+    @commands.command(aliases=['nr', 'netrunner'])
     async def nr_flags(self, *, card_search:str):
-        self.arg_parse_nets(card_search + "--image-only")
+        m_response = self.flag_parse(card_search + "--image-only")
+        await self.bot.say(m_response)
 
     '''@commands.command(aliases=['netrunner'])
     async def nr(self, *, cardname: str):
