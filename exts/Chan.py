@@ -55,9 +55,9 @@ class Chan:
                     if matches == len(message):
                         response += "http://boards.4chan.org/" + board + "/thread/" + str(t["no"]) + "\n"
         if response != "":
-            await send_message(msg.channel, response)
+            await self.bot.say(response)
         else:
-            await send_message(msg.channel, "No thread found.")
+            await self.bot.say("No thread found.")
 
 def setup(bot):
     bot.add_cog(Chan(bot))
