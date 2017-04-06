@@ -24,7 +24,7 @@ class Chan:
     async def chan(self, *, msg: str):
         """Finds a thread"""
         # Determine board/thread title
-        keywords = msg.content.lower().split()
+        keywords = msg.lower().split()
         board = "tg"
         message = keywords
         if len(keywords) > 1:
