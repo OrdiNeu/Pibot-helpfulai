@@ -57,3 +57,6 @@ class Chan:
             await send_message(msg.channel, response)
         else:
             await send_message(msg.channel, "No thread found.")
+
+def setup(bot):
+    bot.add_cog(Chan(bot))
