@@ -7,6 +7,7 @@ import sys
 
 import discord
 import inspect
+import requests
 
 # to expose to the eval command
 import datetime
