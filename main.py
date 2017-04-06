@@ -17,7 +17,8 @@ EXTENSIONS = [
     'exts.Netrunner',
     'exts.Arkham',
     'exts.LOTR',
-    'exts.Fortune'
+    'exts.Fortune',
+    'exts.Chan'
 ]
 
 bot = commands.Bot(
