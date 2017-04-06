@@ -20,8 +20,8 @@ class Chan:
     def __init__(self, bot):
         self.bot = bot
 
-    @commands.command(hidden=True)
-    async def chan(self, client, msg):
+    @commands.command()
+    async def chan(self, *, msg: str):
         """Finds a thread"""
         # Determine board/thread title
         keywords = msg.content.lower().split()
