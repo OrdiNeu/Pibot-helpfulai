@@ -11,7 +11,7 @@ import emoji
 from json.decoder import JSONDecodeError
 from discord.ext import commands
 
-from utils.DiscordArgParse import DiscordArgparseParseError, DiscordArgParse
+from exts.utils.DiscordArgParse import DiscordArgparseParseError, DiscordArgParse
 
 class Netrunner:
     """Netrunner related commands"""
