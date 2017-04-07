@@ -17,7 +17,7 @@ class Listener:
         if channel in attached:
             attached.append(self)
         else:
-            attached[channel] = self
+            attached[channel] = [self]
 
     def release(self, channel):
         global attached

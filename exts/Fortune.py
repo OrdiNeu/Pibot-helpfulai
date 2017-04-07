@@ -65,7 +65,7 @@ class Fortune:
     
     @commands.command(pass_context = True)
     async def test(self, ctx):
-        FortuneListener(self.bot, ctx.message.channel)
+        FortuneListener(self.bot, ctx.message.channel.id)
 
 def setup(bot):
     bot.add_cog(Fortune(bot))
