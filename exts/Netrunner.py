@@ -481,7 +481,7 @@ class Netrunner:
     @commands.command(pass_context = True)
     async def quiz(self, ctx):
         quiz = NetrunQuiz(self.bot, ctx.message.channel.id, self.nr_api)
-        await self.bot.say("What is faction is: " + quiz.card["title"])
+        await self.bot.say("What is faction is: " + quiz.card)
 
 
 def test_arg_parse_nets(string_to_parse: str):
