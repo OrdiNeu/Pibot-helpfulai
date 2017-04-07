@@ -470,7 +470,6 @@ class Netrunner:
             self.bot = bot
             self.attach(channel)
             self.card = random.choice(self.nr_api)
-            while self.card.
             await bot.say("What is faction is: " + self.card["title"])
         
         async def on_message(self, msg):
