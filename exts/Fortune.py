@@ -9,19 +9,6 @@ from discord.ext import commands
 import requests
 import random
 
-from .utils.listener import Listener
-
-class FortuneListener(Listener):
-    def __init__(self, bot, channel):
-        self.bot = bot
-        self.attach(channel)
-
-    async def on_message(self, msg):
-        if msg.content != "stop":
-            await self.bot.send_message(msg.channel, "ur mom")
-        else:
-            self.detach(msg.channel.id)
-
 class Fortune:
     """Fortune generating related commands"""
 
@@ -62,10 +49,6 @@ class Fortune:
             self.check_fortune(fort, 96, 100): "Perfect! Confess your love, Nothing could go wrong!"
         }
         await self.bot.say(fortune[True])
-    
-    @commands.command(pass_context = True)
-    async def test(self, ctx):
-        FortuneListener(self.bot, ctx.message.channel.id)
 
 def setup(bot):
     bot.add_cog(Fortune(bot))
