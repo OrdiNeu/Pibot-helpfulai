@@ -9,7 +9,7 @@ from discord.ext import commands
 import requests
 import random
 
-from .utils import listener
+from .utils.listener import Listener
 
 class FortuneListener(Listener):
     def __init__(self, bot, channel):
