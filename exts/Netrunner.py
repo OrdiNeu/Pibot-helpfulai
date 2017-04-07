@@ -480,6 +480,8 @@ class Netrunner:
 
     @commands.command(pass_context = True)
     async def quiz(self, ctx):
+        if not self.init_api:
+            self.refresh_nr_api()
         quiz = NetrunQuiz(self.bot, ctx.message.channel.id, self.nr_api)
         await self.bot.say("What is faction is: " + str(quiz.card))
 
