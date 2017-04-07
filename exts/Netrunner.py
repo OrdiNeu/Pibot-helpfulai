@@ -14,6 +14,19 @@ from discord.ext import commands
 from .utils.DiscordArgParse import DiscordArgparseParseError, DiscordArgParse
 from .utils.listener import Listener
 
+class NetrunQuiz(Listener):
+    def __init__(self, bot, channel):
+        self.bot = bot
+        self.attach(channel)
+        self.card = random.choice(self.nr_api)
+    
+    async def on_message(self, msg):
+        if msg.content != "!end":
+            self.detach(msg.channel.id)
+        if msg.content == self.card["faction_code"]:
+            await bot.say(msg.author.name + " got it!")
+            self.detach(msg.channel.id)
+
 class Netrunner:
     """Netrunner related commands"""
 
@@ -464,19 +477,6 @@ class Netrunner:
         m_response += link + "\n"
         m_response += self.deck_parse(id)
         await self.bot.say(m_response[:2000])
-
-    class NetrunQuiz(Listener):
-        def __init__(self, bot, channel):
-            self.bot = bot
-            self.attach(channel)
-            self.card = random.choice(self.nr_api)
-        
-        async def on_message(self, msg):
-            if msg.content != "!end":
-                self.detach(msg.channel.id)
-            if msg.content == self.card["faction_code"]:
-                await bot.say(msg.author.name + " got it!")
-                self.detach(msg.channel.id)
 
     @commands.command(pass_context = True)
     async def quiz(self, ctx):
