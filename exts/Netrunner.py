@@ -470,7 +470,6 @@ class Netrunner:
             self.bot = bot
             self.attach(channel)
             self.card = random.choice(self.nr_api)
-            await bot.say("What is faction is: " + self.card["title"])
         
         async def on_message(self, msg):
             if msg.content != "!end":
@@ -482,7 +481,8 @@ class Netrunner:
 
     @commands.command(pass_context = True):
     async def quiz(self, ctx):
-        NetrunQuiz(self.bot, ctx.message.channel.id)
+        quiz = NetrunQuiz(self.bot, ctx.message.channel.id)
+        await bot.say("What is faction is: " + quiz.card["title"])
 
 
 def test_arg_parse_nets(string_to_parse: str):
