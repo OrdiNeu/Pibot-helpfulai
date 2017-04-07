@@ -82,7 +82,7 @@ async def on_ready():
         status_msg = ""
 
         # Also get the status of our extensions
-        for extension in tuple(bot.extensions):
+        for extension in EXTENSIONS:
             try:
                 status_msg += extension + ": "
                 bot.unload_extension(extension)
