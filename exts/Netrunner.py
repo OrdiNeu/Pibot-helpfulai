@@ -23,7 +23,7 @@ class NetrunQuiz(Listener):
         # Check to make sure we pick an OK category to ask
         usable_category = False
         while not usable_category:
-            self.q_category = random.choice(self.card)
+            self.q_category = random.choice(self.card.keys())
             self.answer = self.card[self.category]
 
             usable_category = True
