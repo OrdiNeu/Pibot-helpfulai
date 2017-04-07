@@ -12,6 +12,7 @@ from json.decoder import JSONDecodeError
 from discord.ext import commands
 
 from .utils.DiscordArgParse import DiscordArgparseParseError, DiscordArgParse
+from .utils.listener import Listener
 
 class Netrunner:
     """Netrunner related commands"""
@@ -464,6 +465,26 @@ class Netrunner:
         m_response += self.deck_parse(id)
         await self.bot.say(m_response[:2000])
 
+    class NetrunQuiz(Listener):
+        def __init__(self, bot, channel):
+            self.bot = bot
+            self.attach(channel)
+            self.card = random.choice(self.nr_api)
+            while self.card.
+            await bot.say("What is faction is: " + self.card["title"])
+        
+        async def on_message(self, msg):
+            if msg.content != "!end":
+                self.detach(msg.channel.id)
+            if msg.content == self.card["faction_code"]:
+                await bot.say(msg.author.name + " got it!")
+                self.detach(msg.channel.id)
+            
+
+    @commands.command(pass_context = True):
+    async def quiz(self, ctx):
+        NetrunQuiz(self.bot, ctx.message.channel.id)
+
 
 def test_arg_parse_nets(string_to_parse: str):
     m_response = ""
@@ -513,7 +534,6 @@ def test_arg_parse_nets(string_to_parse: str):
             m_response += nets_parser.exit_message
     # return args
     return m_response
-
 
 def setup(bot):
     bot.add_cog(Netrunner(bot))
