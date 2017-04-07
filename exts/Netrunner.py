@@ -35,12 +35,12 @@ class NetrunQuiz(Listener):
                 usable_category = False
             if self.q_category in invalid_categories:
                 usable_category = False
-        if self.answer in self.answer_transforms:
-            self.answer = self.answer_transforms[self.answer]
-        # "neutral-runner" or self.answer == "neutral-corp":
-        #    self.answer = "neutral"
-        # if self.answer == "weyland-consortium":
-        #    self.answer = "weyland"
+        # if self.answer in self.answer_transforms:
+        #     self.answer = self.answer_transforms[self.answer]
+        if self.answer in "neutral-runner" or self.answer == "neutral-corp":
+            self.answer = "neutral"
+        if self.answer == "weyland-consortium":
+            self.answer = "weyland"
     
     async def on_message(self, msg):
         if msg.content.lower() == "!end":
