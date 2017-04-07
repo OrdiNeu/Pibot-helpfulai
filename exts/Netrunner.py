@@ -37,9 +37,9 @@ class NetrunQuiz(Listener):
         if msg.content.lower() == "!end":
             await self.bot.say("Stopping the quiz...")
             self.detach(msg.channel.id)
-        if msg.content.lower() == self.card[q_category]:
+        if msg.content.lower() == self.card[self.q_category]:
             await self.bot.say(msg.author.name + " got it!")
-            await self.bot.say("It was: " + self.card[q_category])
+            await self.bot.say("It was: " + self.card[self.q_category])
             self.detach(msg.channel.id)
 
 class Netrunner:
