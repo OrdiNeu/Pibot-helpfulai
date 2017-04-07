@@ -525,7 +525,6 @@ class Netrunner:
     @commands.command(pass_context=True)
     async def quiz(self, ctx):
         quiz_opts = DiscordArgParse(prog='nr_quiz')
-        quiz_opts.add_argument(nargs="1", action="store", dest="win_score")
         quiz_opts.add_argument('--spoiler', '-s', action='store_true', dest="spoiler")
         try:
             args = quiz_opts.parse_args(ctx.message.split())
