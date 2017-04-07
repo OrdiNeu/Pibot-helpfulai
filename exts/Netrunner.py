@@ -14,7 +14,9 @@ from discord.ext import commands
 from .utils.DiscordArgParse import DiscordArgparseParseError, DiscordArgParse
 from .utils.listener import Listener
 
+
 class NetrunQuiz(Listener):
+
     def __init__(self, bot, channel, nr_api):
         self.bot = bot
         self.attach(channel)
@@ -27,11 +29,18 @@ class NetrunQuiz(Listener):
             self.answer = self.card[self.q_category]
 
             usable_category = True
-            invalid_categories = ["code", "deck_limit", "flavor", "pack_code", "position", "quantity", "side_code", "title", "illustrator", "text", "keywords", "uniqueness"]
-            if self.answer == "null": usable_category = False
-            if self.q_category in invalid_categories: usable_category = False
-        if self.answer == "neutral-runner" or self.answer == "neutral-corp": self.answer = "neutral"
-        if self.answer == "weyland-consortium": self.answer = "weyland"
+            invalid_categories = ["code", "deck_limit", "flavor", "pack_code", "position", "quantity", "side_code",
+                                  "title", "illustrator", "text", "keywords", "uniqueness"]
+            if self.answer == "null":
+                usable_category = False
+            if self.q_category in invalid_categories:
+                usable_category = False
+        if self.answer in self.answer_transforms:
+            self.answer = self.answer_transforms[self.answer]
+        # "neutral-runner" or self.answer == "neutral-corp":
+        #    self.answer = "neutral"
+        # if self.answer == "weyland-consortium":
+        #    self.answer = "weyland"
     
     async def on_message(self, msg):
         if msg.content.lower() == "!end":
@@ -57,6 +66,26 @@ class Netrunner:
         self.type_code_sort = {'identity': 0, 'agenda': 1, 'asset': 2, 'upgrade': 3, 'operation': 4, 'ice': 5,
                                'event': 6,
                                'hardware': 7, 'resource': 8, 'program': 9}
+        self.key_transforms = {
+            "cost": "Cost",
+            "strength": "Strength",
+            "type_code": "Type",
+            "faction_cost": "Influence",
+            "memory_cost": "MU cost",
+            "trash_cost": "🗑 cost",
+            "advancement_cost": "Advancement cost",
+            "agenda_points": "Agenda Points",
+            "faction_code": "Faction",
+            "base_link": "[🔁]",
+            "influence_limit": "Influence Limit",
+            "minimum_deck_size": "Deck Minimum Size",
+            }
+        self.answer_transforms = {
+                "neutral-runner": "neutral",
+                "neutral-corp": "neutral",
+                "weyland-consortium": "weyland",
+                "haas-bioroid": "hb"
+            }
 
     def flag_parse(self, string_to_parse):
         m_response = ""
@@ -492,7 +521,7 @@ class Netrunner:
         m_response += self.deck_parse(id)
         await self.bot.say(m_response[:2000])
 
-    @commands.command(pass_context = True)
+    @commands.command(pass_context=True)
     async def quiz(self, ctx):
         if not self.init_api:
             self.refresh_nr_api()
