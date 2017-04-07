@@ -11,7 +11,7 @@ import random
 
 from .utils import listener
 
-class FortuneListener(listener):
+class FortuneListener(Listener):
     def __init__(self, bot, channel):
         self.bot = bot
         self.attach(channel)
