@@ -30,12 +30,16 @@ class NetrunQuiz(Listener):
             invalid_categories = ["code", "deck_limit", "flavor", "pack_code", "position", "quantity", "side_code", "title", "illustrator", "text", "keywords", "uniqueness"]
             if self.answer == "null": usable_category = False
             if self.q_category in invalid_categories: usable_category = False
+        if self.answer == "neutral-runner" or self.answer == "neutral-corp": self.answer = "neutral"
+        if self.answer == "weyland-consortium": self.answer = "weyland"
     
     async def on_message(self, msg):
-        if msg.content == "!end":
+        if msg.content.lower() == "!end":
+            await self.bot.say("Stopping the quiz...")
             self.detach(msg.channel.id)
-        if msg.content == self.card["faction_code"]:
-            await bot.say(msg.author.name + " got it!")
+        if msg.content.lower() == self.card[q_category]:
+            await self.bot.say(msg.author.name + " got it!")
+            await self.bot.say("It was: " + self.card[q_category])
             self.detach(msg.channel.id)
 
 class Netrunner:
