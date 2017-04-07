@@ -5,14 +5,25 @@ import re
 from unidecode import unidecode
 
 import discord
+from discord.ext import commands
 import requests
 import random
 
-from discord.ext import commands
+from .utils import listener
 
+class FortuneListener(listener):
+    def __init__(self, bot, channel):
+        self.bot = bot
+        self.attach(channel)
+
+    async def on_message(self, msg):
+        if msg.content != "stop":
+            await self.bot.send_message(msg.channel, "ur mom")
+        else:
+            self.detach(channel)
 
 class Fortune:
-    """Frtune generating related commands"""
+    """Fortune generating related commands"""
 
     def __init__(self, bot):
         self.bot = bot
@@ -51,7 +62,10 @@ class Fortune:
             self.check_fortune(fort, 96, 100): "Perfect! Confess your love, Nothing could go wrong!"
         }
         await self.bot.say(fortune[True])
-
+    
+    @commands.command(pass_context = True)
+    async def test(self, ctx):
+        FortuneListener(self.bot, ctx.message.channel)
 
 def setup(bot):
     bot.add_cog(Fortune(bot))

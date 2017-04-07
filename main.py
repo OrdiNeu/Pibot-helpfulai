@@ -8,6 +8,8 @@ import traceback
 from discord.ext import commands
 import json
 
+import exts.utils.listener
+
 # CONSTANTS ###################################################################
 COMMAND_PREFIX = ['?', '!']
 DESCRIPTION = 'OrdiNeu\'s Discord bot for the Netrunner channel.'
@@ -115,6 +117,12 @@ async def on_message(msg):
         prefix_end = text.find(" ")
         if prefix_end > 0:  # I.e. there was a space
             msg.content = text[0:prefix_end].lower() + text[prefix_end:]
+    
+    # Handle listeners, if any are set:
+    if msg.channel:
+        for listener in exts.utils.listener.attached:
+            listener.on_message(msg)
+
     await bot.process_commands(msg)
 
 # LOGIN AND RUN ###############################################################
