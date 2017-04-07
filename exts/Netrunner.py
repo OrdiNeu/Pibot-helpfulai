@@ -527,8 +527,8 @@ class Netrunner:
         quiz_opts = DiscordArgParse(prog='nr_quiz')
         quiz_opts.add_argument('--spoiler', '-s', action='store_true', dest="spoiler")
         try:
-            args = quiz_opts.parse_args(ctx.message.split())
-            parser_dictionary = vars(args)
+            #args = quiz_opts.parse_args(ctx.message.split())
+            #parser_dictionary = vars(args)
             if not self.init_api:
                 self.refresh_nr_api()
             quiz = NetrunQuiz(self.bot, ctx.message.channel.id, self.nr_api)
