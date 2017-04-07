@@ -15,10 +15,10 @@ from .utils.DiscordArgParse import DiscordArgparseParseError, DiscordArgParse
 from .utils.listener import Listener
 
 class NetrunQuiz(Listener):
-    def __init__(self, bot, channel):
+    def __init__(self, bot, channel, nr_api):
         self.bot = bot
         self.attach(channel)
-        self.card = random.choice(self.nr_api)
+        self.card = random.choice(nr_api)
     
     async def on_message(self, msg):
         if msg.content != "!end":
@@ -480,7 +480,7 @@ class Netrunner:
 
     @commands.command(pass_context = True)
     async def quiz(self, ctx):
-        quiz = NetrunQuiz(self.bot, ctx.message.channel.id)
+        quiz = NetrunQuiz(self.bot, ctx.message.channel.id, self.nr_api)
         await bot.say("What is faction is: " + quiz.card["title"])
 
 
