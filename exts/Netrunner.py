@@ -524,14 +524,25 @@ class Netrunner:
 
     @commands.command(pass_context=True)
     async def quiz(self, ctx):
-        if not self.init_api:
-            self.refresh_nr_api()
-        quiz = NetrunQuiz(self.bot, ctx.message.channel.id, self.nr_api)
-        if quiz.q_category in self.key_transforms:
-            question = self.key_transforms[quiz.q_category]
-        else:
-            question = quiz.q_category
-        await self.bot.say("What {0} is: {1}?".format(question, quiz.card["title"]))
+        quiz_opts = DiscordArgParse(prog='nr_quiz')
+        quiz_opts.add_argument(nargs="1", action="store", dest="win_score")
+        quiz_opts.add_argument('--spoiler', '-s', action='store_true', dest="spoiler")
+        try:
+            args = quiz_opts.parse_args(ctx.message.split())
+            parser_dictionary = vars(args)
+            if not self.init_api:
+                self.refresh_nr_api()
+            quiz = NetrunQuiz(self.bot, ctx.message.channel.id, self.nr_api)
+            if quiz.q_category in self.key_transforms:
+                question = self.key_transforms[quiz.q_category]
+            else:
+                question = quiz.q_category
+            await self.bot.say("What **{0}** is: *{1}*?".format(question, quiz.card["title"]))
+        except DiscordArgparseParseError as se:
+            if se.value is not None:
+                await self.bot.say(se.value)
+            if quiz_opts.exit_message is not None:
+                await self.bot.say(quiz_opts.exit_message)
 
 
 def test_arg_parse_nets(string_to_parse: str):
