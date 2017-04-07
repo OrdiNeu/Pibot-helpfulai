@@ -21,7 +21,7 @@ class NetrunQuiz(Listener):
         self.card = random.choice(nr_api)
     
     async def on_message(self, msg):
-        if msg.content != "!end":
+        if msg.content == "!end":
             self.detach(msg.channel.id)
         if msg.content == self.card["faction_code"]:
             await bot.say(msg.author.name + " got it!")
@@ -483,7 +483,7 @@ class Netrunner:
         if not self.init_api:
             self.refresh_nr_api()
         quiz = NetrunQuiz(self.bot, ctx.message.channel.id, self.nr_api)
-        await self.bot.say("What is faction is: " + str(quiz.card))
+        await self.bot.say("What faction is: " + quiz.card["title"])
 
 
 def test_arg_parse_nets(string_to_parse: str):
