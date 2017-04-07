@@ -19,7 +19,7 @@ class Listener:
         else:
             attached[channel] = [self]
 
-    def release(self, channel):
+    def detach(self, channel):
         global attached
         attached[channel].remove(self)
 
