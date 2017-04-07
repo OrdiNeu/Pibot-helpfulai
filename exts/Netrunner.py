@@ -477,9 +477,8 @@ class Netrunner:
             if msg.content == self.card["faction_code"]:
                 await bot.say(msg.author.name + " got it!")
                 self.detach(msg.channel.id)
-            
 
-    @commands.command(pass_context = True):
+    @commands.command(pass_context = True)
     async def quiz(self, ctx):
         quiz = NetrunQuiz(self.bot, ctx.message.channel.id)
         await bot.say("What is faction is: " + quiz.card["title"])
