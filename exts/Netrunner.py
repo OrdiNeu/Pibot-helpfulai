@@ -19,6 +19,17 @@ class NetrunQuiz(Listener):
         self.bot = bot
         self.attach(channel)
         self.card = random.choice(nr_api)
+
+        # Check to make sure we pick an OK category to ask
+        usable_category = False
+        while not usable_category:
+            self.q_category = random.choice(self.card)
+            self.answer = self.card[self.category]
+
+            usable_category = True
+            invalid_categories = ["code", "deck_limit", "flavor", "pack_code", "position", "quantity", "side_code", "title", "illustrator", "text", "keywords"]
+            if self.answer == "null": usable_category = False
+            if self.q_category in invalid_categories: usable_category = False
     
     async def on_message(self, msg):
         if msg.content == "!end":
@@ -483,7 +494,7 @@ class Netrunner:
         if not self.init_api:
             self.refresh_nr_api()
         quiz = NetrunQuiz(self.bot, ctx.message.channel.id, self.nr_api)
-        await self.bot.say("What faction is: " + quiz.card["title"])
+        await self.bot.say("What " + quiz.q_category + " is: " + quiz.card["title"])
 
 
 def test_arg_parse_nets(string_to_parse: str):
