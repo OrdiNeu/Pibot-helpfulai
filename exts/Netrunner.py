@@ -27,7 +27,7 @@ class NetrunQuiz(Listener):
             self.answer = self.card[self.q_category]
 
             usable_category = True
-            invalid_categories = ["code", "deck_limit", "flavor", "pack_code", "position", "quantity", "side_code", "title", "illustrator", "text", "keywords"]
+            invalid_categories = ["code", "deck_limit", "flavor", "pack_code", "position", "quantity", "side_code", "title", "illustrator", "text", "keywords", "uniqueness"]
             if self.answer == "null": usable_category = False
             if self.q_category in invalid_categories: usable_category = False
     
