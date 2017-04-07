@@ -526,7 +526,11 @@ class Netrunner:
         if not self.init_api:
             self.refresh_nr_api()
         quiz = NetrunQuiz(self.bot, ctx.message.channel.id, self.nr_api)
-        await self.bot.say("What " + quiz.q_category + " is: " + quiz.card["title"])
+        if quiz.q_category in self.key_transforms:
+            question = self.key_transforms[quiz.q_category]
+        else:
+            question = quiz.q_category
+        await self.bot.say("What {0} is: {1}?".format(question, quiz.card["title"]))
 
 
 def test_arg_parse_nets(string_to_parse: str):
