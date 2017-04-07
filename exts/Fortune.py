@@ -20,7 +20,7 @@ class FortuneListener(Listener):
         if msg.content != "stop":
             await self.bot.send_message(msg.channel, "ur mom")
         else:
-            self.detach(channel)
+            self.detach(msg.channel.id)
 
 class Fortune:
     """Fortune generating related commands"""
