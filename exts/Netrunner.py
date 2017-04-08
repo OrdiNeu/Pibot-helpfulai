@@ -46,6 +46,7 @@ class NetrunQuiz(Listener):
         self.key_transforms = key_transforms
         self.q_category = None
         self.timetowait = timetowait
+        self.sleeping = False
 
     def create_question(self):
         """Create a question to be answered"""
@@ -81,7 +82,7 @@ class NetrunQuiz(Listener):
         if msg.content.lower() == "!skip":
             await self.bot.send_message(msg.channel, "Skipping the round...")
             await self.end_round(msg.channel)
-        if self.q_category and not msg.author.id in self.has_answered:
+        if not self.sleeping and not msg.author.id in self.has_answered:
             self.has_answered[msg.author.id] = 1
             if msg.content.lower() == str(self.answer):
                 await self.bot.add_reaction(msg, u"\U0001F3C6")
@@ -130,11 +131,11 @@ class NetrunQuiz(Listener):
             await self.print_scores(channel)
             await self.end_game(channel)
         else:
-            self.q_category = None
+            self.sleeping = True
             await asyncio.sleep(self.timetowait)
             # Try to end race condition here
-            if not self.q_category:
-                self.q_category = 1
+            if self.sleeping:
+                self.sleeping = False
                 self.create_question()
                 await self.ask_question(channel)
 
