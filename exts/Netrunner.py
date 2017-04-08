@@ -46,7 +46,7 @@ class NetrunQuiz(Listener):
             self.answer = self.answer_transforms[self.answer]
 
         # Timeout
-        self.timer = threading.Timer(10.0, NetrunQuiz.end_game, args=[self, channel])
+        self.timer = threading.Timer(1.0, NetrunQuiz.end_game, args=[self, channel])
         self.timer.start()
 
     async def on_message(self, msg):
@@ -66,9 +66,7 @@ class NetrunQuiz(Listener):
 
     def end_game(self, channel):
         loop = asyncio.new_event_loop()
-        asyncio.set_event_loop(loop)
-        loop = asyncio.get_event_loop()
-        loop.run_until_complete(self.bot.send_message(channel, "Time's up!\nIt was: " + str(self.answer)))
+        loop.run_until_complete(asyncio.gather(self.bot.send_message(channel, "Time's up!\nIt was: " + str(self.answer))))
         loop.close()
         self.detach(channel.id)
         self.timer.cancel()
