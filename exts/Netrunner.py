@@ -51,7 +51,7 @@ class NetrunQuiz(Listener):
             await self.end_game(msg.channel)
         if not msg.author.id in self.has_answered:
             self.has_answered[msg.author.id] = 1
-            if msg.content.lower() == str(self.card[self.q_category]):
+            if msg.content.lower() == str(self.answer):
                 await self.bot.add_reaction(msg, u"\U0001F3C6")
                 await self.bot.send_message(msg.channel,
                                             msg.author.name + " got it!\nIt was: " + str(self.answer))
