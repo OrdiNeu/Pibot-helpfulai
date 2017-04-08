@@ -594,7 +594,7 @@ class Netrunner:
 
     @commands.command(pass_context=True)
     async def quiz(self, ctx):
-        quiz_opts = DiscordArgParse(prog='quiz')
+        quiz_opts = DiscordArgParse(prog='!quiz')
         quiz_opts.add_argument('--spoiler', '-s', action='store_true', dest="spoiler")
         quiz_opts.add_argument('--rounds', '-r', action='store', type=int, dest="rounds")
         quiz_opts.add_argument('--fptp', '-f', action='store', type=int, dest="fptp")
