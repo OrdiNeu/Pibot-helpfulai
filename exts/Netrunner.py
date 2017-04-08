@@ -125,7 +125,7 @@ class NetrunQuiz(Listener):
             await self.print_scores(channel)
             await self.end_game(channel)
         else:
-            time.sleep(5)
+            asyncio.sleep(5)
             self.create_question()
             await self.ask_question(channel)
 
