@@ -40,7 +40,7 @@ class NetrunQuiz(Listener):
                 usable_category = False
             if self.q_category in invalid_categories:
                 usable_category = False
-        if self.answer in self.answer_transforms:
+        if self.answer in self.answer_transforms.keys():
             self.answer = self.answer_transforms[self.answer]
         #if self.answer is str:
         #    if self.answer in "neutral-runner" or self.answer == "neutral-corp":
