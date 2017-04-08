@@ -2,6 +2,7 @@
 ### PREAMBLE ##################################################################
 import re
 import random
+import threading
 import time
 from unidecode import unidecode
 
@@ -14,48 +15,57 @@ from discord.ext import commands
 from .utils.DiscordArgParse import DiscordArgparseParseError, DiscordArgParse
 from .utils.listener import Listener
 
-
 class NetrunQuiz(Listener):
-
     def __init__(self, bot, channel, nr_api):
         self.bot = bot
         self.attach(channel)
         self.card = random.choice(nr_api)
         self.answer_transforms = {
-                "neutral-runner": "neutral",
-                "neutral-corp": "neutral",
-                "weyland-consortium": "weyland",
-                "haas-bioroid": "hb"
+            "neutral-runner": "neutral",
+            "neutral-corp": "neutral",
+            "weyland-consortium": "weyland",
+            "haas-bioroid": "hb"
             }
         # Check to make sure we pick an OK category to ask
         usable_category = False
+        self.has_answered = {}
         while not usable_category:
             self.q_category = random.choice(list(self.card.keys()))
             self.answer = self.card[self.q_category]
 
             usable_category = True
-            invalid_categories = ["code", "deck_limit", "flavor", "pack_code", "position", "quantity", "side_code",
-                                  "title", "illustrator", "text", "keywords", "uniqueness"]
+            invalid_categories = ["code", "deck_limit", "flavor", "pack_code", "position",
+                                  "quantity", "side_code", "title", "illustrator", "text",
+                                  "keywords", "uniqueness"]
             if self.answer == "null":
                 usable_category = False
             if self.q_category in invalid_categories:
                 usable_category = False
         if self.answer in self.answer_transforms.keys():
             self.answer = self.answer_transforms[self.answer]
-        #if self.answer is str:
-        #    if self.answer in "neutral-runner" or self.answer == "neutral-corp":
-        #        self.answer = "neutral"
-        #    if self.answer == "weyland-consortium":
-        #        self.answer = "weyland"
-    
+
+        # Timeout
+        self.timer = threading.Timer(10.0, NetrunQuiz.end_game, args=[self, channel])
+        self.timer.start()
+
     async def on_message(self, msg):
         if msg.content.lower() == "!end":
             await self.bot.send_message(msg.channel, "Stopping the quiz...")
-            self.detach(msg.channel.id)
-        if msg.content.lower() == str(self.card[self.q_category]):
-            await self.bot.add_reaction(msg, u"\U0001F3C6")
-            await self.bot.send_message(msg.channel, msg.author.name + " got it!\nIt was: " + str(self.card[self.q_category]))
-            self.detach(msg.channel.id)
+            await self.end_game(msg.channel)
+        if not self.has_answered[msg.author.id]:
+            self.has_answered[msg.author.id] = 1
+            if msg.content.lower() == str(self.card[self.q_category]):
+                await self.bot.add_reaction(msg, u"\U0001F3C6")
+                await self.bot.send_message(msg.channel, msg.author.name + " got it!\nIt was: " + self.answer)
+                self.detach(msg.channel.id)
+                self.timer.cancel()
+            else:
+                await self.bot.add_reaction(msg, u"\U0001F6AB")
+
+    async def end_game(self, channel):
+        await self.bot.send_message(channel, "Time's up!\nIt was: " + self.answer)
+        self.detach(channel.id)
+        self.timer.cancel()
 
 class Netrunner:
     """Netrunner related commands"""
