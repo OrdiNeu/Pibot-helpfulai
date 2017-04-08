@@ -21,7 +21,12 @@ class NetrunQuiz(Listener):
         self.bot = bot
         self.attach(channel)
         self.card = random.choice(nr_api)
-
+        self.answer_transforms = {
+                "neutral-runner": "neutral",
+                "neutral-corp": "neutral",
+                "weyland-consortium": "weyland",
+                "haas-bioroid": "hb"
+            }
         # Check to make sure we pick an OK category to ask
         usable_category = False
         while not usable_category:
@@ -35,13 +40,13 @@ class NetrunQuiz(Listener):
                 usable_category = False
             if self.q_category in invalid_categories:
                 usable_category = False
-        # if self.answer in self.answer_transforms:
-        #     self.answer = self.answer_transforms[self.answer]
-        if self.answer is str:
-            if self.answer in "neutral-runner" or self.answer == "neutral-corp":
-                self.answer = "neutral"
-            if self.answer == "weyland-consortium":
-                self.answer = "weyland"
+        if self.answer in self.answer_transforms:
+            self.answer = self.answer_transforms[self.answer]
+        #if self.answer is str:
+        #    if self.answer in "neutral-runner" or self.answer == "neutral-corp":
+        #        self.answer = "neutral"
+        #    if self.answer == "weyland-consortium":
+        #        self.answer = "weyland"
     
     async def on_message(self, msg):
         if msg.content.lower() == "!end":
@@ -81,12 +86,7 @@ class Netrunner:
             "influence_limit": "Influence Limit",
             "minimum_deck_size": "Deck Minimum Size",
             }
-        self.answer_transforms = {
-                "neutral-runner": "neutral",
-                "neutral-corp": "neutral",
-                "weyland-consortium": "weyland",
-                "haas-bioroid": "hb"
-            }
+
 
     def flag_parse(self, string_to_parse):
         m_response = ""
