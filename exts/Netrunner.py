@@ -74,8 +74,11 @@ class NetrunQuiz(Listener):
     async def on_message(self, msg):
         """Handle people's responses"""
         if msg.content.lower() == "!end":
-            await self.bot.send_message(msg.channel, "Stopping the round...")
+            await self.bot.send_message(msg.channel, "Ending the Fun...")
             await self.end_game(msg.channel)
+        if msg.content.lower() == "!skip":
+            await self.bot.send_message(msg.channel, "Skipping the round...")
+            await self.end_round(msg.channel)
         if not msg.author.id in self.has_answered:
             self.has_answered[msg.author.id] = 1
             if msg.content.lower() == str(self.answer):
@@ -600,7 +603,7 @@ class Netrunner:
         quiz_opts = DiscordArgParse(prog='!quiz')
         quiz_opts.add_argument('--spoiler', '-s', action='store_true', dest="spoiler")
         quiz_opts.add_argument('--rounds', '-r', action='store', type=int, dest="rounds")
-        quiz_opts.add_argument('--fptp', '-f', action='store', type=int, dest="fptp")
+        quiz_opts.add_argument('--fptp', '-f', action='store', type=int, dest="points")
         try:
             # Arg parsing
             flags = ctx.message.content.split()
@@ -613,13 +616,13 @@ class Netrunner:
             num_rounds = 1
             mode = NetrunQuiz.MODE_ONESHOT
             if args_dict["rounds"]:
-                if args_dict["fptp"]:
+                if args_dict["points"]:
                     await self.bot.say("You can't have both rounds and fptp set!")
                     return
                 num_rounds = args_dict["rounds"]
                 mode = NetrunQuiz.MODE_ROUNDS
-            elif args_dict["fptp"]:
-                num_rounds = args_dict["fptp"]
+            elif args_dict["points"]:
+                num_rounds = args_dict["points"]
                 mode = NetrunQuiz.MODE_FPTP
 
             # Create the quiz
