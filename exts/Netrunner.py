@@ -75,7 +75,7 @@ class NetrunQuiz(Listener):
         """Handle people's responses"""
         if msg.content.lower() == "!end":
             await self.bot.send_message(msg.channel, "Stopping the round...")
-            await self.end_round(msg.channel)
+            await self.end_game(msg.channel)
         if not msg.author.id in self.has_answered:
             self.has_answered[msg.author.id] = 1
             if msg.content.lower() == str(self.answer):
@@ -101,6 +101,7 @@ class NetrunQuiz(Listener):
         if self.mode == self.MODE_ROUNDS:
             if self.rounds_played >= self.rounds:
                 return True
+            return False
         return True
 
     async def print_scores(self, channel):
@@ -118,10 +119,12 @@ class NetrunQuiz(Listener):
         """End the current question"""
         await self.bot.send_message(channel, "It was: " + str(self.answer))
         self.has_answered = {}
+        self.rounds_played += 1
         if self.is_over():
             await self.print_scores(channel)
             await self.end_game(channel)
         else:
+            time.sleep(5)
             self.create_question()
             await self.ask_question(channel)
 
