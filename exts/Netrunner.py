@@ -132,8 +132,11 @@ class NetrunQuiz(Listener):
         else:
             self.q_category = None
             await asyncio.sleep(self.timetowait)
-            self.create_question()
-            await self.ask_question(channel)
+            # Try to end race condition here
+            if not self.q_category:
+                self.q_category = 1
+                self.create_question()
+                await self.ask_question(channel)
 
 class Netrunner:
     """Netrunner related commands"""
