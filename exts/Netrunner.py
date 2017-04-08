@@ -22,7 +22,8 @@ class NetrunQuiz(Listener):
         "neutral-runner": "neutral",
         "neutral-corp": "neutral",
         "weyland-consortium": "weyland",
-        "haas-bioroid": "hb"
+        "haas-bioroid": "hb",
+        "identity": "id"
         }
     INVALID_CATEGORIES = ["code", "deck_limit", "flavor", "pack_code", "position",
                           "quantity", "side_code", "title", "illustrator", "text",
