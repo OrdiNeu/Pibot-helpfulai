@@ -600,7 +600,12 @@ class Netrunner:
         quiz_opts.add_argument('--fptp', '-f', action='store', type=int, dest="fptp")
         try:
             # Arg parsing
-            args = quiz_opts.parse_args(ctx.message.content.split())
+            flags = ctx.message.content.split()
+            if len(flags) > 1:
+                flags = flags[1:]
+            else:
+                flags = []
+            args = quiz_opts.parse_args(flags)
             args_dict = vars(args)
             num_rounds = 1
             mode = NetrunQuiz.MODE_ONESHOT
