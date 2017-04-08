@@ -109,6 +109,7 @@ class NetrunQuiz(Listener):
         scores = [[player, self.scores[player]] for player in self.scores]
         scores = sorted(scores, key=lambda z: z[1], reverse=True)
         printable = tabulate(scores, headers=["Player", "Score"])
+        printable = "```\n" + printable + "\n```"
         await self.bot.send_message(channel, printable)
 
     async def end_game(self, channel):
