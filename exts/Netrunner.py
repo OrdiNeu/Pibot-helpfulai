@@ -62,7 +62,6 @@ class NetrunQuiz(Listener):
     async def end_game(self, channel):
         await self.bot.send_message(channel, "Time's up!\nIt was: " + str(self.answer))
         self.detach(channel.id)
-        self.timer.cancel()
 
 class Netrunner:
     """Netrunner related commands"""
