@@ -44,7 +44,7 @@ class NetrunQuiz(Listener):
         self.rounds_played = 0
         self.key_transforms = key_transforms
         self.q_category = None
-        self.timetowait = 5
+        self.timetowait = timetowait
 
     def create_question(self):
         """Create a question to be answered"""
@@ -130,7 +130,7 @@ class NetrunQuiz(Listener):
             await self.end_game(channel)
         else:
             self.q_category = None
-            await asyncio.sleep(5.0)
+            await asyncio.sleep(self.timetowait)
             self.create_question()
             await self.ask_question(channel)
 
