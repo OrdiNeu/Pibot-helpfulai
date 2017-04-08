@@ -1,5 +1,6 @@
 # Netrunner extension for pibot
 ### PREAMBLE ##################################################################
+import asyncio
 import re
 import random
 import threading
@@ -56,14 +57,17 @@ class NetrunQuiz(Listener):
             self.has_answered[msg.author.id] = 1
             if msg.content.lower() == str(self.card[self.q_category]):
                 await self.bot.add_reaction(msg, u"\U0001F3C6")
-                await self.bot.send_message(msg.channel, msg.author.name + " got it!\nIt was: " + self.answer)
+                await self.bot.send_message(msg.channel,
+                                            msg.author.name + " got it!\nIt was: " + self.answer)
                 self.detach(msg.channel.id)
                 self.timer.cancel()
             else:
                 await self.bot.add_reaction(msg, u"\U0001F6AB")
 
-    async def end_game(self, channel):
-        await self.bot.send_message(channel, "Time's up!\nIt was: " + self.answer)
+    def end_game(self, channel):
+        loop = asyncio.get_event_loop()
+        loop.run_until_complete(self.bot.send_message(channel, "Time's up!\nIt was: " + self.answer))
+        loop.close()
         self.detach(channel.id)
         self.timer.cancel()
 
