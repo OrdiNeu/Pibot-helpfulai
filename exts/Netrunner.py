@@ -8,8 +8,9 @@ import time
 from unidecode import unidecode
 
 import discord
-import requests
 import emoji
+import requests
+from tabulate import tabulate
 from json.decoder import JSONDecodeError
 from discord.ext import commands
 
@@ -17,51 +18,113 @@ from .utils.DiscordArgParse import DiscordArgparseParseError, DiscordArgParse
 from .utils.listener import Listener
 
 class NetrunQuiz(Listener):
-    def __init__(self, bot, channel, nr_api):
+    ANSWER_TRANSFORMS = {
+        "neutral-runner": "neutral",
+        "neutral-corp": "neutral",
+        "weyland-consortium": "weyland",
+        "haas-bioroid": "hb"
+        }
+    INVALID_CATEGORIES = ["code", "deck_limit", "flavor", "pack_code", "position",
+                          "quantity", "side_code", "title", "illustrator", "text",
+                          "keywords", "uniqueness"]
+    MODE_ONESHOT = 0
+    MODE_ROUNDS = 1
+    MODE_FPTP = 2
+
+    def __init__(self, bot, channel, nr_api, key_transforms, mode, rounds=1):
         self.bot = bot
+        self.api = nr_api
+        self.card = None
+        self.answer = ""
+        self.has_answered = {}
+        self.scores = {}
         self.attach(channel.id)
-        self.card = random.choice(nr_api)
-        self.answer_transforms = {
-            "neutral-runner": "neutral",
-            "neutral-corp": "neutral",
-            "weyland-consortium": "weyland",
-            "haas-bioroid": "hb"
-            }
+        self.mode = mode
+        self.rounds = rounds
+        self.rounds_played = 0
+        self.key_transforms = key_transforms
+        self.q_category = None
+
+    def create_question(self):
+        """Create a question to be answered"""
+        self.card = random.choice(self.nr_api)
         # Check to make sure we pick an OK category to ask
         usable_category = False
-        self.has_answered = {}
         while not usable_category:
             self.q_category = random.choice(list(self.card.keys()))
             self.answer = self.card[self.q_category]
 
             usable_category = True
-            invalid_categories = ["code", "deck_limit", "flavor", "pack_code", "position",
-                                  "quantity", "side_code", "title", "illustrator", "text",
-                                  "keywords", "uniqueness"]
             if self.answer == "null":
                 usable_category = False
-            if self.q_category in invalid_categories:
+            if self.q_category in self.INVALID_CATEGORIES:
                 usable_category = False
-        if self.answer in self.answer_transforms.keys():
-            self.answer = self.answer_transforms[self.answer]
+        if self.answer in self.ANSWER_TRANSFORMS.keys():
+            self.answer = self.ANSWER_TRANSFORMS[self.answer]
+
+    async def ask_question(self, channel):
+        """Ask the question"""
+        if self.q_category in self.key_transforms:
+            question = self.key_transforms[self.q_category]
+        else:
+            question = self.q_category
+        await self.bot.send_message(channel,
+                                    "What **{0}** is: *{1}*?".format(question, self.card["title"]))
 
     async def on_message(self, msg):
+        """Handle people's responses"""
         if msg.content.lower() == "!end":
-            await self.bot.send_message(msg.channel, "Stopping the quiz...")
-            await self.end_game(msg.channel)
+            await self.bot.send_message(msg.channel, "Stopping the round...")
+            await self.end_round(msg.channel)
         if not msg.author.id in self.has_answered:
             self.has_answered[msg.author.id] = 1
             if msg.content.lower() == str(self.answer):
                 await self.bot.add_reaction(msg, u"\U0001F3C6")
                 await self.bot.send_message(msg.channel,
-                                            msg.author.name + " got it!\nIt was: " + str(self.answer))
-                self.detach(msg.channel.id)
+                                            msg.author.name + " got it!\n" +
+                                            "It was: " + str(self.answer))
+                if msg.author.name in self.scores:
+                    self.scores[msg.author.id] += 1
+                else:
+                    self.scores[msg.author.id] = 1
+                self.end_round(msg.channel)
             else:
                 await self.bot.add_reaction(msg, u"\U0001F6AB")
 
+    def is_over(self):
+        """Returns True if the game should be over, False otherwise"""
+        if self.mode == self.MODE_ONESHOT: return True
+        if self.mode == self.MODE_FPTP:
+            for player in self.scores:
+                if self.scores[player] >= self.rounds:
+                    return True
+            return False
+        if self.mode == self.MODE_ROUNDS:
+            if self.rounds_played >= self.rounds:
+                return True
+        return True
+
+    async def print_scores(self, channel):
+        """Print player scores to the given channel"""
+        scores = [[player, self.scores[player]] for player in self.scores]
+        scores = sorted(scores, key=lambda z: z[1], reverse=True)
+        printable = tabulate(scores, headers=["Player", "Score"])
+        await self.bot.send_message(channel, printable)
+
     async def end_game(self, channel):
-        await self.bot.send_message(channel, "Time's up!\nIt was: " + str(self.answer))
+        """End the game"""
         self.detach(channel.id)
+
+    async def end_round(self, channel):
+        """End the current question"""
+        await self.bot.send_message(channel, "It was: " + str(self.answer))
+        self.has_answered = {}
+        if self.is_over:
+            await self.print_scores(channel)
+            await self.end_game(channel)
+        else:
+            self.create_question()
+            await self.ask_question(channel)
 
 class Netrunner:
     """Netrunner related commands"""
@@ -533,17 +596,29 @@ class Netrunner:
     async def quiz(self, ctx):
         quiz_opts = DiscordArgParse(prog='nr_quiz')
         quiz_opts.add_argument('--spoiler', '-s', action='store_true', dest="spoiler")
+        quiz_opts.add_argument('--rounds', '-r', action='store', type=int, dest="rounds")
+        quiz_opts.add_argument('--fptp', '-r', action='store', type=int, dest="fptp")
         try:
-            #args = quiz_opts.parse_args(ctx.message.split())
-            #parser_dictionary = vars(args)
+            # Arg parsing
+            args = quiz_opts.parse_args(ctx.message.content.split())
+            args_dict = vars(args)
+            num_rounds = 1
+            mode = NetrunQuiz.MODE_ONESHOT
+            if "rounds" in args_dict:
+                if "fptp" in args_dict:
+                    await self.bot.say("You can't have both rounds and fptp set!")
+                    return
+                num_rounds = args_dict["rounds"]
+                mode = NetrunQuiz.MODE_ROUNDS
+            elif "fptp" in args_dict:
+                num_rounds = args_dict["fptp"]
+                mode = NetrunQuiz.MODE_FPTP
+
+            # Create the quiz
             if not self.init_api:
                 self.refresh_nr_api()
-            quiz = NetrunQuiz(self.bot, ctx.message.channel, self.nr_api)
-            if quiz.q_category in self.key_transforms:
-                question = self.key_transforms[quiz.q_category]
-            else:
-                question = quiz.q_category
-            await self.bot.say("What **{0}** is: *{1}*?".format(question, quiz.card["title"]))
+            quiz = NetrunQuiz(self.bot, ctx.message.channel, self.nr_api, self.key_transforms, mode, num_rounds)
+            await quiz.ask_question(self, ctx.message.channel)
         except DiscordArgparseParseError as se:
             if se.value is not None:
                 await self.bot.say(se.value)
