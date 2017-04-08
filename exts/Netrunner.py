@@ -65,7 +65,7 @@ class NetrunQuiz(Listener):
                 await self.bot.add_reaction(msg, u"\U0001F6AB")
 
     def end_game(self, channel):
-        loop = asyncio.get_event_loop()
+        loop = asyncio.new_event_loop()
         loop.run_until_complete(self.bot.send_message(channel, "Time's up!\nIt was: " + self.answer))
         loop.close()
         self.detach(channel.id)
