@@ -83,9 +83,9 @@ class NetrunQuiz(Listener):
                 await self.bot.send_message(msg.channel,
                                             msg.author.name + " got it!\n")
                 if msg.author.name in self.scores:
-                    self.scores[msg.author.id] += 1
+                    self.scores[msg.author.name] += 1
                 else:
-                    self.scores[msg.author.id] = 1
+                    self.scores[msg.author.name] = 1
                 await self.end_round(msg.channel)
             else:
                 await self.bot.add_reaction(msg, u"\U0001F6AB")
