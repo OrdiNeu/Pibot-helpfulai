@@ -19,7 +19,7 @@ from .utils.listener import Listener
 class NetrunQuiz(Listener):
     def __init__(self, bot, channel, nr_api):
         self.bot = bot
-        self.attach(channel)
+        self.attach(channel.id)
         self.card = random.choice(nr_api)
         self.answer_transforms = {
             "neutral-runner": "neutral",
@@ -546,7 +546,7 @@ class Netrunner:
             #parser_dictionary = vars(args)
             if not self.init_api:
                 self.refresh_nr_api()
-            quiz = NetrunQuiz(self.bot, ctx.message.channel.id, self.nr_api)
+            quiz = NetrunQuiz(self.bot, ctx.message.channel, self.nr_api)
             if quiz.q_category in self.key_transforms:
                 question = self.key_transforms[quiz.q_category]
             else:
