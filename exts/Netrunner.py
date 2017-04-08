@@ -609,13 +609,13 @@ class Netrunner:
             args_dict = vars(args)
             num_rounds = 1
             mode = NetrunQuiz.MODE_ONESHOT
-            if "rounds" in args_dict:
-                if "fptp" in args_dict:
+            if args_dict["rounds"]:
+                if args_dict["fptp"]:
                     await self.bot.say("You can't have both rounds and fptp set!")
                     return
                 num_rounds = args_dict["rounds"]
                 mode = NetrunQuiz.MODE_ROUNDS
-            elif "fptp" in args_dict:
+            elif args_dict["fptp"]:
                 num_rounds = args_dict["fptp"]
                 mode = NetrunQuiz.MODE_FPTP
 
