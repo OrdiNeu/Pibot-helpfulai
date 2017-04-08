@@ -597,7 +597,7 @@ class Netrunner:
         quiz_opts = DiscordArgParse(prog='nr_quiz')
         quiz_opts.add_argument('--spoiler', '-s', action='store_true', dest="spoiler")
         quiz_opts.add_argument('--rounds', '-r', action='store', type=int, dest="rounds")
-        quiz_opts.add_argument('--fptp', '-r', action='store', type=int, dest="fptp")
+        quiz_opts.add_argument('--fptp', '-f', action='store', type=int, dest="fptp")
         try:
             # Arg parsing
             args = quiz_opts.parse_args(ctx.message.content.split())
