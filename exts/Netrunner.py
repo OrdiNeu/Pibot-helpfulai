@@ -56,7 +56,6 @@ class NetrunQuiz(Listener):
                 await self.bot.send_message(msg.channel,
                                             msg.author.name + " got it!\nIt was: " + str(self.answer))
                 self.detach(msg.channel.id)
-                self.timer.cancel()
             else:
                 await self.bot.add_reaction(msg, u"\U0001F6AB")
 
