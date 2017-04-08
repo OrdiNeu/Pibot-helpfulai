@@ -58,7 +58,7 @@ class NetrunQuiz(Listener):
             if msg.content.lower() == str(self.card[self.q_category]):
                 await self.bot.add_reaction(msg, u"\U0001F3C6")
                 await self.bot.send_message(msg.channel,
-                                            msg.author.name + " got it!\nIt was: " + self.answer)
+                                            msg.author.name + " got it!\nIt was: " + str(self.answer))
                 self.detach(msg.channel.id)
                 self.timer.cancel()
             else:
@@ -66,7 +66,7 @@ class NetrunQuiz(Listener):
 
     def end_game(self, channel):
         loop = asyncio.new_event_loop()
-        loop.run_until_complete(self.bot.send_message(channel, "Time's up!\nIt was: " + self.answer))
+        loop.run_until_complete(self.bot.send_message(channel, "Time's up!\nIt was: " + str(self.answer)))
         loop.close()
         self.detach(channel.id)
         self.timer.cancel()
