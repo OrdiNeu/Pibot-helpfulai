@@ -623,7 +623,7 @@ class Netrunner:
             if not self.init_api:
                 self.refresh_nr_api()
             quiz = NetrunQuiz(self.bot, ctx.message.channel, self.nr_api, self.key_transforms, mode, num_rounds)
-            await self.ask_question(ctx.message.channel)
+            await quiz.ask_question(ctx.message.channel)
         except DiscordArgparseParseError as se:
             if se.value is not None:
                 await self.bot.say(se.value)
