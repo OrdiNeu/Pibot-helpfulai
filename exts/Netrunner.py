@@ -45,10 +45,6 @@ class NetrunQuiz(Listener):
         if self.answer in self.answer_transforms.keys():
             self.answer = self.answer_transforms[self.answer]
 
-        # Timeout
-        self.timer = threading.Timer(1.0, NetrunQuiz.end_game, args=[self, channel])
-        self.timer.start()
-
     async def on_message(self, msg):
         if msg.content.lower() == "!end":
             await self.bot.send_message(msg.channel, "Stopping the quiz...")
@@ -64,11 +60,8 @@ class NetrunQuiz(Listener):
             else:
                 await self.bot.add_reaction(msg, u"\U0001F6AB")
 
-    def end_game(self, channel):
-        loop = asyncio.new_event_loop()
-        asyncio.set_event_loop(loop)
-        loop.run_until_complete(asyncio.gather(self.bot.send_message(channel, "Time's up!\nIt was: " + str(self.answer))))
-        loop.close()
+    async def end_game(self, channel):
+        await self.bot.send_message(channel, "Time's up!\nIt was: " + str(self.answer))
         self.detach(channel.id)
         self.timer.cancel()
 
