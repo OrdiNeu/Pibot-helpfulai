@@ -31,7 +31,7 @@ class NetrunQuiz(Listener):
     MODE_ROUNDS = 1
     MODE_FPTP = 2
 
-    def __init__(self, bot, channel, nr_api, key_transforms, mode, rounds=1):
+    def __init__(self, bot, channel, nr_api, key_transforms, mode, rounds=1, timetowait=5):
         self.bot = bot
         self.api = nr_api
         self.card = None
@@ -44,6 +44,7 @@ class NetrunQuiz(Listener):
         self.rounds_played = 0
         self.key_transforms = key_transforms
         self.q_category = None
+        self.timetowait = 5
 
     def create_question(self):
         """Create a question to be answered"""
@@ -605,6 +606,7 @@ class Netrunner:
         quiz_opts.add_argument('--spoiler', '-s', action='store_true', dest="spoiler")
         quiz_opts.add_argument('--rounds', '-r', action='store', type=int, dest="rounds")
         quiz_opts.add_argument('--fptp', '-f', action='store', type=int, dest="points")
+        quiz_opts.add_argument('--waittime', '-wt', action='store', type=int, dest="waittime", default=5)
         try:
             # Arg parsing
             flags = ctx.message.content.split()
@@ -629,7 +631,8 @@ class Netrunner:
             # Create the quiz
             if not self.init_api:
                 self.refresh_nr_api()
-            quiz = NetrunQuiz(self.bot, ctx.message.channel, self.nr_api, self.key_transforms, mode, num_rounds)
+            quiz = NetrunQuiz(self.bot, ctx.message.channel, self.nr_api,
+                              self.key_transforms, mode, num_rounds, args_dict["waittime"])
             quiz.create_question()
             await quiz.ask_question(ctx.message.channel)
         except DiscordArgparseParseError as se:
