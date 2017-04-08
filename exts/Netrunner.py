@@ -47,7 +47,7 @@ class NetrunQuiz(Listener):
 
     def create_question(self):
         """Create a question to be answered"""
-        self.card = random.choice(self.nr_api)
+        self.card = random.choice(self.api)
         # Check to make sure we pick an OK category to ask
         usable_category = False
         while not usable_category:
