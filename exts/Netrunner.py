@@ -118,7 +118,7 @@ class NetrunQuiz(Listener):
         """End the current question"""
         await self.bot.send_message(channel, "It was: " + str(self.answer))
         self.has_answered = {}
-        if self.is_over:
+        if self.is_over():
             await self.print_scores(channel)
             await self.end_game(channel)
         else:
