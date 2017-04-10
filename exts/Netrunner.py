@@ -76,13 +76,7 @@ class NetrunQuiz(Listener):
 
     async def on_message(self, msg):
         """Handle people's responses"""
-        if msg.content.lower() == "!end":
-            await self.bot.send_message(msg.channel, "Ending the Fun...")
-            await self.end_game(msg.channel, print_scores=1)
-        elif msg.content.lower() == "!skip":
-            await self.bot.send_message(msg.channel, "Skipping the round...")
-            await self.end_round(msg.channel)
-        elif not self.sleeping and not msg.author.id in self.has_answered:
+        if not self.sleeping and not msg.author.id in self.has_answered:
             self.has_answered[msg.author.id] = 1
             if msg.content.lower() == str(self.answer):
                 await self.bot.add_reaction(msg, u"\U0001F3C6")
@@ -95,6 +89,12 @@ class NetrunQuiz(Listener):
                 await self.end_round(msg.channel)
             else:
                 await self.bot.add_reaction(msg, u"\U0001F6AB")
+        if msg.content.lower() == "!end":
+            await self.bot.send_message(msg.channel, "Ending the Fun...")
+            await self.end_game(msg.channel, print_scores=True)
+        elif msg.content.lower() == "!skip":
+            await self.bot.send_message(msg.channel, "Skipping the round...")
+            await self.end_round(msg.channel)
 
     def is_over(self):
         """Returns True if the game should be over, False otherwise"""
@@ -121,7 +121,7 @@ class NetrunQuiz(Listener):
     async def end_game(self, channel, print_scores=False):
         """End the game"""
         if print_scores:
-            await self.printscores(channel)
+            await self.print_scores(channel)
         self.detach(channel.id)
 
     async def end_round(self, channel):
