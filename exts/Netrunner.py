@@ -78,11 +78,11 @@ class NetrunQuiz(Listener):
         """Handle people's responses"""
         if msg.content.lower() == "!end":
             await self.bot.send_message(msg.channel, "Ending the Fun...")
-            await self.end_game(msg.channel)
-        if msg.content.lower() == "!skip":
+            await self.end_game(msg.channel, print_scores=1)
+        elif msg.content.lower() == "!skip":
             await self.bot.send_message(msg.channel, "Skipping the round...")
             await self.end_round(msg.channel)
-        if not self.sleeping and not msg.author.id in self.has_answered:
+        elif not self.sleeping and not msg.author.id in self.has_answered:
             self.has_answered[msg.author.id] = 1
             if msg.content.lower() == str(self.answer):
                 await self.bot.add_reaction(msg, u"\U0001F3C6")
@@ -118,8 +118,10 @@ class NetrunQuiz(Listener):
         printable = "```\n" + printable + "\n```"
         await self.bot.send_message(channel, printable)
 
-    async def end_game(self, channel):
+    async def end_game(self, channel, print_scores=False):
         """End the game"""
+        if print_scores:
+            await self.printscores(channel)
         self.detach(channel.id)
 
     async def end_round(self, channel):
@@ -128,8 +130,7 @@ class NetrunQuiz(Listener):
         self.has_answered = {}
         self.rounds_played += 1
         if self.is_over():
-            await self.print_scores(channel)
-            await self.end_game(channel)
+            await self.end_game(channel, print_scores=True)
         else:
             self.sleeping = True
             await asyncio.sleep(self.timetowait)
