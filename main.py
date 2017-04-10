@@ -117,7 +117,7 @@ async def on_message(msg):
         prefix_end = text.find(" ")
         if prefix_end > 0:  # I.e. there was a space
             msg.content = text[0:prefix_end].lower() + text[prefix_end:]
-    
+
     # Handle listeners, if any are set:
     if msg.channel:
         if msg.channel.id in exts.utils.listener.attached:
