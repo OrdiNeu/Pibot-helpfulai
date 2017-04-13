@@ -470,7 +470,8 @@ class Netrunner:
             "tilde": "blackat",
             "neko": "blackat",
             "ordineu": "exile",
-            "<:stoned:259424190111678464>": "mr. Stone"
+            "<:stoned:259424190111678464>": "mr. Stone",
+            "<:dan:302195700136148994>": "deuces wild",
         }
         if card_title_criteria in query_corrections.keys():
             card_title_criteria = query_corrections[card_title_criteria]
