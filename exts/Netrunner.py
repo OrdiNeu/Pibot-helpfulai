@@ -52,16 +52,11 @@ class NetrunQuiz(Listener):
         """Create a question to be answered"""
         self.card = random.choice(self.api)
         # Check to make sure we pick an OK category to ask
-        usable_category = False
-        while not usable_category:
-            self.q_category = random.choice(list(self.card.keys()))
-            self.answer = self.card[self.q_category]
-
-            usable_category = True
-            if self.answer == "null":
-                usable_category = False
-            if self.q_category in self.INVALID_CATEGORIES:
-                usable_category = False
+        usable_categories = list(self.card.keys())
+        usable_categories = [cat for cat in usable_categories if cat not in self.INVALID_CATEGORIES]
+        usable_categories = [cat for cat in usable_categories if self.card[cat] != "null" and self.card[cat] != "None"]
+        self.q_category = random.choice(usable_categories)
+        self.answer = self.card[self.q_category]
         if self.answer in self.ANSWER_TRANSFORMS.keys():
             self.answer = self.ANSWER_TRANSFORMS[self.answer]
 
