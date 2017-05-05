@@ -2,6 +2,7 @@
 # PREAMBLE ####################################################################
 import asyncio
 import os
+import random
 import re
 import sys
 
@@ -20,6 +21,25 @@ class Chan:
     """Grabs a link to various chan threads"""
     def __init__(self, bot):
         self.bot = bot
+
+    @commands.command()
+    async def randchan(self, *, msg: str):
+        """"Prints the OP for a random thread
+            Accepts a board name (default is /x/)"""
+        board = "x"
+        if len(msg) > 0:
+            board = msg.lower()
+        # Find the given general
+        pages = requests.get("http://a.4cdn.org/" + board + "/catalog.json").json()
+        potential_responses = []
+        for p in pages:
+            for t in p["threads"]:
+                if "sub" in t:
+                    potential_responses.append(t["sub"])
+        if len(potential_responses) > 0:
+            await self.bot.say(random.choice(potential_responses))
+        else:
+            await self.bot.say("Can't find that board, boss.")
 
     @commands.command()
     async def chan(self, *, msg: str):
