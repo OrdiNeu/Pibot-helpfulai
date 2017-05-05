@@ -33,7 +33,7 @@ def is_admin():
     return commands.check(lambda ctx: is_admin_check(ctx.message))
 
 def is_trusted_check(message):
-    return message.author.id in trusted.keys()
+    return message.author.id in trusted.keys() or is_admin_check(message)
 
 def is_trusted():
     return commands.check(lambda ctx: is_trusted_check(ctx.message))
