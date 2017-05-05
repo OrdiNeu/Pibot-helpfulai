@@ -140,5 +140,17 @@ class Admin:
         a = {}
         print(a['1'])
 
+    @commands.command(pass_context=True, hidden=True)
+    @checks.is_admin()
+    async def set_game(self, ctx):
+        """Sets the "Wyrm is playing" message"""
+        msg = ctx.message.content
+        msg = msg.lower().split()
+        if len(msg) > 1:
+            game_name = " ".join(msg[1:])
+            await self.bot.change_presence(discord.Game(name = game_name))
+        else:
+            await self.bot.change_presence()
+
 def setup(bot):
     bot.add_cog(Admin(bot))
