@@ -12,6 +12,7 @@ import requests
 
 # to expose to the eval command
 import datetime
+import html2text
 
 from collections import Counter
 from discord.ext import commands
@@ -39,7 +40,9 @@ class Chan:
                 if "com" in t:
                     potential_responses.append(t["com"])
         if len(potential_responses) > 0:
-            await self.bot.say(random.choice(potential_responses))
+            response = random.choice(potential_responses)
+            response = html2text.html2text(response)
+            await self.bot.say(response)
         else:
             await self.bot.say("Can't find that board, boss.")
 
