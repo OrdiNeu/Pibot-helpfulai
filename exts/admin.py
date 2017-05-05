@@ -148,7 +148,7 @@ class Admin:
         msg = msg.lower().split()
         if len(msg) > 1:
             game_name = " ".join(msg[1:])
-            await self.bot.change_presence(discord.Game(name = game_name))
+            await self.bot.change_presence(game = discord.Game(name = game_name))
         else:
             await self.bot.change_presence()
 
