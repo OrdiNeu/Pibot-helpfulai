@@ -22,20 +22,20 @@ class Chan:
     def __init__(self, bot):
         self.bot = bot
 
-    @commands.command()
-    async def randchan(self, *, msg: str):
+    @commands.command(pass_context=True)
+    async def randchan(self, ctx, *):
         """"Prints the OP for a random thread
             Accepts a board name (default is /x/)"""
         board = "x"
-        if len(msg) > 0:
-            board = msg.lower()
+        if len(ctx.message.content) > 0:
+            board = ctx.message.content.lower()
         # Find the given general
         pages = requests.get("http://a.4cdn.org/" + board + "/catalog.json").json()
         potential_responses = []
         for p in pages:
             for t in p["threads"]:
-                if "sub" in t:
-                    potential_responses.append(t["sub"])
+                if "com" in t:
+                    potential_responses.append(t["com"])
         if len(potential_responses) > 0:
             await self.bot.say(random.choice(potential_responses))
         else:
