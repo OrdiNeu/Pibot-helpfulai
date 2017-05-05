@@ -23,7 +23,7 @@ class Chan:
         self.bot = bot
 
     @commands.command(pass_context=True)
-    async def randchan(self, ctx, *):
+    async def randchan(self, ctx):
         """"Prints the OP for a random thread
             Accepts a board name (default is /x/)"""
         board = "x"
