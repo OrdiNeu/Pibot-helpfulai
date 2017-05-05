@@ -141,7 +141,6 @@ class Admin:
         print(a['1'])
 
     @commands.command(pass_context=True, hidden=True)
-    @checks.is_admin()
     async def set_game(self, ctx):
         """Sets the "Wyrm is playing" message"""
         msg = ctx.message.content
