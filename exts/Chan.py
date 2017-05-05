@@ -27,8 +27,10 @@ class Chan:
         """"Prints the OP for a random thread
             Accepts a board name (default is /x/)"""
         board = "x"
-        if len(ctx.message.content) > 0:
-            board = ctx.message.content.lower()
+        msg = ctx.message.content
+        msg = msg.lower().split()
+        if len(msg) > 1:
+            board = msg[1].lower()
         # Find the given general
         pages = requests.get("http://a.4cdn.org/" + board + "/catalog.json").json()
         potential_responses = []
