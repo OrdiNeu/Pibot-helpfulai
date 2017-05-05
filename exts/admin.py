@@ -145,7 +145,7 @@ class Admin:
     async def set_game(self, ctx):
         """Sets the "Wyrm is playing" message"""
         msg = ctx.message.content
-        msg = msg.lower().split()
+        msg = msg.split()
         if len(msg) > 1:
             game_name = " ".join(msg[1:])
             await self.bot.change_presence(game = discord.Game(name = game_name))
