@@ -9,11 +9,11 @@ from discord.ext import commands
 # commands. The values are not important
 admins = {
     "135449740778274816": "OrdiNeu",
-    "136288437035597824": "Leg"
+    "136288437035597824": "Leg",
+    "134012742146195458": "Destragon"
 }
 
 trusted = {
-    "134012742146195458": "Destragon",
     "145389680341286912": "Dilron",
     "135471846471499776": "Kika",
     "134038407428046848": "Mush",
