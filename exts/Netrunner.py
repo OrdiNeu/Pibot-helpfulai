@@ -33,6 +33,7 @@ class NetrunQuiz(MsgListener):
     MODE_FPTP = 2
 
     def __init__(self, bot, channel, nr_api, key_transforms, mode, rounds=1, timetowait=5):
+        super().__init__()
         self.bot = bot
         self.api = nr_api
         self.card = None
