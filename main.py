@@ -98,6 +98,15 @@ async def on_ready():
         await bot.send_message(channel_id, status_msg)
 
 @bot.event
+async def on_reaction_add(reaction, user):
+    # Do we have a listener for this?
+    if reaction.message.channel:
+        channel = reaction.message.channel
+        if channel.id in exts.utils.listener.reaction_listeners:
+            for listener in exts.utils.listener.reaction_listeners[channel.id]:
+                await listener._check_and_act(reaction)
+
+@bot.event
 async def on_message(msg):
     # Ignore messages from bots
     if msg.author.bot:

@@ -16,7 +16,7 @@ import html2text
 
 from collections import Counter
 from discord.ext import commands
-from .utils import checks
+from .utils import checks, scrollable
 
 class Chan:
     """Grabs a link to various chan threads"""
@@ -38,11 +38,11 @@ class Chan:
         for p in pages:
             for t in p["threads"]:
                 if "com" in t:
-                    potential_responses.append(t["com"])
+                    potential_responses.append(html2text.html2text(t["com"]))
         if len(potential_responses) > 0:
-            response = random.choice(potential_responses)
-            response = html2text.html2text(response)
-            await self.bot.say(response)
+            random_pos = random.randint(0, len(potential_responses)-1)
+            response = scrollable.Scrollable(self.bot)
+            response.send(ctx.message.channel, potential_responses, random_pos)
         else:
             await self.bot.say("Can't find that board, boss.")
 
