@@ -19,12 +19,14 @@ class Scrollable(listener.RctListener):
     @asyncio.coroutine
     def send(self, channel, msg_list, cur_pos=0):
         """Send the given message list, scrolled to the given position"""
+        print("Send begin")
         self.msg = yield from self.bot.send_message(channel, msg_list[cur_pos])
         self.bot.add_reaction(self.msg, ":arrow_up_small:")
         self.bot.add_reaction(self.msg, ":arrow_down_small:")
         self.msg_list = msg_list
         self.cur_pos = cur_pos
         self.attach(channel)
+        print("Send end")
 
     async def on_reaction(self, rct):
         """Handle the scroll reaction"""

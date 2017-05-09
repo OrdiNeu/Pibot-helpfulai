@@ -42,7 +42,7 @@ class Chan:
         if len(potential_responses) > 0:
             random_pos = random.randint(0, len(potential_responses)-1)
             response = scrollable.Scrollable(self.bot)
-            response.send(ctx.message.channel, potential_responses, random_pos)
+            await response.send(ctx.message.channel, potential_responses, random_pos)
         else:
             await self.bot.say("Can't find that board, boss.")
 
