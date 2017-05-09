@@ -27,13 +27,13 @@ class Scrollable(listener.RctListener):
 
     async def on_reaction(self, rct):
         """Handle the scroll reaction"""
-        if str(rct) == u"\u2B06":    # Up arrow
+        if str(rct.emoji) == u"\u2B06":    # Up arrow
             self.cur_pos += 1
             if self.cur_pos >= len(msg_list):
                 self.cur_pos = 0
-        elif str(rct) == u"\u2B07":   # Down arrow
+        elif str(rct.emoji) == u"\u2B07":   # Down arrow
             self.cur_pos -= 1
             if self.cur_pos < 0:
                 self.cur_pos = len(msg_list)-1
-        print("reaction: " + str(rct))   # Debugging code
+        print("reaction: " + str(rct.emoji))   # Debugging code
         await self.bot.edit_message(self.msg, self.msg_list[self.cur_pos])
