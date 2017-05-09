@@ -20,7 +20,7 @@ class Scrollable(listener.RctListener):
     async def send(self, channel, msg_list, cur_pos=0):
         """Send the given message list, scrolled to the given position"""
         self.msg = await self.bot.send_message(channel, msg_list[cur_pos])
-        await self.bot.add_reaction(self.msg, u"\U0001F3C6") # Up arrow
+        await self.bot.add_reaction(self.msg, u"\u2B06") # Up arrow
         await self.bot.add_reaction(self.msg, u"\u25BE") # Down arrow
         self.msg_list = msg_list
         self.cur_pos = cur_pos
@@ -28,7 +28,7 @@ class Scrollable(listener.RctListener):
 
     async def on_reaction(self, rct):
         """Handle the scroll reaction"""
-        if str(rct) == u"\u25B4":    # Up arrow
+        if str(rct) == u"\u2B06":    # Up arrow
             self.cur_pos += 1
         elif str(rct) == u"\u25BE":   # Down arrow
             self.cur_pos -= 1
