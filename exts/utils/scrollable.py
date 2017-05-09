@@ -40,5 +40,4 @@ class Scrollable(listener.RctListener):
                 self.cur_pos = len(self.msg_list)-1
             if added:
                 self.bot.remove_reaction(self.msg, rct.emoji, user)
-        print("reaction: " + str(rct.emoji))   # Debugging code
         await self.bot.edit_message(self.msg, self.msg_list[self.cur_pos])
