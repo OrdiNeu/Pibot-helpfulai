@@ -103,8 +103,10 @@ async def on_reaction_add(reaction, user):
     print("Reaction found: " + str(reaction))
     if reaction.message.channel:
         channel = reaction.message.channel
+        print("Channel OK")
         if channel.id in exts.utils.listener.reaction_listeners:
             for listener in exts.utils.listener.reaction_listeners[channel.id]:
+                print("Listener found")
                 await listener._check_and_act(reaction)
 
 @bot.event
