@@ -114,11 +114,11 @@ async def on_reaction(reaction, user, added):
 
 @bot.event
 async def on_reaction_add(reaction, user):
-    on_reaction(reaction, user, True)
+    await on_reaction(reaction, user, True)
 
 @bot.event
 async def on_reaction_remove(reaction, user):
-    on_reaction(reaction, user, False)
+    await on_reaction(reaction, user, False)
 
 @bot.event
 async def on_message(msg):
