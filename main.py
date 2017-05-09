@@ -97,8 +97,7 @@ async def on_ready():
             status_msg += "\n"
         await bot.send_message(channel_id, status_msg)
 
-@bot.event
-async def on_reaction_add(reaction, user):
+async def on_reaction(reaction, user, added):
     # Ignore reactions from bots
     if user.bot:
         return
@@ -111,7 +110,15 @@ async def on_reaction_add(reaction, user):
         if channel.id in exts.utils.listener.reaction_listeners:
             for listener in exts.utils.listener.reaction_listeners[channel.id]:
                 print("Listener found")
-                await listener._check_and_act(reaction)
+                await listener._check_and_act(reaction, user, added)
+
+@bot.event
+async def on_reaction_add(reaction, user):
+    on_reaction(reaction, user, True)
+
+@bot.event
+async def on_reaction_remove(reaction, user):
+    on_reaction(reaction, user, False)
 
 @bot.event
 async def on_message(msg):

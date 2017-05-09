@@ -25,15 +25,20 @@ class Scrollable(listener.RctListener):
         self.cur_pos = cur_pos
         self.attach(channel.id)
 
-    async def on_reaction(self, rct):
+    async def on_reaction(self, rct, user, added):
         """Handle the scroll reaction"""
         if str(rct.emoji) == u"\u2B06":    # Up arrow
+            # Move position safely, and remove this reaction
             self.cur_pos += 1
             if self.cur_pos >= len(self.msg_list):
                 self.cur_pos = 0
+            if added:
+                self.bot.remove_reaction(self.msg, rct.emoji, user)
         elif str(rct.emoji) == u"\u2B07":   # Down arrow
             self.cur_pos -= 1
             if self.cur_pos < 0:
                 self.cur_pos = len(self.msg_list)-1
+            if added:
+                self.bot.remove_reaction(self.msg, rct.emoji, user)
         print("reaction: " + str(rct.emoji))   # Debugging code
         await self.bot.edit_message(self.msg, self.msg_list[self.cur_pos])

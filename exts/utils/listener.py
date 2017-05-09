@@ -44,15 +44,16 @@ class RctListener(Listener):
         self.listener_list = reaction_listeners
         self.msg = msg
 
-    async def _check_and_act(self, rct):
+    async def _check_and_act(self, rct, user, added):
         """Used internally"""
         print("check_and_act")
         if rct.message.id == self.msg.id:
             print("passed")
-            await self.on_reaction(rct)
+            await self.on_reaction(rct, user, added)
 
-    async def on_reaction(self, rct):
+    async def on_reaction(self, rct, user, added):
         """Virtual function, called whenever a reaction is placed on the attached message
         Overwrite this function to use.
-        Note that msg is of type discord.Message"""
+        Note that rct is of type discord.Reaction
+        Added is True if a reaction was added, False otherwise"""
         pass
