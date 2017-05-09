@@ -47,7 +47,7 @@ class RctListener(Listener):
     async def _check_and_act(self, rct):
         """Used internally"""
         print("check_and_act")
-        if rct.message == self.msg:
+        if rct.message.id == self.msg.id:
             print("passed")
             await self.on_reaction(rct)
 
