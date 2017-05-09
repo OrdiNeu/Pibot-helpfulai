@@ -46,8 +46,10 @@ class RctListener(Listener):
 
     async def _check_and_act(self, rct):
         """Used internally"""
+        print("check_and_act")
         if rct.message == self.msg:
-            self.on_reaction(rct)
+            print("passed")
+            await self.on_reaction(rct)
 
     async def on_reaction(self, rct):
         """Virtual function, called whenever a reaction is placed on the attached message

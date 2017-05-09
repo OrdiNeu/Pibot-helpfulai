@@ -100,6 +100,7 @@ async def on_ready():
 @bot.event
 async def on_reaction_add(reaction, user):
     # Do we have a listener for this?
+    print("Reaction found: " + str(reaction))
     if reaction.message.channel:
         channel = reaction.message.channel
         if channel.id in exts.utils.listener.reaction_listeners:
