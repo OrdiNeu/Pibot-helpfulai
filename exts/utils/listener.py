@@ -6,24 +6,51 @@ import asyncio
 from discord.ext import commands
 
 # Keys: channel. Value: list of listeners
-attached = {}
+msg_listeners = {}
+reaction_listeners = {}
 
 class Listener:
+    """Abstract class for listeners"""
     def __init__(self):
-        pass
-    
+        self.listener_list = {}
+
     def attach(self, channel):
-        global attached
-        if channel in attached:
-            attached[channel].append(self)
+        """Attach this listener to the given channel"""
+        if channel in self.listener_list:
+            self.listener_list[channel].append(self)
         else:
-            attached[channel] = [self]
+            self.listener_list[channel] = [self]
 
     def detach(self, channel):
-        global attached
-        attached[channel].remove(self)
+        """Detach this listener from the given channel"""
+        self.listener_list[channel].remove(self)
 
-    # Overwrite this function for messages
-    # Note that msg is of type discord.Message
+class MsgListener(Listener):
+    """Virtual class for a listener that scans messages on a channel"""
+    def __init__(self):
+        super().__init__()
+        self.listener_list = msg_listeners
+
     async def on_message(self, msg):
+        """Virtual function, called whenever a message arrives at the attached channel
+        Overwrite this function to use.
+        Note that msg is of type discord.Message"""
+        pass
+
+class RctListener(Listener):
+    """Virtual class for a listener that scans reactions on a message"""
+    def __init__(self, msg):
+        super().__init__()
+        self.listener_list = reaction_listeners
+        self.msg = msg
+
+    async def _check_and_act(self, rct):
+        """Used internally"""
+        if rct.message == self.msg:
+            self.on_reaction(rct)
+
+    async def on_reaction(self, rct):
+        """Virtual function, called whenever a reaction is placed on the attached message
+        Overwrite this function to use.
+        Note that msg is of type discord.Message"""
         pass

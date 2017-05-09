@@ -15,9 +15,9 @@ from json.decoder import JSONDecodeError
 from discord.ext import commands
 
 from .utils.DiscordArgParse import DiscordArgparseParseError, DiscordArgParse
-from .utils.listener import Listener
+from .utils.listener import MsgListener
 
-class NetrunQuiz(Listener):
+class NetrunQuiz(MsgListener):
     ANSWER_TRANSFORMS = {
         "neutral-runner": "neutral",
         "neutral-corp": "neutral",

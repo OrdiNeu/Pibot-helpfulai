@@ -122,8 +122,8 @@ async def on_message(msg):
 
     # Handle listeners, if any are set:
     if msg.channel:
-        if msg.channel.id in exts.utils.listener.attached:
-            for listener in exts.utils.listener.attached[msg.channel.id]:
+        if msg.channel.id in exts.utils.listener.msg_listeners:
+            for listener in exts.utils.listener.msg_listeners[msg.channel.id]:
                 await listener.on_message(msg)
 
     await bot.process_commands(msg)
