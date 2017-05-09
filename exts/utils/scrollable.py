@@ -17,11 +17,11 @@ class Scrollable(listener.RctListener):
         super().__init__(None)    # TODO: I screwed up somewhere with designing this
 
     @asyncio.coroutine
-    def send(self, channel, msg_list, cur_pos=0):
+    async def send(self, channel, msg_list, cur_pos=0):
         """Send the given message list, scrolled to the given position"""
-        self.msg = yield from self.bot.send_message(channel, msg_list[cur_pos])
-        self.bot.add_reaction(self.msg, "▴")
-        self.bot.add_reaction(self.msg, "▾")
+        self.msg = await self.bot.send_message(channel, msg_list[cur_pos])
+        await self.bot.add_reaction(self.msg, "▴")
+        await self.bot.add_reaction(self.msg, "▾")
         self.msg_list = msg_list
         self.cur_pos = cur_pos
         self.attach(channel)
