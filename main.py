@@ -99,6 +99,10 @@ async def on_ready():
 
 @bot.event
 async def on_reaction_add(reaction, user):
+    # Ignore reactions from bots
+    if msg.author.bot:
+        return
+
     # Do we have a listener for this?
     print("Reaction found: " + str(reaction.emoji))
     if reaction.message.channel:

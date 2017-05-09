@@ -24,7 +24,7 @@ class Scrollable(listener.RctListener):
         await self.bot.add_reaction(self.msg, u"\u2B07") # Down arrow
         self.msg_list = msg_list
         self.cur_pos = cur_pos
-        self.attach(channel)
+        self.attach(channel.id)
 
     async def on_reaction(self, rct):
         """Handle the scroll reaction"""
