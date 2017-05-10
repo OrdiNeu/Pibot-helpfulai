@@ -31,8 +31,8 @@ class Reddit:
                 crafted_response = ""
                 to_add = ["title", "url", "selftext_html"]
                 for search_term in to_add:
-                    if search_term in post:
-                        crafted_response += html2text.html2text(post[search_term]) + "\n"
+                    if search_term in post["data"]:
+                        crafted_response += html2text.html2text(post["data"][search_term]) + "\n"
                 if len(crafted_response) > 0:
                     potential_responses.append(crafted_response)
         if len(potential_responses) > 0:
