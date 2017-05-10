@@ -470,6 +470,9 @@ class Netrunner:
             "neko": "blackat",
             "<:stoned:259424190111678464>": "mr. Stone",
             "<:dan:302195700136148994>": "deuces wild",
+            "<:snare:230408123079196672>": "snare",
+            "<:abomb:269152319004868610>": "emp device",
+            "<:moonman:249217069185368064>": "shoot the moon",
         }
         if card_title_criteria.lower() in query_corrections.keys():
             card_title_criteria = query_corrections[card_title_criteria.lower()]
