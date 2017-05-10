@@ -33,7 +33,8 @@ class Reddit:
                 for search_term in to_add:
                     if search_term in post:
                         crafted_response += html2text.html2text(post[search_term]) + "\n"
-                potential_responses.append(crafted_response)
+                if len(crafted_response) > 0:
+                    potential_responses.append(crafted_response)
         if len(potential_responses) > 0:
             response = scrollable.Scrollable(self.bot)
             await response.send(ctx.message.channel, potential_responses, 0)
