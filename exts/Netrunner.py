@@ -472,7 +472,7 @@ class Netrunner:
             "<:dan:302195700136148994>": "deuces wild",
         }
         if card_title_criteria.lower() in query_corrections.keys():
-            card_title_criteria = query_corrections[card_title_criteria]
+            card_title_criteria = query_corrections[card_title_criteria.lower()]
         return card_title_criteria
 
     @staticmethod
@@ -489,7 +489,7 @@ class Netrunner:
             "cyberface": "http://i.imgur.com/cV7EAtx.png",
         }
         if card_title_criteria.lower() in query_redirects.keys():
-            return query_redirects[card_title_criteria]
+            return query_redirects[card_title_criteria.lower()]
         else:
             return None
 
