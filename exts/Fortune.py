@@ -93,7 +93,7 @@ class Fortune:
         e = discord.Embed(description=fortune[True]["text"],
                           colour=int(fortune[True]["colour"], 16),
                           )
-        if ctx.message.split()[1:].lower().startswith("fortuna"):
+        if ctx.invoked_with == "fortuna":
             e.set_image(url=fortune[True]["img"])
         await self.bot.say(embed=e)
 
