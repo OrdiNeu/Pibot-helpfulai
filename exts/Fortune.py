@@ -90,7 +90,7 @@ class Fortune:
                 "img": "http://68.media.tumblr.com/938a2d4fb94cae500839d9dccd3881be/tumblr_mn9j2tU3YU1s3kvg9o1_500.gif"
             }
         }
-        e = discord.Embed(description=fortune[True]["text"],
+        e = discord.Embed(description= "{}, your fortune is: {}".format(ctx.message.author.mention, fortune[True]["text"]),
                           colour=int(fortune[True]["colour"], 16),
                           )
         if ctx.invoked_with == "fortuna":

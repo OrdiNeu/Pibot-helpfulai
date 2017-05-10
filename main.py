@@ -21,7 +21,8 @@ EXTENSIONS = [
     'exts.LOTR',
     'exts.Fortune',
     'exts.Chan',
-    'exts.reddit'
+    'exts.reddit',
+    'exts.uncategorised'
 ]
 
 bot = commands.Bot(
