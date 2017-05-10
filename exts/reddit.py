@@ -23,20 +23,22 @@ class Reddit:
             sub = msg[1].lower()
 
         # Grab the correct json file
-        pages = requests.get("https://www.reddit.com/r/" + sub + ".json").json()
+        url = "https://www.reddit.com/r/" + sub + ".json"
+        pages = requests.get(url, headers={'User-agent': 'Draco v0.1'}).json()
         potential_responses = []
-        for post in pages["data"]["children"]:
-            crafted_response = ""
-            to_add = ["title", "url", "selftext_html"]
-            for search_term in to_add:
-                if search_term in post:
-                    crafted_response += html2text.html2text(post[search_term]) + "\n"
-            potential_responses.append(crafted_response)
+        if "data" in pages and "children" in pages["data"]:
+            for post in pages["data"]["children"]:
+                crafted_response = ""
+                to_add = ["title", "url", "selftext_html"]
+                for search_term in to_add:
+                    if search_term in post:
+                        crafted_response += html2text.html2text(post[search_term]) + "\n"
+                potential_responses.append(crafted_response)
         if len(potential_responses) > 0:
             response = scrollable.Scrollable(self.bot)
             await response.send(ctx.message.channel, potential_responses, 0)
         else:
-            await self.bot.say("Can't find that subreddit, boss.")
+            await self.bot.say("Error in grabbing " + url + " boss.")
 
 def setup(bot):
     bot.add_cog(Reddit(bot))
