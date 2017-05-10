@@ -250,7 +250,11 @@ class Netrunner:
             if not self.init_api:
                 self.refresh_nr_api()
             m_match_list = self.search_text(m_criteria_list)
-            if len(m_match_list) == 0:
+            # redirecting to special images for specific input
+            redirect = self.apply_title_redirect_jokes(string_to_parse.split()[0])
+            if redirect:
+                m_response = redirect
+            elif len(m_match_list) == 0:
                 m_response = "Search criteria returned 0 results\n"
                 m_response += string_to_parse
             else:
@@ -460,18 +464,34 @@ class Netrunner:
         query_corrections = {
             "smc": "self-modifying code",
             "jesus": "jackson howard",
-            "nyan": "noise",
             "neh": "near earth hub",
             "sot": "same old thing",
             "tilde": "blackat",
             "neko": "blackat",
-            "ordineu": "exile",
             "<:stoned:259424190111678464>": "mr. Stone",
             "<:dan:302195700136148994>": "deuces wild",
         }
-        if card_title_criteria in query_corrections.keys():
+        if card_title_criteria.lower() in query_corrections.keys():
             card_title_criteria = query_corrections[card_title_criteria]
         return card_title_criteria
+
+    @staticmethod
+    def apply_title_redirect_jokes(card_title_criteria):
+        # Auto-link some images instead of other users' names
+        query_redirects = {
+            "nyan": "http://i.imgur.com/TnwGEhG.jpg", #http://i.imgur.com/AtqdQiP.jpg
+            "ordineu": "http://i.imgur.com/PDySfQ7.png",
+            "kika": "http://i.imgur.com/WnsNJho.jpg",
+            "leg": "http://i.imgur.com/53dBofH.png",
+            "triffids": "http://run4games.com/wp-content/gallery/altcard_runner_id_shaper/Nasir-by-stentorr-001.jpg",
+            "dee": "http://i.imgur.com/vrQmmOf.png",
+            "garvin": "http://i.imgur.com/KtvboU8.jpg",
+            "cyberface": "http://i.imgur.com/cV7EAtx.png",
+        }
+        if card_title_criteria.lower() in query_redirects.keys():
+            return query_redirects[card_title_criteria]
+        else:
+            return None
 
     """
     Experimental section to test string parsing
