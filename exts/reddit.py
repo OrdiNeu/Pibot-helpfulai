@@ -1,6 +1,8 @@
 # Reddit browser
 # PREAMBLE ####################################################################
 import asyncio
+import html
+
 import discord
 import html2text
 import requests
@@ -34,7 +36,8 @@ class Reddit:
                     if search_term in post["data"]:
                         if post["data"][search_term] is None:
                             continue
-                        crafted_response += html2text.html2text(post["data"][search_term]) + "\n"
+                        unescaped = html.unescape(post["data"][search_term])
+                        crafted_response += html2text.html2text(unescaped) + "\n"
                 if len(crafted_response) > 0:
                     potential_responses.append(crafted_response)
         if len(potential_responses) > 0:
