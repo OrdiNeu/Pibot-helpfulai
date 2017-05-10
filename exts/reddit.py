@@ -37,3 +37,6 @@ class Reddit:
             await response.send(ctx.message.channel, potential_responses, 0)
         else:
             await self.bot.say("Can't find that subreddit, boss.")
+
+def setup(bot):
+    bot.add_cog(Reddit(bot))

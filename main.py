@@ -20,7 +20,8 @@ EXTENSIONS = [
     'exts.Arkham',
     'exts.LOTR',
     'exts.Fortune',
-    'exts.Chan'
+    'exts.Chan',
+    'exits.reddit'
 ]
 
 bot = commands.Bot(
