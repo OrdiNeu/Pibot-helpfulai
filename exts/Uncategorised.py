@@ -84,14 +84,14 @@ class Uncategorised:
 
         await self.bot.say(img + "\n" + desc)
 
-    @commands.command()
-    async def pok(self):
+    @commands.command(pass_context=True)
+    async def pok(self, ctx):
         """Posts a random pokemon, randomly"""
         r = random.randint(1,10)
         if r <= 7:
-            await self.pokemon()
+            await ctx.invoke(self.pokemon)
         else:
-            await self.garfemon()
+            await ctx.invoke(self.garfemon)
 
 def setup(bot):
     bot.add_cog(Uncategorised(bot))
