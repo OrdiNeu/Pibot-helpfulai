@@ -25,7 +25,7 @@ class Arkham:
 
 
     @commands.command(aliases=['arkham','arkhamhorror', 'ahe', 'ahb', 'ah1', 'ah2', 'ah3', 'ah4', 'ah5', 'aha'], pass_context=True)
-    async def ah(self, *, cardname : str, ctx):
+    async def ah(self, ctx, *, cardname : str):
         """Arkham Horror card lookup"""
         m_query = cardname.lower()
         img = 'imagesrc'
