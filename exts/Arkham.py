@@ -28,7 +28,7 @@ class Arkham:
     async def ah(self, ctx):
     #async def ah(self, ctx, *, cardname: str):
         """Arkham Horror card lookup"""
-        m_query = ctx.message.content.split(" ", 1)[1].lower()
+        m_query = ' '.join(ctx.msg.content.split()[1:]).lower()
         #m_query = cardname.lower()
         img = 'imagesrc'
 
