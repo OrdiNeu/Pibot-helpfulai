@@ -38,7 +38,11 @@ class Uncategorised:
         n = re.search('<img id="pk_img" height=160 width=160 src=(.*?)/><br', text)
         url = n.group(1)
 
-        await self.bot.say(url + "\n" + name)
+        # turn into embed
+        e = discord.Embed(title=name)
+        # colour=?
+        e.set_image(url=url)
+        await self.bot.say(embed=e)
 
     @commands.command()
     async def garfemon(self):
@@ -69,10 +73,10 @@ class Uncategorised:
             u = re.search("- (.*?) -", desc)
             name = u.group(1)
             newdesc = desc.split(name, 1)
-            name = "**" + name + "**"
-            newnewdesc = "*" + newdesc[1][3:] + "*"
-            desc = newdesc[0] + name + " - " + newnewdesc
+            desc = "*" + newdesc[1][3:] + "*"
+            name = "{}**{}** -".format(newdesc[0], name)
         except:
+            name = "Garfemon"
             desc = "Desc not found."
         desc = desc.replace("\\u2019", "'")
         desc = desc.replace("\\u201c", '"')
@@ -82,7 +86,10 @@ class Uncategorised:
         desc = desc.replace("\\u202c", '')
         desc = desc.replace("\\u2018", "'")
 
-        await self.bot.say(img + "\n" + desc)
+        # turn into embed
+        e = discord.Embed(title=name, description=desc, colour=int("D68717", 16))
+        e.set_image(url=img)
+        await self.bot.say(embed=e)
 
     @commands.command(pass_context=True)
     async def pok(self, ctx):
