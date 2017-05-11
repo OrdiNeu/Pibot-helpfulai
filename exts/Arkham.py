@@ -25,9 +25,11 @@ class Arkham:
 
 
     @commands.command(aliases=['arkham','arkhamhorror', 'ahe', 'ahb', 'ah1', 'ah2', 'ah3', 'ah4', 'ah5', 'aha'], pass_context=True)
-    async def ah(self, ctx, *, cardname : str):
+    async def ah(self, ctx):
+    #async def ah(self, ctx, *, cardname: str):
         """Arkham Horror card lookup"""
-        m_query = cardname.lower()
+        m_query = ctx.message.content.split("", 1)[1].lower()
+        #m_query = cardname.lower()
         img = 'imagesrc'
 
         # Auto-correct some card names (and inside jokes)
