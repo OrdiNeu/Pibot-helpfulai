@@ -64,7 +64,7 @@ class Arkham:
             if last_type_seen != card['type_code']:
                 last_type_seen = card['type_code']
                 m_response += "**{0}**\n".format(card['type_code'])
-            m_response += "{0}x{1}\n".format(card['number'], card['name'])
+            m_response += "{0}x{1} {2}\n".format(card['number'], card['name'], "*" * card['xp'])
 
         return m_response
 
