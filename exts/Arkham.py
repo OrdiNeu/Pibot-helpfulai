@@ -5,7 +5,7 @@ import re
 
 import discord
 import requests
-import undecode
+import unidecode
 from discord.ext import commands
 
 
