@@ -44,8 +44,8 @@ class Arkham:
         m_response = ''
         deck_json = requests.get(api_prefix + deck_id).json()
         slots = deck_json['slots']
+        slots[deck_json['investigator_code']] = "1"
         codes_to_find = slots.keys()
-        codes_to_find[deck_json['investigator_code']] = "1"
         decklist_data = []
         # Find every card listed in slots
         for card in self.ah_api:
