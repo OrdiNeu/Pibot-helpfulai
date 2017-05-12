@@ -54,16 +54,16 @@ class Arkham:
                 to_save = copy.copy(card)
                 to_save["number"] = slots[code]
                 decklist_data.append(to_save)
-        
+
         # Print out a formatted list
         last_type_seen = 'investigator'
         decklist_data = self.sort_cards(decklist_data)
-        m_response += deck_json['name'] + " \n"
+        m_response += "**{0}**\n".format(deck_json['name'])
         for card in decklist_data:
             if last_type_seen != card['type_code']:
                 last_type_seen = card['type_code']
                 m_response += "**{0}**\n".format(card['type_code'])
-            m_response += "**{0}x{1}**\n".format(card['number'], card['name'])
+            m_response += "{0}x{1}\n".format(card['number'], card['name'])
 
         return m_response
 
