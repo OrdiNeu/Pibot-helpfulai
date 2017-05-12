@@ -603,13 +603,10 @@ class Netrunner:
         m_response = ""
         m_decklist = unidecode(decklist.lower())
         re_decklist_id = re.search("(https://netrunnerdb\.com/en/decklist/)(\d+)(/.*)", m_decklist)
-        if re_decklist_id is None:
+        if re_decklist_id is None or re_decklist_id.group(2) is None:
             m_response += "I see: \"{0}\", but I don't understand\n".format(m_decklist)
         else:
-            if re_decklist_id.group(2) is None:
-                m_response += "I see: \"{0}\", but I don't understand\n".format(m_decklist)
-            else:
-                m_response += self.deck_parse(re_decklist_id.group(2))
+            m_response += self.deck_parse(re_decklist_id.group(2))
         await self.bot.say(m_response[:2000])
 
     @commands.command(aliases=['ndrand'])
