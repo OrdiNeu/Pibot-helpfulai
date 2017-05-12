@@ -30,7 +30,7 @@ class Arkham:
     def sort_cards(self, cards):
         # input should be a list of full card dictionaries to be sorted
         # first sort by title
-        cards = sorted(cards, key=lambda card: card['title'])
+        cards = sorted(cards, key=lambda card: card['name'])
         # next sort by type
         cards = sorted(cards, key=lambda card: self.type_code_sort[card['type_code']])
         return cards
