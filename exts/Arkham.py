@@ -1,11 +1,13 @@
 # Netrunner extension for pibot
 ### PREAMBLE ##################################################################
+import copy
 import re
 
 import discord
 import requests
-
+import undecode
 from discord.ext import commands
+
 
 class Arkham:
     """Arkham Horror related commands"""
@@ -15,21 +17,72 @@ class Arkham:
         self.ah_api = [{}]
         self.ah_api_p = [{}]
         self.init_api = False
+        self.type_code_sort = {'investigator': 0, 'asset': 1, 'event': 2, 'skill': 3, 'scenario': 4, 'treachery': 5,
+                               'enemy': 6}
 
     def refresh_ah_api(self):
         self.ah_api = sorted([c for c in requests.get('https://arkhamdb.com/api/public/cards?encounter=1').json()],
                              key=lambda card: card['name'])
+
         # only player cards
-        self.ah_api_p = [c for c in self.ah_api if not "spoiler" in c]
+        self.ah_api_p = [c for c in self.ah_api if "spoiler" not in c]
         self.init_api = True
 
+    def sort_cards(self, cards):
+        # input should be a list of full card dictionaries to be sorted
+        # first sort by title
+        cards = sorted(cards, key=lambda card: card['title'])
+        # next sort by type
+        cards = sorted(cards, key=lambda card: self.type_code_sort[card['type_code']])
+        return cards
 
-    @commands.command(aliases=['arkham','arkhamhorror', 'ahe', 'ahb', 'ah1', 'ah2', 'ah3', 'ah4', 'ah5', 'aha'], pass_context=True)
+    def deck_parse(self, deck_id):
+        """Returns a formatted string of the cards in the given deck_id"""
+        if not self.init_api():
+            self.refresh_ah_api()
+
+        api_prefix = 'https://arkhamdb.com/api/public/decklist/'
+        m_response = ''
+        deck_json = requests.get(api_prefix + deck_id).json()
+        slots = deck_json['slots']
+        codes_to_find = slots.keys()
+        decklist_data = []
+        # Find every card listed in slots
+        for card in self.ah_api:
+            code = card["code"]
+            if code in codes_to_find:
+                # Save the number of copies this card in the deck_parse
+                to_save = copy.copy(card)
+                to_save["number"] = slots[code]
+                decklist_data.append(to_save)
+        
+        # Print out a formatted list
+        last_type_seen = 'investigator'
+        decklist_data = self.sort_cards(decklist_data)
+        m_response += deck_json['name'] + " \n"
+        for card in decklist_data:
+            if last_type_seen != card['type_code']:
+                last_type_seen = card['type_code']
+                m_response += "**{0}**\n".format(card['type_code'])
+            m_response += "**{0}x{1}**\n".format(card['number'], card['name'])
+
+        return m_response
+
+    @commands.command(aliases=['ahd'])
+    async def ahdeck(self, *, decklist: str):
+        """Arkham Horror deck listing"""
+        m_decklist = unidecode(decklist.lower())
+        re_decklist_id = re.search(r"(https://arkhamdb\.com/decklist/view/)(\d+)(/.*)", m_decklist)
+        if re_decklist_id is None or re_decklist_id.group(2) is None:
+            m_response += "I see: \"{0}\", but I don't understand\n".format(m_decklist)
+        else:
+            m_response += self.deck_parse(re_decklist_id.group(2))
+        await self.bot.say(m_response[:2000])
+
+    @commands.command(aliases=['arkham', 'arkhamhorror', 'ahe', 'ahb', 'ah1', 'ah2', 'ah3', 'ah4', 'ah5', 'aha'], pass_context=True)
     async def ah(self, ctx):
-    #async def ah(self, ctx, *, cardname: str):
         """Arkham Horror card lookup"""
         m_query = ' '.join(ctx.message.content.split()[1:]).lower()
-        #m_query = cardname.lower()
         img = 'imagesrc'
 
         # Auto-correct some card names (and inside jokes)
