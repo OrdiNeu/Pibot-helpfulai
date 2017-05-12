@@ -5,9 +5,8 @@ import re
 
 import discord
 import requests
-import unidecode
 from discord.ext import commands
-
+from unidecode import unidecode
 
 class Arkham:
     """Arkham Horror related commands"""
