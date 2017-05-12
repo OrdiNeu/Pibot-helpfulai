@@ -72,6 +72,7 @@ class Arkham:
         """Arkham Horror deck listing"""
         m_decklist = unidecode(decklist.lower())
         re_decklist_id = re.search(r"(https://arkhamdb\.com/decklist/view/)(\d+)(/.*)", m_decklist)
+        m_response = ""
         if re_decklist_id is None or re_decklist_id.group(2) is None:
             m_response += "I see: \"{0}\", but I don't understand\n".format(m_decklist)
         else:
