@@ -37,7 +37,7 @@ class Arkham:
 
     def deck_parse(self, deck_id):
         """Returns a formatted string of the cards in the given deck_id"""
-        if not self.init_api():
+        if not self.init_api:
             self.refresh_ah_api()
 
         api_prefix = 'https://arkhamdb.com/api/public/decklist/'
