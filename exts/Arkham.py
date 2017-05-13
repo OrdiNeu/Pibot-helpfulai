@@ -67,7 +67,7 @@ class Arkham:
             xp = 0
             if "xp" in card:
                 xp = int(card['xp'])
-            m_response += "{0}x{1} {2}\n".format(card['number'], card['name'], "°" * xp * to_save["number"])
+            m_response += "{0}x{1} {2}\n".format(card['number'], card['name'], "°" * (xp * to_save["number"]))
 
         return m_response
 
