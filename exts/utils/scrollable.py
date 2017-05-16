@@ -2,6 +2,7 @@
 # PREAMBLE ####################################################################
 import discord
 import asyncio
+import random
 
 from discord.ext import commands
 from . import listener
@@ -19,8 +20,10 @@ class Scrollable(listener.RctListener):
     async def send(self, channel, msg_list, cur_pos=0):
         """Send the given message list, scrolled to the given position"""
         self.msg = await self.bot.send_message(channel, msg_list[cur_pos])
-        await self.bot.add_reaction(self.msg, u"\u2B06") # Up arrow
-        await self.bot.add_reaction(self.msg, u"\u2B07") # Down arrow
+        await self.bot.add_reaction(self.msg, u"\u2B06")  # Up arrow
+        await self.bot.add_reaction(self.msg, u"\u2B07")  # Down arrow
+        await self.bot.add_reaction(self.msg, u"\U0001F3B2")  # Game die
+
         self.msg_list = msg_list
         self.cur_pos = cur_pos
         self.attach(channel.id)
@@ -38,6 +41,10 @@ class Scrollable(listener.RctListener):
             self.cur_pos -= 1
             if self.cur_pos < 0:
                 self.cur_pos = len(self.msg_list)-1
+            if added:
+                self.bot.remove_reaction(self.msg, rct.emoji, user)
+        elif str(rct.emoji) == u"\U0001F3B2":  # Game die
+            self.cur_pos = random.randint(0, len(self.msg_list)-1)
             if added:
                 self.bot.remove_reaction(self.msg, rct.emoji, user)
         await self.bot.edit_message(self.msg, self.msg_list[self.cur_pos])
