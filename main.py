@@ -158,11 +158,12 @@ def load_credentials():
 
 def load_twitter():
     with open('../pibot-twitter-cred.json') as f:
+        creds = json.load(f)
         exts.utils.twitter.init(
-            f['consumer_key'],
-            f['consumer_secret'],
-            f['access_token'],
-            f['access_token_secret']
+            creds['consumer_key'],
+            creds['consumer_secret'],
+            creds['access_token'],
+            creds['access_token_secret']
             )
 
 # Login and run
