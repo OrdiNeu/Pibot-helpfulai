@@ -9,6 +9,7 @@ from discord.ext import commands
 import json
 
 import exts.utils.listener
+import exts.utils.twitter
 
 # CONSTANTS ###################################################################
 COMMAND_PREFIX = ['?', '!']
@@ -155,9 +156,18 @@ def load_credentials():
     with open('../pibot-discord-cred.json') as f:
         return json.load(f)
 
+def load_twitter():
+    with open('../pibot-twitter-cred.json') as f:
+        exts.utils.twitter.init(
+            f['consumer_key'],
+            f['consumer_secret'],
+            f['access_token'],
+            f['access_token_secret']
+            )
 
 # Login and run
 if __name__ == '__main__':
+    load_twitter()
     credentials = load_credentials()
     token = credentials['token']
 

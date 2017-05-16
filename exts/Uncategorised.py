@@ -1,10 +1,13 @@
 # Uncategorised extension for pibot
 ### PREAMBLE ##################################################################
-import discord
-from discord.ext import commands
-import requests
 import re
 import random
+
+import discord
+import requests
+from discord.ext import commands
+
+from .utils import twitter, scrollable
 
 class Uncategorised:
     """Currently uncategorised commands"""
@@ -15,11 +18,12 @@ class Uncategorised:
     @commands.command()
     async def inspire(self):
         """Posts a random inspirational image"""
-        digitA = random.randint(0,2)
-        digitB = random.randint(0,9)
+        digitA = random.randint(0, 2)
+        digitB = random.randint(0, 9)
         numberA = str(digitA) + str(digitB)
-        if numberA == "00": numberA = "30"
-        number = random.randint(0,9999)
+        if numberA == "00":
+            numberA = "30"
+        number = random.randint(0, 9999)
         response = "http://generated.inspirobot.me/0" + numberA + "/aXm" + str(number) + "xjU.jpg"
         await self.bot.say(response)
 
@@ -94,11 +98,34 @@ class Uncategorised:
     @commands.command(pass_context=True)
     async def pok(self, ctx):
         """Posts a random pokemon, randomly"""
-        r = random.randint(1,10)
+        r = random.randint(1, 10)
         if r <= 7:
             await ctx.invoke(self.pokemon)
         else:
             await ctx.invoke(self.garfemon)
+
+    @commands.command(aliases=['twatter'], pass_context=True)
+    async def twitter(self, ctx):
+        """Grabs the twitter feed of the given user, as a scrollable.
+        Currently only grabs the latest 20 tweets"""
+        if twitter.API is None:
+            await self.bot.say("Twitter API not initialized")
+            return
+
+        # Parse out the timeline
+        username = ctx.message.content.split()
+        if len(username) > 1:
+            username = " ".join(username[1:])
+        if username.startswith("@"):
+            username = username[1:]
+        timeline = twitter.API.user_timeline(username)
+
+        # Transform into a scrollable
+        tweet_texts = []
+        for tweet in timeline:
+            tweet_texts.append(tweet.text)
+        response = scrollable.Scrollable(self.bot)
+        await response.send(ctx.message.channel, tweet_texts)
 
 def setup(bot):
     bot.add_cog(Uncategorised(bot))
