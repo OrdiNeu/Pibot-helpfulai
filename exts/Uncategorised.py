@@ -163,5 +163,20 @@ class Uncategorised:
         response = scrollable.Scrollable(self.bot)
         await response.send(ctx.message.channel, upload_urls)
 
+
+    @commands.command(aliases=['flintstones'],pass_context=True)
+    async def flint(self, ctx):
+        """Grabs the YouTube upload list of Siivagunner, an unregistered user."""
+        if youtube.API is None:
+            await self.bot.say("YouTube API not initialized")
+            return
+
+        uploads = youtube.grabUploadsByPlaylistId("PLzDaKOnENQJ98YMmY5vrvzkm0Sc68IPa3")
+        upload_urls = ["https://www.youtube.com/watch?v=" + s for s in uploads]
+        response = scrollable.Scrollable(self.bot)
+        await response.send(ctx.message.channel, upload_urls)
+
+
+
 def setup(bot):
     bot.add_cog(Uncategorised(bot))
