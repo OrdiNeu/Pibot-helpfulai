@@ -152,7 +152,7 @@ class Uncategorised:
 
     @commands.command(aliases=['siivagunner', 'silvagunner'],pass_context=True)
     async def siiva(self, ctx):
-        """Grabs the YouTube upload list of the given user, as a scrollable."""
+        """Grabs the YouTube upload list of Siivagunner, an unregistered user."""
         if youtube.API is None:
             await self.bot.say("YouTube API not initialized")
             return
