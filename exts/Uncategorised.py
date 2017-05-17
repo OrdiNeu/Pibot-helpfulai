@@ -139,9 +139,25 @@ class Uncategorised:
         if len(username) > 1:
             username = " ".join(username[1:])
         uploads = youtube.grabUploads(username)
-        if len(uploads) == 0:
-            await self.bot.say("Couldn't find any videos")
+        if not type(uploads) is list:
+            if uploads == youtube.ERROR_COULD_NOT_FIND_USER:
+                await self.bot.say("Couldn't find the given user")
+            elif uploads == youtube.ERROR_COULD_NOT_FIND_UPLOADS:
+                await self.bot.say("Couldn't find uploads by the given user")
             return
+        
+        upload_urls = ["https://www.youtube.com/watch?v=" + s for s in uploads]
+        response = scrollable.Scrollable(self.bot)
+        await response.send(ctx.message.channel, upload_urls)
+
+        @commands.command(pass_context=True)
+        async def siiva(self, ctx):
+        """Grabs the YouTube upload list of the given user, as a scrollable."""
+        if youtube.API is None:
+            await self.bot.say("YouTube API not initialized")
+            return
+
+        uploads = youtube.grabUploadsByPlaylistId("UU9ecwl3FTG66jIKA9JRDtmg")
         
         upload_urls = ["https://www.youtube.com/watch?v=" + s for s in uploads]
         response = scrollable.Scrollable(self.bot)
