@@ -7,7 +7,7 @@ import discord
 import requests
 from discord.ext import commands
 
-from .utils import twitter, scrollable
+from .utils import twitter, scrollable, youtube
 
 class Uncategorised:
     """Currently uncategorised commands"""
@@ -126,6 +126,26 @@ class Uncategorised:
             tweet_texts.append(tweet.text)
         response = scrollable.Scrollable(self.bot)
         await response.send(ctx.message.channel, tweet_texts)
+    
+    @commands.command(aliases=['youtsube'], pass_context=True)
+    async def youtube(self, ctx):
+        """Grabs the YouTube upload list of the given user, as a scrollable."""
+        if youtube.API is None:
+            await self.bot.say("YouTube API not initialized")
+            return
+        
+        # Parse out the username
+        username = ctx.message.content.split()
+        if len(username) > 1:
+            username = " ".join(username[1:])
+        uploads = youtube.grabUploads(username)
+        if len(uploads) == 0:
+            await self.bot.say("Couldn't find any videos")
+            return
+        
+        upload_urls = ["https://www.youtube.com/watch?v=" + s for s in uploads]
+        response = scrollable.Scrollable(self.bot)
+        await response.send(ctx.message.channel, upload_urls)
 
 def setup(bot):
     bot.add_cog(Uncategorised(bot))
