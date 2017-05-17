@@ -148,7 +148,7 @@ class Uncategorised:
         
         upload_urls = ["https://www.youtube.com/watch?v=" + s for s in uploads]
         response = scrollable.Scrollable(self.bot)
-        await response.send(ctx.message.channel, upload_urls)
+        await response.send(ctx.message.channel, upload_urls, locked_to=ctx.author)
 
     @commands.command(aliases=['siivagunner', 'silvagunner'],pass_context=True)
     async def siiva(self, ctx):
@@ -161,8 +161,7 @@ class Uncategorised:
         
         upload_urls = ["https://www.youtube.com/watch?v=" + s for s in uploads]
         response = scrollable.Scrollable(self.bot)
-        await response.send(ctx.message.channel, upload_urls)
-
+        await response.send(ctx.message.channel, upload_urls, locked_to=ctx.author)
 
     @commands.command(aliases=['flintstones'],pass_context=True)
     async def flint(self, ctx):
@@ -174,7 +173,7 @@ class Uncategorised:
         uploads = youtube.grabUploadsByPlaylistId("PLzDaKOnENQJ98YMmY5vrvzkm0Sc68IPa3")
         upload_urls = ["https://www.youtube.com/watch?v=" + s for s in uploads]
         response = scrollable.Scrollable(self.bot)
-        await response.send(ctx.message.channel, upload_urls)
+        await response.send(ctx.message.channel, upload_urls, locked_to=ctx.author)
 
 
 

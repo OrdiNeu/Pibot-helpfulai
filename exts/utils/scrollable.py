@@ -14,22 +14,30 @@ class Scrollable(listener.RctListener):
         self.bot = bot
         self.msg_list = None
         self.cur_pos = 0
-        self.msg = None # TODO: aghh pylint stop it
+        self.msg = None
+        self.locked_to = None
         super().__init__(None)    # TODO: I screwed up somewhere with designing this
 
-    async def send(self, channel, msg_list, cur_pos=0):
-        """Send the given message list, scrolled to the given position"""
+    async def send(self, channel, msg_list, cur_pos=0, locked_to=None):
+        """Send the given message list, scrolled to the given position
+        cur_pos lets you configure where in the list you start at
+        locked_to lets you lock the controls to a particular user"""
         self.msg = await self.bot.send_message(channel, msg_list[cur_pos])
         await self.bot.add_reaction(self.msg, u"\u2B06")  # Up arrow
         await self.bot.add_reaction(self.msg, u"\u2B07")  # Down arrow
         await self.bot.add_reaction(self.msg, u"\U0001F3B2")  # Game die
+        if locked_to:
+            await self.bot.add_reaction(self.msg, u"\U0001F512")  # Padlock
 
         self.msg_list = msg_list
         self.cur_pos = cur_pos
         self.attach(channel.id)
+        self.locked_to = locked_to
 
     async def on_reaction(self, rct, user, added):
         """Handle the scroll reaction"""
+        if self.locked_to and self.locked_to != user:
+            return
         if str(rct.emoji) == u"\u2B06":    # Up arrow
             # Move position safely, and remove this reaction
             self.cur_pos += 1
