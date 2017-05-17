@@ -150,8 +150,8 @@ class Uncategorised:
         response = scrollable.Scrollable(self.bot)
         await response.send(ctx.message.channel, upload_urls)
 
-        @commands.command(pass_context=True)
-        async def siiva(self, ctx):
+    @commands.command(aliases=['siivagunner', 'silvagunner'],pass_context=True)
+    async def siiva(self, ctx):
         """Grabs the YouTube upload list of the given user, as a scrollable."""
         if youtube.API is None:
             await self.bot.say("YouTube API not initialized")
