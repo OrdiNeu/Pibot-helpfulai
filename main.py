@@ -10,6 +10,7 @@ import json
 
 import exts.utils.listener
 import exts.utils.twitter
+import exts.utils.youtube
 
 # CONSTANTS ###################################################################
 COMMAND_PREFIX = ['?', '!']
@@ -169,6 +170,7 @@ def load_twitter():
 # Login and run
 if __name__ == '__main__':
     load_twitter()
+    exts.utils.youtube.init("../pibot-google-secret.json")
     credentials = load_credentials()
     token = credentials['token']
 
