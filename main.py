@@ -11,6 +11,7 @@ import json
 import exts.utils.listener
 import exts.utils.twitter
 import exts.utils.youtube
+import exts.utils.alarm
 
 # CONSTANTS ###################################################################
 COMMAND_PREFIX = ['?', '!']
@@ -175,6 +176,7 @@ if __name__ == '__main__':
     token = credentials['token']
 
     bot.client_id = credentials['client_id']
+    bot.loop.create_task(exts.utils.alarm._check_alarm(bot))
     for extension in EXTENSIONS:
         try:
             bot.load_extension(extension)
