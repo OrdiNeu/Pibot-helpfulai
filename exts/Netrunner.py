@@ -519,9 +519,18 @@ class Netrunner:
     async def nr_flags(self, *, card_search:str):
         m_response = self.flag_parse(card_search + " --image-only")
         # await self.bot.say(m_response)
+        description = ""
         for i, card in enumerate(m_response.split("\n")):
             embed_response = discord.Embed(title="[{}]".format(i), type="rich")
-            embed_response.set_image(card)
+            url_search = re.search(r"(http://netrunnerdb\.com/card_image/)(\d*)\..*$", card)
+            if url_search is not None:
+                embed_response.set_image(url=card)
+                await self.bot.say(embed=embed_response)
+            else:
+                description += card
+        if len(description) > 0:
+            embed_response = discord.Embed(title="search", type="rich")
+            embed_response.description = description
             await self.bot.say(embed=embed_response)
 
     def rich_embed_deck_parse(self, deck_id):
