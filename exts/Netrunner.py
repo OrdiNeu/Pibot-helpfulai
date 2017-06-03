@@ -519,9 +519,10 @@ class Netrunner:
     async def nr_flags(self, *, card_search:str):
         m_response = self.flag_parse(card_search + " --image-only")
         # await self.bot.say(m_response)
-        embed_response = discord.Embed(title="Netrunner", type="rich")
-        embed_response.description = m_response
-        await self.bot.say(embed=embed_response)
+        for i, card in enumerate(m_response.split("\n")):
+            embed_response = discord.Embed(title="[{}]".format(i), type="rich")
+            embed_response.set_image(card)
+            await self.bot.say(embed=embed_response)
 
     def rich_embed_deck_parse(self, deck_id):
         # m_response = ""
@@ -547,8 +548,9 @@ class Netrunner:
             for card in card_sort_list:
                 type_section += "{0}x {1}\n".format(card['number'], card['title'])
                 if card['type_code'] not in last_type:
-                    # response_addr += "**{0}**\n".format(card['type_code'])
-                    e_response.add_field(name=card['type_code'], value=type_section, inline=False)
+                    # response_addr += "**{0}**\n".format
+                    format_code = card['type_code'][0].upper() + card['type_code'][1:]
+                    e_response.add_field(name=format_code, value=type_section, inline=False)
                     last_type = card['type_code']
                     type_section = ""
             return e_response
