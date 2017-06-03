@@ -521,6 +521,7 @@ class Netrunner:
         # await self.bot.say(m_response)
         description = ""
         for i, card in enumerate(m_response.split("\n")):
+            time.sleep(0.5)
             embed_response = discord.Embed(title="[{}]".format(i), type="rich")
             url_search = re.search(r"(http://netrunnerdb\.com/card_image/)(\d*)\..*$", card)
             if url_search is not None:
@@ -530,7 +531,7 @@ class Netrunner:
             else:
                 description += card
         if len(description) > 0:
-            embed_response = discord.Embed(title="search", type="rich")
+            embed_response = discord.Embed(title="search results:", type="rich")
             embed_response.description = description
             await self.bot.say(embed=embed_response)
 
