@@ -525,6 +525,7 @@ class Netrunner:
             url_search = re.search(r"(http://netrunnerdb\.com/card_image/)(\d*)\..*$", card)
             if url_search is not None:
                 embed_response.set_image(url=card)
+                embed_response.description = "'{}'".format(card)
                 await self.bot.say(embed=embed_response)
             else:
                 description += card
