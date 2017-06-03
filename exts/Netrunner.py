@@ -621,14 +621,14 @@ class Netrunner:
                 card_sort_list.append(card)
             card_sort_list = self.sort_cards(card_sort_list)
             # for each card, sorted by type, we'll create a new field, and add all cards from the list
-            response_addr = ""
+            type_section = ""
             for card in card_sort_list:
-                response_addr += "{0}x {1}\n".format(card['number'], card['title'])
-                if last_type not in card['type_code']:
+                type_section += "{0}x {1}\n".format(card['number'], card['title'])
+                if card['type_code'] not in last_type:
                     # response_addr += "**{0}**\n".format(card['type_code'])
-                    e_response.add_field(name=card['type_code'], value=response_addr, inline=False)
+                    e_response.add_field(name=card['type_code'], value=type_section, inline=False)
                     last_type = card['type_code']
-                    response_addr = ""
+                    type_section = ""
             return e_response
         except JSONDecodeError as badUrlError:
             error_embed = discord.Embed(title="badUrlError", type="rich")
