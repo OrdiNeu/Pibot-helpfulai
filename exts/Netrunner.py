@@ -166,6 +166,8 @@ class Netrunner:
             "influence_limit": "Influence Limit",
             "minimum_deck_size": "Deck Minimum Size",
             }
+        self.union_keys = ["pack_code"]
+        self.cache_refresh_pack_codes = ["td"]
 
 
     def flag_parse(self, string_to_parse):
@@ -607,7 +609,10 @@ class Netrunner:
             m_response += "I see: \"{0}\", but I don't understand\n".format(m_decklist)
         else:
             m_response += self.deck_parse(re_decklist_id.group(2))
-        await self.bot.say(m_response[:2000])
+        # await self.bot.say(m_response[:2000])
+        e = discord.Embed(description="{}".format(m_response[:2000]), colour=int(16))
+        await self.bot.say(embed=e)
+
 
     @commands.command(aliases=['ndrand'])
     async def rand_deck(self):
