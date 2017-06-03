@@ -574,6 +574,7 @@ class Netrunner:
             decklist_data = [c for c in requests.get(m_api_prefex + deck_id).json()['data']]
             # decklist_data[0]['cards'] is a dict with card_id keys to counts {'10005': 1}
             m_response += "**{0}**\n".format(decklist_data[0]['name'])
+            e_response = discord.Embed(title=decklist_data[0]['name'], type="rich")
             # id_search_tuple_list = [('code', "{0}".format(decklist_data[0]['id']))]
             # m_response += "{0}\n".format(self.search_text(id_search_tuple_list)[0]['title'])
             # build a list of tuples in the pairs, value(number of card), key (id of card)
@@ -600,6 +601,41 @@ class Netrunner:
             m_response = "Unhandled error in search!"
         return m_response
 
+    def rich_embed_deck_parse(self, deck_id):
+        # m_response = ""
+        m_api_prefex = "https://netrunnerdb.com/api/2.0/public/decklist/"
+        card_sort_list = []
+        last_type = ""
+        if not self.init_api:
+            self.refresh_nr_api()
+        try:
+            decklist_data = [c for c in requests.get(m_api_prefex + deck_id).json()['data']]
+            # decklist_data[0]['cards'] is a dict with card_id keys to counts {'10005': 1}
+            e_response = discord.Embed(title=decklist_data[0]['name'], type="rich")
+            # build a list of tuples in the pairs, value(number of card), key (id of card)
+            for number, card_id in [(v, k) for (k, v) in decklist_data[0]['cards'].items()]:
+                # for number, card_id, in num_card_tup:
+                card = self.search_text([('code', card_id)])[0]
+                # add a key to the dictionary with the number of instances, to use later
+                card['number'] = number
+                card_sort_list.append(card)
+            card_sort_list = self.sort_cards(card_sort_list)
+            # for each card, sorted by type, we'll create a new field, and add all cards from the list
+            response_addr = ""
+            for card in card_sort_list:
+                response_addr += "{0}x {1}\n".format(card['number'], card['title'])
+                if last_type not in card['type_code']:
+                    # response_addr += "**{0}**\n".format(card['type_code'])
+                    e_response.add_field(name=card['type_code'], value=response_addr)
+                    last_type = card['type_code']
+                    response_addr = ""
+            return e_response
+        except JSONDecodeError as badUrlError:
+            error_embed = discord.Embed(title="badUrlError", type="rich")
+            error_embed.description = badUrlError.msg
+            return error_embed
+
+
     @commands.command(aliases=['nd'])
     async def deck(self, *, decklist: str):
         m_response = ""
@@ -609,9 +645,11 @@ class Netrunner:
             m_response += "I see: \"{0}\", but I don't understand\n".format(m_decklist)
         else:
             m_response += self.deck_parse(re_decklist_id.group(2))
+            e_response = self.rich_embed_deck_parse(re_decklist_id.group(2))
         # await self.bot.say(m_response[:2000])
-        e = discord.Embed(description="{}".format(m_response[:2000]), colour=int(16))
-        await self.bot.say(embed=e)
+        # e = discord.Embed(description="{}".format(m_response[:2000]), colour=int(16))
+        # await self.bot.say(embed=e)
+        await self.bot.say(embed=e_response)
 
 
     @commands.command(aliases=['ndrand'])
