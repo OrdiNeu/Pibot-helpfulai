@@ -626,7 +626,7 @@ class Netrunner:
                 response_addr += "{0}x {1}\n".format(card['number'], card['title'])
                 if last_type not in card['type_code']:
                     # response_addr += "**{0}**\n".format(card['type_code'])
-                    e_response.add_field(name=card['type_code'], value=response_addr)
+                    e_response.add_field(name=card['type_code'], value=response_addr, inline=False)
                     last_type = card['type_code']
                     response_addr = ""
             return e_response
@@ -644,12 +644,14 @@ class Netrunner:
         if re_decklist_id is None or re_decklist_id.group(2) is None:
             m_response += "I see: \"{0}\", but I don't understand\n".format(m_decklist)
         else:
-            m_response += self.deck_parse(re_decklist_id.group(2))
+            # m_response += self.deck_parse(re_decklist_id.group(2))
             e_response = self.rich_embed_deck_parse(re_decklist_id.group(2))
-        # await self.bot.say(m_response[:2000])
+            e_response.add_field(name="test field", value="thing to test", inline=False)
+            await self.bot.say(embed=e_response)
+        await self.bot.say(m_response[:2000])
         # e = discord.Embed(description="{}".format(m_response[:2000]), colour=int(16))
         # await self.bot.say(embed=e)
-        await self.bot.say(embed=e_response)
+
 
 
     @commands.command(aliases=['ndrand'])
