@@ -263,7 +263,7 @@ class Netrunner:
                 #  figure out how we're going to respond, if we're images only, skip parsing and use this.
                 if parser_dictionary["image-only"]:
                     for i, card in enumerate(m_match_list[:5]):
-                        m_response += "http://netrunnerdb.com/card_image/" + card['code'] + ".png\n"
+                        m_response += "https://netrunnerdb.com/card_image/" + card['code'] + ".png\n"
                     if len(m_match_list) > 5:
                         m_response += "[{0}/{1}]".format(5, len(m_match_list))
                 else:
@@ -523,7 +523,7 @@ class Netrunner:
         for i, card in enumerate(m_response.split("\n")):
             time.sleep(0.5)
             embed_response = discord.Embed(title="[{}]".format(i), type="rich")
-            url_search = re.search(r"(http://netrunnerdb\.com/card_image/)(\d*)\..*$", card)
+            url_search = re.search(r"(https://netrunnerdb\.com/card_image/)(\d*)\..*$", card)
             if url_search is not None:
                 embed_response.set_image(url=card)
                 embed_response.description = "'{}'".format(card)
@@ -597,7 +597,7 @@ class Netrunner:
         hyphen_name = decks[selection]['name'].replace(" ", "-").lower()
         link = r"https://netrunnerdb.com/en/decklist/" + id + "/" + hyphen_name
         m_response += link + "\n"
-        m_response += self.deck_parse(id)
+        m_response += self.rich_embed_deck_parse(id)
         await self.bot.say(m_response[:2000])
 
     @commands.command(pass_context=True)
