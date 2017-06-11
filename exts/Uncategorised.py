@@ -210,6 +210,7 @@ class Uncategorised:
                     self.channel,
                     "https://www.youtube.com/watch?v=" + newest_upload
                     )
+            self.attach(3600)
 
     @commands.command(pass_context=True)
     async def waitforsiiva(self, ctx):
@@ -236,6 +237,7 @@ class Uncategorised:
                 self.channel,
                 'Test'
                 )
+            self.attach(5)
     
     @commands.command(pass_context=True)
     async def bugme(self, ctx):
