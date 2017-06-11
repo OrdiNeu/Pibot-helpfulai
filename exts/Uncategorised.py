@@ -211,7 +211,7 @@ class Uncategorised:
                     )
 
     @commands.command(pass_context=True)
-    async def waitForSiiva(self, ctx):
+    async def waitforsiiva(self, ctx):
         """Checks every hour a new upload by Siivagunner.
         Yeah I know this is a bit hard to use right now. Bear with me"""
         new_alarm = Uncategorised.YouTubeAlarm(
@@ -236,7 +236,7 @@ class Uncategorised:
                 )
     
     @commands.command(pass_context=True)
-    async def bugMe(self, ctx):
+    async def bugme(self, ctx):
         """Temporary testing rig for alarms"""
         new_alarm = Uncategorised.BugMe(self.bot, ctx.message.channel)
         new_alarm.attach(5)
