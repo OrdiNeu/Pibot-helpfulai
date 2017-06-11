@@ -16,7 +16,7 @@ async def _check_alarm(client):
             alarms.pop(0)
         await asyncio.sleep(1) # only check once per second
 
-async def _insert_alarm(trigger_time, alarm):
+def _insert_alarm(trigger_time, alarm):
     """Set an alarm to trigger at the given time"""
     if len(alarms) == 0:
         alarm.append((trigger_time, alarm))
