@@ -18,8 +18,6 @@ async def _check_alarm(client):
 
 def _insert_alarm(trigger_time, alarm):
     """Set an alarm to trigger at the given time"""
-    if len(alarms) == 0:
-        alarms.append((trigger_time, alarm))
     success = False
     for i in range(0, len(alarms)):
         if trigger_time <= alarms[i][0]:
