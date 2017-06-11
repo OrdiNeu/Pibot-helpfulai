@@ -7,7 +7,7 @@ import discord
 import requests
 from discord.ext import commands
 
-from .utils import twitter, scrollable, youtube
+from .utils import twitter, scrollable, youtube, alarm
 
 class Uncategorised:
     """Currently uncategorised commands"""
@@ -175,7 +175,71 @@ class Uncategorised:
         response = scrollable.Scrollable(self.bot)
         await response.send(ctx.message.channel, upload_urls, locked_to=ctx.message.author)
 
+    class YouTubeAlarm(alarm.Alarm):
+        """Waits for a new upload by the given YouTube channel, then tells everyone"""
+        def __init__(self, bot, channel, playlistID):
+            self.bot = bot
+            self.playlistID = playlistID
+            self.channel = channel
+            self.last_known_siiva_upload = ""
+            self._initialized = False
 
+        async def initialize(self):
+            self._initialized = True
+            self.last_known_siiva_upload = await self.get_latest_upload()
+
+        async def get_latest_upload(self):
+            """Grabs the latest upload by Siivagunner"""
+            if youtube.API is None:
+                await self.bot.send_message(
+                    self.channel,
+                    'YouTube API not initialized'
+                    )
+                return
+
+            uploads = youtube.grabUploadsByPlaylistId(self.playlistID)
+            return uploads[0]
+    
+        async def run(self):
+            """Auto-run via alarm: check for a new upload"""
+            newest_upload = await self.get_latest_upload
+            if self.last_known_siiva_upload != newest_upload:
+                self.last_known_siiva_upload = newest_upload
+                await self.bot.send_message(
+                    self.channel,
+                    "https://www.youtube.com/watch?v=" + newest_upload
+                    )
+
+    @commands.command(pass_context=True)
+    async def waitForSiiva(self, ctx):
+        """Checks every hour a new upload by Siivagunner.
+        Yeah I know this is a bit hard to use right now. Bear with me"""
+        new_alarm = Uncategorised.YouTubeAlarm(
+            self.bot,
+            ctx.message.channel,
+            "UU9ecwl3FTG66jIKA9JRDtmg"
+            )
+        await new_alarm.initialize()
+        new_alarm.attach(3600)
+        await self.bot.say("Ok, I will let you know when the next Siivagunner upload happens")
+    
+    class BugMe(alarm.Alarm):
+        """Temporary testing rig for alarms"""
+        def __init__(self, bot, channel):
+            self.bot = bot
+            self.channel = channel
+        
+        async def run(self):
+            await self.bot.send_message(
+                self.channel,
+                'Test'
+                )
+    
+    @commands.command(pass_context=True)
+    async def bugMe(self, ctx):
+        """Temporary testing rig for alarms"""
+        new_alarm = Uncategorised.BugMe(self.bot, ctx.message.channel)
+        new_alarm.attach(5)
 
 def setup(bot):
     bot.add_cog(Uncategorised(bot))
