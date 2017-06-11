@@ -26,6 +26,8 @@ def _insert_alarm(trigger_time, alarm):
             break
     if not success:
         alarms.append((trigger_time, alarm))
+    # Tmp debugging
+    print(alarms)
 
 class Alarm:
     """Abstract class for alarms"""
