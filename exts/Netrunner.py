@@ -166,6 +166,8 @@ class Netrunner:
             "influence_limit": "Influence Limit",
             "minimum_deck_size": "Deck Minimum Size",
             }
+        self.union_keys = ["pack_code"]
+        self.cache_refresh_pack_codes = ["td"]
 
 
     def flag_parse(self, string_to_parse):
@@ -261,7 +263,7 @@ class Netrunner:
                 #  figure out how we're going to respond, if we're images only, skip parsing and use this.
                 if parser_dictionary["image-only"]:
                     for i, card in enumerate(m_match_list[:5]):
-                        m_response += "http://netrunnerdb.com/card_image/" + card['code'] + ".png\n"
+                        m_response += "https://netrunnerdb.com/card_image/" + card['code'] + ".png\n"
                     if len(m_match_list) > 5:
                         m_response += "[{0}/{1}]".format(5, len(m_match_list))
                 else:
@@ -516,64 +518,34 @@ class Netrunner:
     @commands.command(aliases=['nr', 'netrunner'])
     async def nr_flags(self, *, card_search:str):
         m_response = self.flag_parse(card_search + " --image-only")
-        await self.bot.say(m_response)
-
-    '''@commands.command(aliases=['netrunner'])
-    async def nr(self, *, cardname: str):
-        """Netrunner card lookup"""
-        m_query = unidecode(cardname.lower())
-
-        # Auto-correct some card names (and inside jokes)
-        query_corrections = {
-            "smc": "self-modifying code",
-            "jesus": "jackson howard",
-            "nyan": "noise",
-            "neh": "near earth hub",
-            "sot": "same old thing",
-            "tilde": "blackat",
-            "neko": "blackat",
-            "ordineu": "exile",
-            "<:stoned:259424190111678464>": "blackstone"
-        }
-        if m_query in query_corrections.keys():
-            m_query = query_corrections[m_query]
-
-        # Auto-link some images instead of other users' names
-        query_redirects = {
-            "triffids": "http://run4games.com/wp-content/gallery/altcard_runner_id_shaper/Nasir-by-stentorr-001.jpg"
-        }
-        m_response = ""
-        if m_query in query_redirects.keys():
-            m_response = query_redirects[m_query]
-        else:
-            if not self.init_api:
-                self.refresh_nr_api()
-            # Otherwise find and handle card names
-            m_cards = [c for c in self.nr_api if unidecode(c['title'].lower()).__contains__(m_query)]
-            if len(m_cards) == 0:
-                m_response += "Sorry, I cannot seem to find any card with these parameters:\n"
-                m_response += "http://netrunnerdb.com/find/?q=" + m_query.replace(" ", "+")
+        # await self.bot.say(m_response)
+        description = ""
+        for i, card in enumerate(m_response.split("\n")):
+            time.sleep(0.5)
+            embed_response = discord.Embed(title="[{}]".format(i), type="rich")
+            url_search = re.search(r"(https://netrunnerdb\.com/card_image/)(\d*)\..*$", card)
+            if url_search is not None:
+                embed_response.set_image(url=card)
+                embed_response.description = "'{}'".format(card)
+                await self.bot.say(embed=embed_response)
             else:
-                for i, card in enumerate(m_cards[:5]):
-                    m_response += "http://netrunnerdb.com/card_image/" + card['code'] + ".png\n"
-                if len(m_cards) > 5:
-                    m_response += "[{0}/{1}]".format(5, len(m_cards))
-        await self.bot.say(m_response)
-'''
+                description += card
+        if len(description) > 0:
+            embed_response = discord.Embed(title="search results:", type="rich")
+            embed_response.description = description
+            await self.bot.say(embed=embed_response)
 
-    def deck_parse(self, deck_id):
-        m_response = ""
+    def rich_embed_deck_parse(self, deck_id):
+        # m_response = ""
         m_api_prefex = "https://netrunnerdb.com/api/2.0/public/decklist/"
         card_sort_list = []
-        last_type = "identity"
+        last_type = ""
         if not self.init_api:
             self.refresh_nr_api()
         try:
             decklist_data = [c for c in requests.get(m_api_prefex + deck_id).json()['data']]
             # decklist_data[0]['cards'] is a dict with card_id keys to counts {'10005': 1}
-            m_response += "**{0}**\n".format(decklist_data[0]['name'])
-            # id_search_tuple_list = [('code', "{0}".format(decklist_data[0]['id']))]
-            # m_response += "{0}\n".format(self.search_text(id_search_tuple_list)[0]['title'])
+            e_response = discord.Embed(title=decklist_data[0]['name'], type="rich")
             # build a list of tuples in the pairs, value(number of card), key (id of card)
             for number, card_id in [(v, k) for (k, v) in decklist_data[0]['cards'].items()]:
                 # for number, card_id, in num_card_tup:
@@ -581,22 +553,22 @@ class Netrunner:
                 # add a key to the dictionary with the number of instances, to use later
                 card['number'] = number
                 card_sort_list.append(card)
-                # card_title = self.search_text([('code', card_id)])[0]['title']
             card_sort_list = self.sort_cards(card_sort_list)
+            # for each card, sorted by type, we'll create a new field, and add all cards from the list
+            type_section = ""
             for card in card_sort_list:
-                response_addr = ""
-                if last_type not in card['type_code']:
-                    response_addr += "**{0}**\n".format(card['type_code'])
+                type_section += "{0}x {1}\n".format(card['number'], card['title'])
+                if card['type_code'] not in last_type:
+                    # response_addr += "**{0}**\n".format
+                    format_code = card['type_code'][0].upper() + card['type_code'][1:]
+                    e_response.add_field(name=format_code, value=type_section, inline=False)
                     last_type = card['type_code']
-                response_addr += "{0}x {1}\n".format(card['number'], card['title'])
-                if (len(m_response) + len(response_addr)) >= self.max_message_len:
-                    m_response += "cont..."
-                    break
-                else:
-                    m_response += response_addr
+                    type_section = ""
+            return e_response
         except JSONDecodeError as badUrlError:
-            m_response = "Unhandled error in search!"
-        return m_response
+            error_embed = discord.Embed(title="badUrlError", type="rich")
+            error_embed.description = badUrlError.msg
+            return error_embed
 
     @commands.command(aliases=['nd'])
     async def deck(self, *, decklist: str):
@@ -606,8 +578,13 @@ class Netrunner:
         if re_decklist_id is None or re_decklist_id.group(2) is None:
             m_response += "I see: \"{0}\", but I don't understand\n".format(m_decklist)
         else:
-            m_response += self.deck_parse(re_decklist_id.group(2))
-        await self.bot.say(m_response[:2000])
+            # m_response += self.deck_parse(re_decklist_id.group(2))
+            e_response = self.rich_embed_deck_parse(re_decklist_id.group(2))
+            await self.bot.say(embed=e_response)
+        if len(m_response) > 0:
+            await self.bot.say(m_response[:2000])
+
+
 
     @commands.command(aliases=['ndrand'])
     async def rand_deck(self):
@@ -620,7 +597,7 @@ class Netrunner:
         hyphen_name = decks[selection]['name'].replace(" ", "-").lower()
         link = r"https://netrunnerdb.com/en/decklist/" + id + "/" + hyphen_name
         m_response += link + "\n"
-        m_response += self.deck_parse(id)
+        m_response += self.rich_embed_deck_parse(id)
         await self.bot.say(m_response[:2000])
 
     @commands.command(pass_context=True)
