@@ -183,6 +183,7 @@ class Uncategorised:
             self.channel = channel
             self.last_known_siiva_upload = ""
             self._initialized = False
+            super().__init__()
 
         async def initialize(self):
             self._initialized = True
@@ -228,6 +229,7 @@ class Uncategorised:
         def __init__(self, bot, channel):
             self.bot = bot
             self.channel = channel
+            super().__init__()
         
         async def run(self):
             await self.bot.send_message(
