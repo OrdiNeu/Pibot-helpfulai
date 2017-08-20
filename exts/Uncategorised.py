@@ -27,7 +27,7 @@ class Uncategorised:
         response = "http://generated.inspirobot.me/0" + numberA + "/aXm" + str(number) + "xjU.jpg"
         await self.bot.say(response)
 
-    @commands.command()
+    @commands.command(aliases=['rat'])
     async def pokemon(self):
         """Posts a randomly fused Pokemon"""
         site = "http://pokemon.alexonsager.net/"

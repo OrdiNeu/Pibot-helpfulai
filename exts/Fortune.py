@@ -30,7 +30,7 @@ class Fortune:
         if datetime.date.today() != self.last_check:
             self.fortuned_users = {}
         # Assign this user a fortune if they don't have one yet
-        if not author_id in self.fortuned_users.keys():
+        if author_id not in self.fortuned_users.keys():
             self.fortuned_users[author_id] = random.randrange(0, 100)
         return self.fortuned_users[author_id]
 
