@@ -2,23 +2,17 @@
 ### PREAMBLE ##################################################################
 import asyncio
 import re
-import random
-import threading
 import time
 from unidecode import unidecode
 
 import discord
-import emoji
 import requests
-from tabulate import tabulate
-from json.decoder import JSONDecodeError
 from discord.ext import commands
 
 from .utils.DiscordArgParse import DiscordArgparseParseError, DiscordArgParse
-from .utils.listener import MsgListener
 
 
-class L5R:
+class L5r:
     def __init__(self, bot):
         self.bot = bot
         self.api_cards = [{}]
@@ -222,4 +216,4 @@ class L5R:
 
 
 def setup(bot):
-    bot.add_cog(L5R(bot))
+    bot.add_cog(L5r(bot))
