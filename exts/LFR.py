@@ -12,7 +12,7 @@ from discord.ext import commands
 from .utils.DiscordArgParse import DiscordArgparseParseError, DiscordArgParse
 
 
-class L5r:
+class LFR:
     def __init__(self, bot):
         self.bot = bot
         self.api_cards = [{}]
@@ -216,4 +216,4 @@ class L5r:
 
 
 def setup(bot):
-    bot.add_cog(L5r(bot))
+    bot.add_cog(LFR(bot))

@@ -27,7 +27,7 @@ EXTENSIONS = [
     'exts.Fortune',
     'exts.Chan',
     'exts.reddit',
-    'exts.L5r',
+    'exts.LFR',
     'exts.Uncategorised',
 ]
 
