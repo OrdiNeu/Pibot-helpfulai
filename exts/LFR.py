@@ -46,7 +46,7 @@ class LFR:
         type_fields_appends = []
         l5r_parser = DiscordArgParse(prog='flag_nets')
         # These first flags capture multiple words that follow, rather than the first word
-        concat_categories = ['title', 'text']
+        concat_categories = ['name', 'text']
         l5r_parser.add_argument(nargs="*", action="append", dest="name")
         l5r_parser.add_argument('--text', '-x', nargs="+", action='append', dest="text")
         # These flags capture a single type from a single word
@@ -82,7 +82,7 @@ class LFR:
                             concat_string = ""
                             for word in word_list:
                                 concat_string += word + " "
-                            if key in "title":
+                            if key in "name":
                                 concat_string = concat_string.strip()
                             m_criteria_list.append((key, concat_string.strip()))
                 # then check the lists that are done literally
@@ -183,7 +183,6 @@ class LFR:
         :return: card(s) that match the search criteria
         '''
         m_match = []
-        card_match = True
         for i, s_card in enumerate(self.api_cards):
             card_match = True
             for c_key, c_value in criteria:
