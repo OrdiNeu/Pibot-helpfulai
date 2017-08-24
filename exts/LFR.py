@@ -101,7 +101,7 @@ class LFR:
                 #  figure out how we're going to respond, if we're images only, skip parsing and use this.
                 if parser_dictionary["image-only"]:
                     for i, card in enumerate(m_match_list[:5]):
-                        m_response += "https://fiveringsdb.com/bundles/card_images/" + card['id'] + ".png\n"
+                        m_response += "https://fiveringsdb.com/bundles/card_images/core/" + card['id'] + ".png\n"
                     if len(m_match_list) > 5:
                         m_response += "[{0}/{1}]".format(5, len(m_match_list))
                 else:
