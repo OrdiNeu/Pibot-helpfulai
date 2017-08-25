@@ -299,7 +299,8 @@ class Uncategorised:
                         if role.name in target_role:
                             new_valid_role = role
                     # remove any current clans from current user's list
-                    await self.bot.remove_roles(ctx.message.author, valid_roles)
+                    for role in valid_roles:
+                        await self.bot.remove_roles(ctx.message.author, role)
                     # Add the new role
                     if new_valid_role is not None:
                         await self.bot.add_roles(ctx.message.author, new_valid_role)
