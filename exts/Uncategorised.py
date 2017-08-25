@@ -250,7 +250,7 @@ class Uncategorised:
         server_roles = ctx.message.server.roles
         user_roles = ctx.message.author.roles
         for role in server_roles:
-            if ctx.message.content in server_roles:
+            if ctx.message.content in role.name:
                 if role not in user_roles:
                     ctx.message.author.add_roles(role)
 
@@ -259,7 +259,7 @@ class Uncategorised:
         server_roles = ctx.message.server.roles
         user_roles = ctx.message.author.roles
         for role in user_roles:
-            if ctx.message.content in role:
+            if ctx.message.content in role.name:
                 ctx.message.author.remove_roles(role)
 
 def setup(bot):
