@@ -251,24 +251,32 @@ class Uncategorised:
         server_roles = ctx.message.server.roles
         user_roles = ctx.message.author.roles
         search_role = role_search.search(ctx.message.content)
-        if search_role is not None:
-            target_role = search_role.group(2)
-            for role in user_roles:
-                await self.bot.say("user_roles:'{}'".format(role.name))
-            for role in server_roles:
-                await self.bot.say("server_role:'{}'".format(role.name))
-                await self.bot.say("message.content '{}'".format(target_role))
-                if target_role in role.name:
-                    if role not in user_roles:
-                        await self.bot.add_roles(ctx.message.author, role)
+        try:
+            if search_role is not None:
+                target_role = search_role.group(2)
+                for role in server_roles:
+                    if target_role in role.name:
+                        if role not in user_roles:
+                            await self.bot.add_roles(ctx.message.author, role)
+                            await self.bot.say(":ok_hand:")
+        except discord.Forbidden as df:
+            await self.bot.say("I lack sufficient permissions to do that: '{}".format(df.text))
 
     @commands.command(aliases=['role_tide'], pass_context=True)
     async def remove_role(self, ctx):
-        server_roles = ctx.message.server.roles
+        role_search = re.compile("([!?]role_tide\s)(.*)")
         user_roles = ctx.message.author.roles
-        for role in user_roles:
-            if ctx.message.content in role.name:
-                await self.bot.remove_roles(ctx.message.author, role)
+        search_role = role_search.search(ctx.message.content)
+        try:
+            if role_search is not None:
+                target_role = search_role.group(2)
+                for role in user_roles:
+                    if target_role in role.name:
+                        await self.bot.remove_roles(ctx.message.author, role)
+                        await self.bot.say(":ok_hand:")
+
+        except discord.Forbidden as df:
+            await self.bot.say("I lack sufficient permissions to do that: '{}".format(df.text))
 
 def setup(bot):
     bot.add_cog(Uncategorised(bot))
