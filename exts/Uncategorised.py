@@ -247,16 +247,20 @@ class Uncategorised:
 
     @commands.command(aliases=['role_up'], pass_context=True)
     async def add_role(self, ctx):
+        role_search = re.compile("([!?]role_up\s)(.*)")
         server_roles = ctx.message.server.roles
         user_roles = ctx.message.author.roles
-        for role in user_roles:
-            await self.bot.say("user_roles:'{}'".format(role.name))
-        for role in server_roles:
-            await self.bot.say("server_role:'{}'".format(role.name))
-            await self.bot.say("message.content '{}'".format(ctx.message.content))
-            if ctx.message.content in role.name:
-                if role not in user_roles:
-                    ctx.message.author.add_roles(role)
+        search_role = role_search.search(ctx.message.content)
+        if search_role is not None:
+            target_role = search_role.group(2)
+            for role in user_roles:
+                await self.bot.say("user_roles:'{}'".format(role.name))
+            for role in server_roles:
+                await self.bot.say("server_role:'{}'".format(role.name))
+                await self.bot.say("message.content '{}'".format(target_role))
+                if target_role in role.name:
+                    if role not in user_roles:
+                        ctx.message.author.add_roles(role)
 
 
     @commands.command(aliases=['role_tide'], pass_context=True)
