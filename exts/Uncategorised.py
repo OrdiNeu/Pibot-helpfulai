@@ -249,13 +249,14 @@ class Uncategorised:
     async def add_role(self, ctx):
         server_roles = ctx.message.server.roles
         user_roles = ctx.message.author.roles
+        for role in user_roles:
+            await self.bot.say("user_roles:'{}'".format(role.name))
         for role in server_roles:
+            await self.bot.say("server_role:'{}'".format(role.name))
+            await self.bot.say("message.content '{}'".format(ctx.message.content))
             if ctx.message.content in role.name:
                 if role not in user_roles:
                     ctx.message.author.add_roles(role)
-        await self.bot.say("server_roles:{}".format(server_roles))
-        await self.bot.say("user_roles:{}".format(user_roles))
-        await self.bot.say("message.content".format(ctx.message.content))
 
 
     @commands.command(aliases=['role_tide'], pass_context=True)
