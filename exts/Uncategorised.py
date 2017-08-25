@@ -245,7 +245,7 @@ class Uncategorised:
         new_alarm = Uncategorised.BugMe(self.bot, ctx.message.channel)
         new_alarm.attach(5)
 
-    @commands.command(aliases=['add_role'], pass_context=True)
+    @commands.command(aliases=['role_up'], pass_context=True)
     async def add_role(self, ctx):
         server_roles = ctx.message.server.roles
         user_roles = ctx.message.author.roles
@@ -254,7 +254,7 @@ class Uncategorised:
                 if role not in user_roles:
                     ctx.message.author.add_roles(role)
 
-    @commands.command(aliases=['remove_role'], pass_context=True)
+    @commands.command(aliases=['role_tide'], pass_context=True)
     async def remove_role(self, ctx):
         server_roles = ctx.message.server.roles
         user_roles = ctx.message.author.roles
