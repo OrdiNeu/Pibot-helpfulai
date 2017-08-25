@@ -253,6 +253,10 @@ class Uncategorised:
             if ctx.message.content in role.name:
                 if role not in user_roles:
                     ctx.message.author.add_roles(role)
+        await self.bot.say("server_roles:{}".format(server_roles))
+        await self.bot.say("user_roles:{}".format(user_roles))
+        await self.bot.say("message.content".format(ctx.message.content))
+
 
     @commands.command(aliases=['role_tide'], pass_context=True)
     async def remove_role(self, ctx):
