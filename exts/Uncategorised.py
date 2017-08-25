@@ -301,10 +301,16 @@ class Uncategorised:
                     # remove any current clans from current user's list
                     for role in valid_roles:
                         await self.bot.remove_roles(ctx.message.author, role)
+                        await self.bot.say("done removing previous clans, now for the new one")
                     # Add the new role
                     if new_valid_role is not None:
                         await self.bot.add_roles(ctx.message.author, new_valid_role)
                         await self.bot.say(":ok_hand:")
+                        if new_valid_role in valid_roles:
+                            valid_roles.remove(new_valid_role)
+                    # remove any current clans from current user's list
+                        for role in valid_roles:
+                            await self.bot.remove_roles(ctx.message.author, role)
                 except discord.Forbidden as df:
                     await self.bot.say("I lack sufficient permissions to do that: '{}".format(df.text))
             else:
