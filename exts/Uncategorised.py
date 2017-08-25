@@ -303,8 +303,11 @@ class Uncategorised:
                     # Add the new role
                     if new_valid_role is not None:
                         await self.bot.add_roles(ctx.message.author, new_valid_role)
+                        await self.bot.say(":ok_hand:")
                 except discord.Forbidden as df:
                     await self.bot.say("I lack sufficient permissions to do that: '{}".format(df.text))
+            else:
+                await self.bot.say("I couldn't find the role '{}' to assign you to".format(target_role))
 
 
 
