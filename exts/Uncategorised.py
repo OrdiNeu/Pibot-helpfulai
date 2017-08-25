@@ -282,21 +282,21 @@ class Uncategorised:
     async def swap_role(self, ctx):
         role_search = re.compile("(.*?[!?]clan\s)(.*)")
         search_role = role_search.search(ctx.message.content)
-        valid_clans = ["Crab", "Crane", "Dragon", "Lion", "Mantis", "Phoenix", "Scorpion", "Unicorn", "Spider", "Ronin"]
+        valid_clans = ["crab", "crane", "dragon", "lion", "mantis", "phoenix", "scorpion", "unicorn", "spider", "ronin"]
         valid_roles = list()
         new_valid_role = None
         user_roles = ctx.message.author.roles
         if role_search is not None:
-            target_role = search_role.group(2)
+            target_role = search_role.group(2).lower()
             if target_role in valid_clans:
                 # find list of role objects
                 server_roles = ctx.message.server.roles
                 try:
                     for role in server_roles:
-                        if role.name in valid_clans:
+                        if role.name.lower() in valid_clans:
                             valid_roles.append(role)
                         # while we're searching, save the target role
-                        if role.name in target_role:
+                        if role.name.lower() in target_role:
                             new_valid_role = role
                     # remove any current clans from current user's list
                     for role in valid_roles:
