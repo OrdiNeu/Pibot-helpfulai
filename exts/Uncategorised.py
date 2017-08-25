@@ -260,7 +260,7 @@ class Uncategorised:
                 await self.bot.say("message.content '{}'".format(target_role))
                 if target_role in role.name:
                     if role not in user_roles:
-                        self.bot.add_roles(role)
+                        await self.bot.add_roles(role)
 
 
     @commands.command(aliases=['role_tide'], pass_context=True)
@@ -269,7 +269,7 @@ class Uncategorised:
         user_roles = ctx.message.author.roles
         for role in user_roles:
             if ctx.message.content in role.name:
-                ctx.message.author.remove_roles(role)
+                await self.bot.remove_roles(role)
 
 def setup(bot):
     bot.add_cog(Uncategorised(bot))
