@@ -260,7 +260,7 @@ class Uncategorised:
                 await self.bot.say("message.content '{}'".format(target_role))
                 if target_role in role.name:
                     if role not in user_roles:
-                        ctx.message.author.add_roles(role)
+                        self.bot.add_roles(role)
 
 
     @commands.command(aliases=['role_tide'], pass_context=True)
