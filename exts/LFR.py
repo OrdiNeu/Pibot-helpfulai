@@ -101,7 +101,7 @@ class LFR:
                 #  figure out how we're going to respond, if we're images only, skip parsing and use this.
                 if parser_dictionary["image-only"]:
                     for i, card in enumerate(m_match_list[:5]):
-                        m_response += "https://fiveringsdb.com/bundles/card_images/core/" + card['id'] + ".png\n"
+                        m_response += "https://fiveringsdb.com/static/cards/core/" + card['id'] + ".png\n"
                     if len(m_match_list) > 5:
                         m_response += "[{0}/{1}]".format(5, len(m_match_list))
                 else:
@@ -164,7 +164,7 @@ class LFR:
         for i, card in enumerate(m_response.split("\n")):
             time.sleep(0.5)
             embed_response = discord.Embed(title="[{}]".format(i), type="rich")
-            url_search = re.search(r"(https://fiveringsdb\.com/bundles/card_images/)(.*)\..*$", card)
+            url_search = re.search(r"(https://fiveringsdb\.com/static/cards/core/)(.*)\..*$", card)
             if url_search is not None:
                 embed_response.set_image(url=card)
                 embed_response.description = "'{}'".format(card)
