@@ -31,7 +31,7 @@ class LFR:
 
     def refresh_l5r_api(self):
         # api will respond with these keys: ['records', 'size', 'success', 'last_updated']
-        api_response = requests.get('https://fiveringsdb.com/cards').json()
+        api_response = requests.get('https://api.fiveringsdb.com/cards').json()
         self.api_cards = sorted([c for c in api_response['records']], key=lambda card: card['name_canonical'])
         self.api_success = api_response['success']
         self.api_last_updated = api_response['last_updated']
