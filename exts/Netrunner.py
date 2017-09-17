@@ -167,7 +167,19 @@ class Netrunner:
             "minimum_deck_size": "Deck Minimum Size",
             }
         self.union_keys = ["pack_code"]
-        self.cache_refresh_pack_codes = ["td"]
+
+        # 2 decimal prefix: Any prefix except core2.0 + three decimal suffix
+        self.legacy_legal_code_regex = "((00)|(01)|(02)|(03)|(04)|(05)|(06)|(07)|(08)|(09)|(10)|(11)|(12)|(13))(\d\d\d)"
+        # 2 decimal prefix:  C&C | H&P | O&C | D&D | TD | Flashpoint | Red Sand | Core2.0 + three decimal suffix
+        self.cache_refresh_legal_code_regex = "((03)|(05)|(07)|(09)|(13)|(11)|(12)|(14))(\d\d\d)"
+        # 2 decimal prefix:  C&C | H&P | Lunar| O&C | SanSan | D&D | Mumbad | Flashpoint | Red Sand | TD |
+        # Core2.0 + three decimal suffix
+        self.rotation_legal_code_regex = "((03)|(05)|(06)|(07)|(08)|(09)|(10)|(11)|(12)|(13)|(14))(\d\d\d)"
+        self.search_legality_regex = self.rotation_legal_code_regex  # We'll support rotation, legacy, cr
+        self.nr_api_url_template = ""
+        self.nr_api_last_updated = ""
+        self.nr_api_version_number = ""
+        self.nr_api_total = 0
 
 
     def flag_parse(self, string_to_parse):
@@ -217,6 +229,8 @@ class Netrunner:
         nets_parser.add_argument('--title-only', action='store_true', dest="title-only")
         nets_parser.add_argument('--image-only', action='store_true', dest="image-only")
         nets_parser.add_argument('--debug-flags', action='store_true', dest="debug-flags")
+        nets_parser.add_argument('-c', '--legality', action='store', dest="legality", default="rotation",
+                                 help="Pick among legality subsets: rotation | legacy | cr")
         try:
             args = nets_parser.parse_args(string_to_parse.split())
             # return args
@@ -251,6 +265,17 @@ class Netrunner:
                         m_criteria_list.append((key, parser_dictionary[key]))
             if not self.init_api:
                 self.refresh_nr_api()
+            # Apply legality set
+            check_legality_arg = re.search("(rotation)|(legacy)|(cr)", parser_dictionary['legality'].lower())
+            if check_legality_arg is not None:
+                if check_legality_arg.group(2) is not None:
+                    self.search_legality_regex = self.legacy_legal_code_regex
+                elif check_legality_arg.group(3) is not None:
+                    self.search_legality_regex = self.cache_refresh_legal_code_regex
+                else:  # check_legality_arg.group(1) is not None:
+                    self.search_legality_regex = self.rotation_legal_code_regex
+            else:
+                self.search_legality_regex = self.rotation_legal_code_regex
             m_match_list = self.search_text(m_criteria_list)
             # redirecting to special images for specific input
             redirect = self.apply_title_redirect_jokes(string_to_parse.split()[0])
@@ -320,6 +345,16 @@ class Netrunner:
     @commands.command(name="flag_test", aliases=['nets'])
     async def arg_parse_nets(self, *, string_to_parse: str):
         m_response = self.flag_parse(string_to_parse)
+        await self.bot.say(m_response)
+
+    @commands.command(name="flag_test", aliases=['nets_cr'])
+    async def arg_parse_nets(self, *, string_to_parse: str):
+        m_response = self.flag_parse(string_to_parse + " --legality cr")
+        await self.bot.say(m_response)
+
+    @commands.command(name="flag_test", aliases=['nets_legacy'])
+    async def arg_parse_nets(self, *, string_to_parse: str):
+        m_response = self.flag_parse(string_to_parse + " --legality cr")
         await self.bot.say(m_response)
 
     def transform_api_items_to_printable_format(self, api_key, value):
@@ -405,42 +440,49 @@ class Netrunner:
         return cards
 
     def search_text(self, criteria):
+        legal_code_re = re.compile(self.search_legality_regex)
         m_match = []
         card_match = True
         for i, s_card in enumerate(self.nr_api):
-            card_match = True
-            for c_key, c_value in criteria:
-                if c_key in s_card.keys():
-                    try:
-                        if isinstance(s_card[c_key], int):
-                            if not int(c_value) == s_card[c_key]:
-                                card_match = False
+            if legal_code_re.search(s_card['code']):  # first exclude cards based on legality set
+                card_match = True
+                for c_key, c_value in criteria:
+                    if c_key in s_card.keys():
+                        try:
+                            if isinstance(s_card[c_key], int):
+                                if not int(c_value) == s_card[c_key]:
+                                    card_match = False
+                                    break
+                            elif s_card[c_key] is None:
                                 break
-                        elif s_card[c_key] is None:
-                            break
-                            # print("None value from search for on " + s_card['code'])
-                        else:
-                            if not unidecode(c_value.lower()) in unidecode(s_card[c_key]).lower():
-                                card_match = False
-                                break
-                                # print("match on " + c_value)
-                    except ValueError:
-                        return []
-                        # m_response += "Value error parsing search!" + s_card['code'] + "\n"
-                        # return m_response
-                        # print("ValueError on value from search " +
-                        #  c_key + " for " + c_value + " on " + s_card['code'])
-                else:
-                    card_match = False
-                    break
-            if card_match:
-                m_match.append(s_card)
+                                # print("None value from search for on " + s_card['code'])
+                            else:
+                                if not unidecode(c_value.lower()) in unidecode(s_card[c_key]).lower():
+                                    card_match = False
+                                    break
+                                    # print("match on " + c_value)
+                        except ValueError:
+                            return []
+                            # m_response += "Value error parsing search!" + s_card['code'] + "\n"
+                            # return m_response
+                            # print("ValueError on value from search " +
+                            #  c_key + " for " + c_value + " on " + s_card['code'])
+                    else:
+                        card_match = False
+                        break
+                if card_match:
+                    m_match.append(s_card)
         return m_match
 
     def refresh_nr_api(self):
-        self.nr_api = sorted([c for c in requests.get('https://netrunnerdb.com/api/2.0/public/cards').json()['data']],
-                             key=lambda card: card['title'])
-        self.init_api = True
+        nr_api_all = requests.get('https://netrunnerdb.com/api/2.0/public/cards').json()
+        if nr_api_all['success']:
+            self.nr_api_version_number = nr_api_all['version_number']
+            self.nr_api_url_template = nr_api_all['imageUrlTemplate']
+            self.nr_api_total = nr_api_all['total']
+            self.nr_api_last_updated = nr_api_all['last_updated']
+            self.nr_api = sorted([c for c in nr_api_all['data']], key=lambda card: card['code'])
+            self.init_api = True
 
     @staticmethod
     def transform_trace(re_obj):
@@ -518,6 +560,46 @@ class Netrunner:
     @commands.command(aliases=['nr', 'netrunner'])
     async def nr_flags(self, *, card_search:str):
         m_response = self.flag_parse(card_search + " --image-only")
+        # await self.bot.say(m_response)
+        description = ""
+        for i, card in enumerate(m_response.split("\n")):
+            time.sleep(0.5)
+            embed_response = discord.Embed(title="[{}]".format(i), type="rich")
+            url_search = re.search(r"(https://netrunnerdb\.com/card_image/)(\d*)\..*$", card)
+            if url_search is not None:
+                embed_response.set_image(url=card)
+                embed_response.description = "'{}'".format(card)
+                await self.bot.say(embed=embed_response)
+            else:
+                description += card
+        if len(description) > 0:
+            embed_response = discord.Embed(title="search results:", type="rich")
+            embed_response.description = description
+            await self.bot.say(embed=embed_response)
+
+    @commands.command(aliases=['nrcr', 'cache_refresh'])
+    async def cr_flags(self, *, card_search:str):
+        m_response = self.flag_parse(card_search + " --image-only --legality cr")
+        # await self.bot.say(m_response)
+        description = ""
+        for i, card in enumerate(m_response.split("\n")):
+            time.sleep(0.5)
+            embed_response = discord.Embed(title="[{}]".format(i), type="rich")
+            url_search = re.search(r"(https://netrunnerdb\.com/card_image/)(\d*)\..*$", card)
+            if url_search is not None:
+                embed_response.set_image(url=card)
+                embed_response.description = "'{}'".format(card)
+                await self.bot.say(embed=embed_response)
+            else:
+                description += card
+        if len(description) > 0:
+            embed_response = discord.Embed(title="search results:", type="rich")
+            embed_response.description = description
+            await self.bot.say(embed=embed_response)
+
+    @commands.command(aliases=['nrleg', 'nr_legacy'])
+    async def legacy_flags(self, *, card_search:str):
+        m_response = self.flag_parse(card_search + " --image-only --legality legacy")
         # await self.bot.say(m_response)
         description = ""
         for i, card in enumerate(m_response.split("\n")):
