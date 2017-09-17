@@ -17,6 +17,7 @@ from discord.ext import commands
 from .utils.DiscordArgParse import DiscordArgparseParseError, DiscordArgParse
 from .utils.listener import MsgListener
 
+
 class NetrunQuiz(MsgListener):
     ANSWER_TRANSFORMS = {
         "neutral-runner": "neutral",
@@ -24,7 +25,7 @@ class NetrunQuiz(MsgListener):
         "weyland-consortium": "weyland",
         "haas-bioroid": "hb",
         "identity": "id"
-        }
+    }
     INVALID_CATEGORIES = ["code", "deck_limit", "flavor", "pack_code", "position",
                           "quantity", "side_code", "title", "illustrator", "text",
                           "keywords", "uniqueness"]
@@ -136,6 +137,7 @@ class NetrunQuiz(MsgListener):
                 self.create_question()
                 await self.ask_question(channel)
 
+
 class Netrunner:
     """Netrunner related commands"""
 
@@ -165,7 +167,7 @@ class Netrunner:
             "base_link": "[🔁]",
             "influence_limit": "Influence Limit",
             "minimum_deck_size": "Deck Minimum Size",
-            }
+        }
         self.union_keys = ["pack_code"]
 
         # 2 decimal prefix: Any prefix except core2.0 + three decimal suffix
@@ -180,7 +182,6 @@ class Netrunner:
         self.nr_api_last_updated = ""
         self.nr_api_version_number = ""
         self.nr_api_total = 0
-
 
     def flag_parse(self, string_to_parse):
         m_response = ""
@@ -347,13 +348,13 @@ class Netrunner:
         m_response = self.flag_parse(string_to_parse)
         await self.bot.say(m_response)
 
-    @commands.command(name="flag_nets_cr", aliases=['nets_cr'])
-    async def arg_parse_nets(self, *, string_to_parse: str):
+    @commands.command(name="flag_nets_cr", aliases=['netscr'])
+    async def arg_parse_nets_cr(self, *, string_to_parse: str):
         m_response = self.flag_parse(string_to_parse + " --legality cr")
         await self.bot.say(m_response)
 
-    @commands.command(name="flag_nets_legacy", aliases=['nets_legacy'])
-    async def arg_parse_nets(self, *, string_to_parse: str):
+    @commands.command(name="flag_nets_legacy", aliases=['netslegacy'])
+    async def arg_parse_nets_legacy(self, *, string_to_parse: str):
         m_response = self.flag_parse(string_to_parse + " --legality cr")
         await self.bot.say(m_response)
 
@@ -526,7 +527,7 @@ class Netrunner:
     def apply_title_redirect_jokes(card_title_criteria):
         # Auto-link some images instead of other users' names
         query_redirects = {
-            "nyan": "http://i.imgur.com/TnwGEhG.jpg", #http://i.imgur.com/AtqdQiP.jpg
+            "nyan": "http://i.imgur.com/TnwGEhG.jpg",  # http://i.imgur.com/AtqdQiP.jpg
             "ordineu": "http://i.imgur.com/PDySfQ7.png",
             "kika": "http://i.imgur.com/WnsNJho.jpg",
             "leg": "http://i.imgur.com/53dBofH.png",
@@ -551,14 +552,8 @@ class Netrunner:
     <card image link>
     """
 
-    @commands.command(name="old_nets", aliases=['leg_nets'])
-    async def leg(self, *, cardname: str):
-        await self.bot.say("hello")
-        await self.bot.say("hello")
-        await self.bot.say("hello")
-
     @commands.command(aliases=['nr', 'netrunner'])
-    async def nr_flags(self, *, card_search:str):
+    async def nr_flags(self, *, card_search: str):
         m_response = self.flag_parse(card_search + " --image-only")
         # await self.bot.say(m_response)
         description = ""
@@ -578,7 +573,7 @@ class Netrunner:
             await self.bot.say(embed=embed_response)
 
     @commands.command(aliases=['nrcr', 'cache_refresh'])
-    async def cr_flags(self, *, card_search:str):
+    async def cr_flags(self, *, card_search: str):
         m_response = self.flag_parse(card_search + " --image-only --legality cr")
         # await self.bot.say(m_response)
         description = ""
@@ -598,7 +593,7 @@ class Netrunner:
             await self.bot.say(embed=embed_response)
 
     @commands.command(aliases=['nrleg', 'nr_legacy'])
-    async def legacy_flags(self, *, card_search:str):
+    async def legacy_flags(self, *, card_search: str):
         m_response = self.flag_parse(card_search + " --image-only --legality legacy")
         # await self.bot.say(m_response)
         description = ""
@@ -665,8 +660,6 @@ class Netrunner:
             await self.bot.say(embed=e_response)
         if len(m_response) > 0:
             await self.bot.say(m_response[:2000])
-
-
 
     @commands.command(aliases=['ndrand'])
     async def rand_deck(self):
@@ -772,6 +765,7 @@ def test_arg_parse_nets(string_to_parse: str):
             m_response += nets_parser.exit_message
     # return args
     return m_response
+
 
 def setup(bot):
     bot.add_cog(Netrunner(bot))
