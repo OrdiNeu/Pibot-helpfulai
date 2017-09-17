@@ -171,10 +171,10 @@ class Netrunner:
         # 2 decimal prefix: Any prefix except core2.0 + three decimal suffix
         self.legacy_legal_code_regex = "((00)|(01)|(02)|(03)|(04)|(05)|(06)|(07)|(08)|(09)|(10)|(11)|(12)|(13))(\d\d\d)"
         # 2 decimal prefix:  C&C | H&P | O&C | D&D | TD | Flashpoint | Red Sand | Core2.0 + three decimal suffix
-        self.cache_refresh_legal_code_regex = "((03)|(05)|(07)|(09)|(13)|(11)|(12)|(14))(\d\d\d)"
+        self.cache_refresh_legal_code_regex = "((03)|(05)|(07)|(09)|(13)|(11)|(12)|(20))(\d\d\d)"
         # 2 decimal prefix:  C&C | H&P | Lunar| O&C | SanSan | D&D | Mumbad | Flashpoint | Red Sand | TD |
         # Core2.0 + three decimal suffix
-        self.rotation_legal_code_regex = "((03)|(05)|(06)|(07)|(08)|(09)|(10)|(11)|(12)|(13)|(14))(\d\d\d)"
+        self.rotation_legal_code_regex = "((03)|(05)|(06)|(07)|(08)|(09)|(10)|(11)|(12)|(13)|(20))(\d\d\d)"
         self.search_legality_regex = self.rotation_legal_code_regex  # We'll support rotation, legacy, cr
         self.nr_api_url_template = ""
         self.nr_api_last_updated = ""
