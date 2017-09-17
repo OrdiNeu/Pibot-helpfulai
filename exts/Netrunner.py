@@ -342,17 +342,17 @@ class Netrunner:
             m_response = m_response[:self.max_message_len - 10] + "\ncont..."
         return m_response
 
-    @commands.command(name="flag_test", aliases=['nets'])
+    @commands.command(name="flag_nets", aliases=['nets'])
     async def arg_parse_nets(self, *, string_to_parse: str):
         m_response = self.flag_parse(string_to_parse)
         await self.bot.say(m_response)
 
-    @commands.command(name="flag_test", aliases=['nets_cr'])
+    @commands.command(name="flag_nets_cr", aliases=['nets_cr'])
     async def arg_parse_nets(self, *, string_to_parse: str):
         m_response = self.flag_parse(string_to_parse + " --legality cr")
         await self.bot.say(m_response)
 
-    @commands.command(name="flag_test", aliases=['nets_legacy'])
+    @commands.command(name="flag_nets_legacy", aliases=['nets_legacy'])
     async def arg_parse_nets(self, *, string_to_parse: str):
         m_response = self.flag_parse(string_to_parse + " --legality cr")
         await self.bot.say(m_response)
