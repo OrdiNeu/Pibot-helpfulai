@@ -93,7 +93,7 @@ class Fortune:
         e = discord.Embed(
             description="{}, your fortune is: {}".format(ctx.message.author.mention, fortune[True]["text"]),
             colour=int(fortune[True]["colour"], 16))
-        if ctx.invoked_with == "fortuna":
+        if ctx.invoked_with == "fortuna" or ctx.invoked_with == "bib":
             e.set_image(url=fortune[True]["img"])
         await self.bot.say(embed=e)
 
