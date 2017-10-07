@@ -34,7 +34,7 @@ class Fortune:
             self.fortuned_users[author_id] = random.randrange(0, 100)
         return self.fortuned_users[author_id]
 
-    @commands.command(aliases=['fortuna'], pass_context=True)
+    @commands.command(aliases=['fortuna', 'bib'], pass_context=True)
     async def fortune(self, ctx):
         """Grabs your fortune for the day!"""
         fort = await self.get_fortune(ctx.message.author.id)
@@ -90,9 +90,9 @@ class Fortune:
                 "img": "http://68.media.tumblr.com/938a2d4fb94cae500839d9dccd3881be/tumblr_mn9j2tU3YU1s3kvg9o1_500.gif"
             }
         }
-        e = discord.Embed(description= "{}, your fortune is: {}".format(ctx.message.author.mention, fortune[True]["text"]),
-                          colour=int(fortune[True]["colour"], 16),
-                          )
+        e = discord.Embed(
+            description="{}, your fortune is: {}".format(ctx.message.author.mention, fortune[True]["text"]),
+            colour=int(fortune[True]["colour"], 16))
         if ctx.invoked_with == "fortuna":
             e.set_image(url=fortune[True]["img"])
         await self.bot.say(embed=e)
