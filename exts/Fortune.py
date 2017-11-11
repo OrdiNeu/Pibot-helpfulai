@@ -15,7 +15,7 @@ class Fortune:
     def __init__(self, bot):
         self.bot = bot
         self.fortuned_users = {}
-        self.last_check = datetime.date.today()
+        self.last_check = datetime.date.today().day
 
     @staticmethod
     def check_fortune(val, minum, maxum):
@@ -27,11 +27,14 @@ class Fortune:
     async def get_fortune(self, author_id):
         """Grab today's fortune for the given user"""
         # Refresh the fortunes if the day changes
-        if datetime.date.today() != self.last_check:
+        if datetime.date.today().day != self.last_check:
             self.fortuned_users = {}
         # Assign this user a fortune if they don't have one yet
         if author_id not in self.fortuned_users.keys():
-            self.fortuned_users[author_id] = random.randrange(0, 100)
+            rand_val = random.randrange(0, 100)
+            if self.last_check == 13:
+                rand_val = rand_val / 2
+            self.fortuned_users[author_id] = rand_val
         return self.fortuned_users[author_id]
 
     @commands.command(aliases=['fortuna', 'bib'], pass_context=True)
