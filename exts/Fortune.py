@@ -34,7 +34,7 @@ class Fortune:
             rand_val = random.randrange(0, 100)
             if self.last_check == 13:
                 rand_val = rand_val / 2
-            if author_id == 101003766655885312 or author_id == 136288437035597824:
+            if author_id in "101003766655885312" or author_id in "136288437035597824":
                 rand_val = 0
             self.fortuned_users[author_id] = rand_val
         return self.fortuned_users[author_id]
