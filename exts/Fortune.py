@@ -31,6 +31,8 @@ class Fortune:
             self.fortuned_users = {}
         # Assign this user a fortune if they don't have one yet
         if author_id not in self.fortuned_users.keys():
+            # set the seed to the author id + the day of the month + day of the year
+            random.seed(int(author_id + datetime.date.today().day + datetime.date.today().month))
             rand_val = random.randrange(0, 100)
             if self.last_check == 13:
                 rand_val = int(rand_val / 2)
