@@ -33,9 +33,9 @@ class Fortune:
         if author_id not in self.fortuned_users.keys():
             rand_val = random.randrange(0, 100)
             if self.last_check == 13:
-                rand_val /= 2
+                rand_val = int(rand_val / 2)
             if author_id in "101003766655885312":
-                rand_val /= 2
+                rand_val = int(rand_val / 2)
             self.fortuned_users[author_id] = rand_val
         return self.fortuned_users[author_id]
 
