@@ -37,7 +37,7 @@ class Fortune:
             if self.last_check == 13:
                 rand_val = int(rand_val / 2)
             if author_id in "101003766655885312":
-                rand_val = int(rand_val / 2)
+                rand_val = int((rand_val * 2) / 3)
             self.fortuned_users[author_id] = rand_val
         return self.fortuned_users[author_id]
 
