@@ -208,13 +208,13 @@ class Netrunner:
         # These flags capture a single type from a single word
         single_categories = ['type_code', 'faction_code', 'side_code', 'cost', 'advancement_cost', 'memory_cost',
                              'faction_cost', 'strength', 'agenda_points', 'base_link', 'deck_limit',
-                             'minimum_deck_size',
+                             'minimum_deck_size', 'code',
                              'trash_cost', 'unique', 'pack_code']
         nets_parser.add_argument('-t', '--type', action='store', dest="type_code")
         nets_parser.add_argument('-f', '--faction', action='store', dest="faction_code")
         nets_parser.add_argument('-d', '--side', action='store', dest="side_code")
         nets_parser.add_argument('-e', '--set', action='store', dest="pack_code")
-        nets_parser.add_argument('--nrdb_code', action='store', dest="code")
+        nets_parser.add_argument('--nrdb_code', action='store', dest="code", type=int)
         nets_parser.add_argument('-o', '--cost', action='store', type=int, dest="cost")
         nets_parser.add_argument('-g', '--advancement-cost', action='store', type=int, dest="advancement_cost", )
         nets_parser.add_argument('-m', '--memory-usage', action='store', type=int, dest="memory_cost")
