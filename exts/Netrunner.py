@@ -455,7 +455,7 @@ class Netrunner:
                                     if not int(c_value) == int(s_card[c_key]):
                                         card_match = False
                                         break
-                            if isinstance(s_card[c_key], int):
+                            elif isinstance(s_card[c_key], int):
                                 if not int(c_value) == s_card[c_key]:
                                     card_match = False
                                     break
