@@ -450,6 +450,11 @@ class Netrunner:
                 for c_key, c_value in criteria:
                     if c_key in s_card.keys():
                         try:
+                            if isinstance(c_value, int):
+                                if not isinstance(s_card[c_key], int):
+                                    if not int(c_value) == int(s_card[c_key]):
+                                        card_match = False
+                                        break
                             if isinstance(s_card[c_key], int):
                                 if not int(c_value) == s_card[c_key]:
                                     card_match = False
