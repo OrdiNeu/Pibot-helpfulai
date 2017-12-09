@@ -626,7 +626,9 @@ class Netrunner:
             # build a list of tuples in the pairs, value(number of card), key (id of card)
             for number, card_id in [(v, k) for (k, v) in decklist_data[0]['cards'].items()]:
                 # for number, card_id, in num_card_tup:
-                card = self.search_text([('code', card_id)])[0]
+                card_list = self.search_text([('code', card_id)])
+                if len(card_list) > 0:
+                    card = card_list[0]
                 # add a key to the dictionary with the number of instances, to use later
                 card['number'] = number
                 card_sort_list.append(card)
