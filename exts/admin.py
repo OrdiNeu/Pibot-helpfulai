@@ -124,7 +124,7 @@ class Admin:
     async def locate(self):
         """Grabs the local and global IP of the bot"""
         globalip = os.popen("dig +short myip.opendns.com @resolver1.opendns.com").read()
-        localip = os.popen("ifconfig | grep -oP \"inet addr:192.168.\\\\d+.\\\\d+\"").read()
+        localip = os.popen("ifconfig | grep -oP \"inet (addr:)?192.168.\\\\d+.\\\\d+\"").read()
         await self.bot.say("Global IP: {}\nLocal IP: {}".format(globalip, localip))
 
     @commands.command(pass_context=True, hidden=True, aliases=['screenshot', 'wiretap'])

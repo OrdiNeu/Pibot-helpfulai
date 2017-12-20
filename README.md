@@ -18,3 +18,14 @@ Requires a pibot-discord-cred.json file that looks like the following:
 }
 ```
 The entries for both these fields can be obtained by following the instructions [here](https://github.com/reactiflux/discord-irc/wiki/Creating-a-discord-bot-&-getting-a-token)
+
+You will require the following libraries (installable via pip) and python3
+```
+apiclient
+discord
+emoji
+google-api-python-client
+html2text
+tabulate
+tweepy
+```
