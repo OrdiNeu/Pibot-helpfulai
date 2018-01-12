@@ -289,7 +289,7 @@ class Netrunner:
                 #  figure out how we're going to respond, if we're images only, skip parsing and use this.
                 if parser_dictionary["image-only"]:
                     for i, card in enumerate(m_match_list[:5]):
-                        m_response += "https://netrunnerdb.com/card_image/" + card['code'] + ".png\n"
+                        m_response += self.get_card_url(card)
                     if len(m_match_list) > 5:
                         m_response += "[{0}/{1}]".format(5, len(m_match_list))
                 else:
