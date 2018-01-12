@@ -358,6 +358,17 @@ class Netrunner:
         m_response = self.flag_parse(string_to_parse + " --legality cr")
         await self.bot.say(m_response)
 
+    def get_card_url(self, card):
+        # so we need to find the best image we can
+        # first we'll check for a listed URL in the card itself, newer cards use this syntax
+        if 'image_url' in card:
+            if card['image_url'] != "":
+                return card['image_url']
+        url_search = re.search(r"(https://netrunnerdb\.com/card_image/)(\d*)\..*$", card)
+        if url_search is not None:
+            return url_search
+        return None
+
     def transform_api_items_to_printable_format(self, api_key, value):
         # this function transforms the internal keys used in the api to a more user friendly print format
         value = self.replace_api_text_with_emoji(value)
@@ -565,7 +576,7 @@ class Netrunner:
         for i, card in enumerate(m_response.split("\n")):
             time.sleep(0.5)
             embed_response = discord.Embed(title="[{}]".format(i), type="rich")
-            url_search = re.search(r"(https://netrunnerdb\.com/card_image/)(\d*)\..*$", card)
+            url_search = self.get_card_url(card)
             if url_search is not None:
                 embed_response.set_image(url=card)
                 embed_response.description = "'{}'".format(card)
@@ -585,7 +596,7 @@ class Netrunner:
         for i, card in enumerate(m_response.split("\n")):
             time.sleep(0.5)
             embed_response = discord.Embed(title="[{}]".format(i), type="rich")
-            url_search = re.search(r"(https://netrunnerdb\.com/card_image/)(\d*)\..*$", card)
+            url_search = self.get_card_url(card)
             if url_search is not None:
                 embed_response.set_image(url=card)
                 embed_response.description = "'{}'".format(card)
@@ -605,7 +616,7 @@ class Netrunner:
         for i, card in enumerate(m_response.split("\n")):
             time.sleep(0.5)
             embed_response = discord.Embed(title="[{}]".format(i), type="rich")
-            url_search = re.search(r"(https://netrunnerdb\.com/card_image/)(\d*)\..*$", card)
+            url_search = self.get_card_url(card)
             if url_search is not None:
                 embed_response.set_image(url=card)
                 embed_response.description = "'{}'".format(card)
