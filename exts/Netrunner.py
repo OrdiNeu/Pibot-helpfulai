@@ -358,7 +358,8 @@ class Netrunner:
         m_response = self.flag_parse(string_to_parse + " --legality cr")
         await self.bot.say(m_response)
 
-    def get_card_url(self, card):
+    @staticmethod
+    def get_card_url(card):
         # so we need to find the best image we can
         # first we'll check for a listed URL in the card itself, newer cards use this syntax
         if 'image_url' in card:
