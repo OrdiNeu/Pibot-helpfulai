@@ -33,10 +33,7 @@ class NetrunnerDBCard:
         self.position = int(api_dict['position'])
         self.quantity = int(api_dict['quantity'])
         # the one boolean
-        if api_dict['uniqueness'] in "False":
-            self.uniqueness = False
-        else:
-            self.uniqueness = True
+        self.uniqueness = api_dict['uniqueness']
         # card variables, may or may not be set to non-None
         # type should be string:
         if 'flavor' in api_dict:
