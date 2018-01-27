@@ -582,7 +582,7 @@ class Netrunner:
             embed_response = discord.Embed(title="[{}]".format(i), type="rich")
             url_search = self.get_card_url(card)
             if url_search is not None:
-                embed_response.set_image(url=card)
+                embed_response.set_image(url=url_search)
                 embed_response.description = "'{}'".format(card)
                 await self.bot.say(embed=embed_response)
             else:
@@ -622,7 +622,7 @@ class Netrunner:
             embed_response = discord.Embed(title="[{}]".format(i), type="rich")
             url_search = self.get_card_url(card)
             if url_search is not None:
-                embed_response.set_image(url=card)
+                embed_response.set_image(url=url_search)
                 embed_response.description = "'{}'".format(card)
                 await self.bot.say(embed=embed_response)
             else:
