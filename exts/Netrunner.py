@@ -359,12 +359,17 @@ class Netrunner:
         await self.bot.say(m_response)
 
     @staticmethod
+    def fix_https(url):
+        # Fixes http:// to https:// from image urls
+        return re.sub('^http:', 'https:', url)
+
+    @staticmethod
     def get_card_url(card):
         # so we need to find the best image we can
         # first we'll check for a listed URL in the card itself, newer cards use this syntax
         if 'image_url' in card:
             if card['image_url'] != "":
-                return card['image_url']
+                return fix_https(card['image_url'])
         url_search = re.search(r"(https://netrunnerdb\.com/card_image/)(\d*)\..*$", card)
         if url_search is not None:
             return url_search
