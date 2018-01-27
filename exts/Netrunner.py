@@ -36,22 +36,19 @@ class NetrunnerDBCard:
         self.uniqueness = api_dict['uniqueness']
         # card variables, may or may not be set to non-None
         # type should be string:
+        self.flavor = None
         if 'flavor' in api_dict:
             self.flavor = api_dict['flavor']
-        else:
-            self.flavor = None
+        self.illustrator = None
         if 'illustrator' in api_dict:
             self.illustrator = api_dict['illustrator']
-        else:
-            self.illustrator = None
+        self.text = None
         if 'text' in api_dict:
             self.text = api_dict['text']
-        else:
-            self.text = None
+        self.image_url = None
         if 'image_url' in api_dict:
-            self.image_url = self.fix_https(api_dict['image_url'])
-        else:
-            self.image_url = None
+            if api_dict['image_url'] is not None:
+                self.image_url = self.fix_https(api_dict['image_url'])
         # type should be int
         self.influence_limit = None
         if 'influence_limit' in api_dict:
@@ -481,7 +478,7 @@ class Netrunner:
         # so we need to find the best image we can
         # first we'll check for a listed URL in the card itself, newer cards use this syntax
         if 'image_url' in card:
-            if card['image_url'] != "":
+            if card['image_url']:
                 return Netrunner.fix_https(card['image_url'])
         url_search = re.search(r"(https://netrunnerdb\.com/card_image/)(\d*)\..*$", card)
         return url_search
