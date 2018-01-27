@@ -18,6 +18,119 @@ from .utils.DiscordArgParse import DiscordArgparseParseError, DiscordArgParse
 from .utils.listener import MsgListener
 
 
+class NetrunnerDBCard:
+    def __init__(self, api_dict):
+        # card primitives (must be present in every card)
+        # strings
+        self.side_code = api_dict['side_code']
+        self.type_code = api_dict['type_code']
+        self.faction_code = api_dict['faction_code']
+        self.pack_code = api_dict['pack_code']
+        self.title = api_dict['title']
+        # parsed int
+        self.deck_limit = int(api_dict['deck_limit'])
+        self.code = int(api_dict['code'])
+        self.position = int(api_dict['position'])
+        self.quantity = int(api_dict['quantity'])
+        # the one boolean
+        if api_dict['uniqueness'] in "False":
+            self.uniqueness = False
+        else:
+            self.uniqueness = True
+        # card variables, may or may not be set to non-None
+        # type should be string:
+        if 'flavor' in api_dict:
+            self.flavor = api_dict['flavor']
+        else:
+            self.flavor = None
+        if 'illustrator' in api_dict:
+            self.illustrator = api_dict['illustrator']
+        else:
+            self.illustrator = None
+        if 'text' in api_dict:
+            self.text = api_dict['text']
+        else:
+            self.text = None
+        if 'image_url' in api_dict:
+            self.image_url = self.fix_https(api_dict['image_url'])
+        else:
+            self.image_url = None
+        # type should be int
+        if 'influence_limit' in api_dict:
+            self.influence_limit = int(api_dict['influence_limit'])
+        else:
+            self.influence_limit = None
+        if 'minimum_deck_size' in api_dict:
+            self.minimum_deck_size = int(api_dict['minimum_deck_size'])
+        else:
+            self.minimum_deck_size = None
+        if 'base_link' in api_dict:
+            self.base_link = int(api_dict['base_link'])
+        else:
+            self.base_link = None
+        if 'cost' in api_dict:
+            self.cost = int(api_dict['cost'])
+        else:
+            self.cost = None
+        if 'faction_cost' in api_dict:
+            self.faction_cost = int(api_dict['faction_cost'])
+        else:
+            self.faction_cost = None
+        if 'memory_cost' in api_dict:
+            self.memory_cost = int(api_dict['memory_cost'])
+        else:
+            self.memory_cost = None
+        if 'strength' in api_dict:
+            self.strength = int(api_dict['strength'])
+        else:
+            self.strength = None
+        if 'advancement_cost' in api_dict:
+            self.advancement_cost = int(api_dict['advancement_cost'])
+        else:
+            self.advancement_cost = None
+        if 'agenda_points' in api_dict:
+            self.agenda_points = int(api_dict['agenda_points'])
+        else:
+            self.agenda_points = None
+        if 'trash_cost' in api_dict:
+            self.trash_cost = int(api_dict['trash_cost'])
+        else:
+            self.trash_cost = None
+        # type should be list(str)
+        self.keywords = list()
+        if 'keywords' in api_dict:
+            for keyword in api_dict['keywords'].split("-"):
+                self.keywords.append(keyword.strip())
+        # things that aren't cards
+        self.type_code_sort = {
+            'identity': 0, 'agenda': 1, 'asset': 2, 'upgrade': 3, 'operation': 4, 'ice': 5,
+            'event': 6, 'hardware': 7, 'resource': 8, 'program': 9}
+
+    @staticmethod
+    def fix_https(url):
+        # Fixes http:// to https:// from image urls
+        return re.sub('^http:', 'https:', url)
+
+    @staticmethod
+    def is_valid_card_dict(api_card_dict):
+        primitive_keys = [
+            'code', 'title', 'deck_limit', 'faction_code', 'pack_code', 'position', 'quantity', 'side_code',
+            'type_code', 'uniqueness']
+        for key in primitive_keys:
+            if key not in api_card_dict:
+                return False
+        return True
+
+    def get_card_image_url(self):
+        # so we need to find the best image we can
+        # first we'll check for a listed URL in the card itself, newer cards use this syntax
+        if self.image_url is not None:
+            return self.image_url
+        # else form the netrunnerdb image url
+        # format the code from int to 0 back-filled string
+        return "https://netrunnerdb.com/card_image/{:06}.png", self.code
+
+
 class NetrunQuiz(MsgListener):
     ANSWER_TRANSFORMS = {
         "neutral-runner": "neutral",
@@ -73,7 +186,7 @@ class NetrunQuiz(MsgListener):
 
     async def on_message(self, msg):
         """Handle people's responses"""
-        if not self.sleeping and not msg.author.id in self.has_answered:
+        if not self.sleeping and msg.author.id not in self.has_answered:
             self.has_answered[msg.author.id] = 1
             if msg.content.lower() == str(self.answer):
                 await self.bot.add_reaction(msg, u"\U0001F3C6")
@@ -95,7 +208,8 @@ class NetrunQuiz(MsgListener):
 
     def is_over(self):
         """Returns True if the game should be over, False otherwise"""
-        if self.mode == self.MODE_ONESHOT: return True
+        if self.mode == self.MODE_ONESHOT:
+            return True
         if self.mode == self.MODE_FPTP:
             for player in self.scores:
                 if self.scores[player] >= self.rounds:
@@ -144,6 +258,7 @@ class Netrunner:
     def __init__(self, bot):
         self.bot = bot
         self.nr_api = [{}]
+        self.card_list = list()
         self.init_api = False
         self.max_message_len = 1990
         self.nets_help = "!nets command syntax:!nets --help or -h for flags listing\n"
@@ -504,6 +619,14 @@ class Netrunner:
             self.nr_api_last_updated = nr_api_all['last_updated']
             self.nr_api = sorted([c for c in nr_api_all['data']], key=lambda card: card['code'])
             self.init_api = True
+
+    @commands.command(aliases=['build_nrdbc_obj'])
+    def build_card_list(self):
+        if not self.init_api:
+            self.refresh_nr_api()
+        for api_card_dict in self.nr_api:
+            if NetrunnerDBCard.is_valid_card_dict(api_card_dict):
+                self.card_list.append(NetrunnerDBCard(api_card_dict))
 
     @staticmethod
     def transform_trace(re_obj):
