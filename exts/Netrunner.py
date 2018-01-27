@@ -619,8 +619,8 @@ class Netrunner:
             self.nr_api_last_updated = nr_api_all['last_updated']
             self.nr_api = sorted([c for c in nr_api_all['data']], key=lambda card: card['code'])
             self.init_api = True
+        self.build_card_list()
 
-    @commands.command(aliases=['build_nrdbc_obj'])
     def build_card_list(self):
         if not self.init_api:
             self.refresh_nr_api()
