@@ -53,46 +53,47 @@ class NetrunnerDBCard:
         else:
             self.image_url = None
         # type should be int
+        self.influence_limit = None
         if 'influence_limit' in api_dict:
-            self.influence_limit = int(api_dict['influence_limit'])
-        else:
-            self.influence_limit = None
+            if api_dict['influence_limit'] is not None:
+                self.influence_limit = int(api_dict['influence_limit'])
+        self.minimum_deck_size = None
         if 'minimum_deck_size' in api_dict:
-            self.minimum_deck_size = int(api_dict['minimum_deck_size'])
-        else:
-            self.minimum_deck_size = None
+            if api_dict['minimum_deck_size'] is not None:
+                self.minimum_deck_size = int(api_dict['minimum_deck_size'])
+        self.base_link = None
         if 'base_link' in api_dict:
-            self.base_link = int(api_dict['base_link'])
-        else:
-            self.base_link = None
+            if api_dict['base_link'] is not None:
+                self.base_link = int(api_dict['base_link'])
+        self.cost = None
         if 'cost' in api_dict:
-            self.cost = int(api_dict['cost'])
-        else:
-            self.cost = None
+            if api_dict['cost'] is not None:
+                self.cost = int(api_dict['cost'])
+        self.faction_cost = None
         if 'faction_cost' in api_dict:
-            self.faction_cost = int(api_dict['faction_cost'])
-        else:
-            self.faction_cost = None
+            if api_dict['faction_cost'] is not None:
+                self.faction_cost = int(api_dict['faction_cost'])
+        self.memory_cost = None
         if 'memory_cost' in api_dict:
-            self.memory_cost = int(api_dict['memory_cost'])
-        else:
-            self.memory_cost = None
+            if api_dict['memory_cost'] is not None:
+                self.memory_cost = int(api_dict['memory_cost'])
+        self.strength = None
         if 'strength' in api_dict:
-            self.strength = int(api_dict['strength'])
-        else:
-            self.strength = None
+            if api_dict['strength'] is not None:
+                self.strength = int(api_dict['strength'])
+        self.advancement_cost = None
         if 'advancement_cost' in api_dict:
-            self.advancement_cost = int(api_dict['advancement_cost'])
-        else:
-            self.advancement_cost = None
+            if api_dict['advancement_cost'] is not None:
+                self.advancement_cost = int(api_dict['advancement_cost'])
+        self.agenda_points = None
         if 'agenda_points' in api_dict:
-            self.agenda_points = int(api_dict['agenda_points'])
-        else:
-            self.agenda_points = None
+            if api_dict['agenda_points'] is not None:
+                self.agenda_points = int(api_dict['agenda_points'])
+        self.trash_cost = None
         if 'trash_cost' in api_dict:
-            self.trash_cost = int(api_dict['trash_cost'])
-        else:
-            self.trash_cost = None
+            if api_dict['trash_cost'] is not None:
+                self.trash_cost = int(api_dict['trash_cost'])
+
         # type should be list(str)
         self.keywords = list()
         if 'keywords' in api_dict:
