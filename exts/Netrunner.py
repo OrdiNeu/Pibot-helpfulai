@@ -123,7 +123,7 @@ class NetrunnerDBCard:
             return self.image_url
         # else form the netrunnerdb image url
         # format the code from int to 0 back-filled string
-        return "https://netrunnerdb.com/card_image/{:06}.png", self.code
+        return "https://netrunnerdb.com/card_image/{:06}.png".format(self.code)
 
 
 class NetrunQuiz(MsgListener):
@@ -480,7 +480,7 @@ class Netrunner:
         if 'image_url' in card:
             if card['image_url']:
                 return Netrunner.fix_https(card['image_url'])
-        return "https://netrunnerdb.com/card_image/{:06}.png", card['code']
+        return "https://netrunnerdb.com/card_image/{:06}.png".format(card['code'])
 
     def transform_api_items_to_printable_format(self, api_key, value):
         # this function transforms the internal keys used in the api to a more user friendly print format
