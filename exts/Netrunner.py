@@ -369,7 +369,7 @@ class Netrunner:
         # first we'll check for a listed URL in the card itself, newer cards use this syntax
         if 'image_url' in card:
             if card['image_url'] != "":
-                return fix_https(card['image_url'])
+                return self.fix_https(card['image_url'])
         url_search = re.search(r"(https://netrunnerdb\.com/card_image/)(\d*)\..*$", card)
         if url_search is not None:
             return url_search
