@@ -28,4 +28,5 @@ google-api-python-client
 html2text
 tabulate
 tweepy
+unidecode
 ```
