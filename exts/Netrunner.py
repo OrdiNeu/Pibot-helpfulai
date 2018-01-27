@@ -480,8 +480,7 @@ class Netrunner:
         if 'image_url' in card:
             if card['image_url']:
                 return Netrunner.fix_https(card['image_url'])
-        url_search = re.search(r"(https://netrunnerdb\.com/card_image/)(\d*)\..*$", card)
-        return url_search
+        return "https://netrunnerdb.com/card_image/{:06}.png", card['code']
 
     def transform_api_items_to_printable_format(self, api_key, value):
         # this function transforms the internal keys used in the api to a more user friendly print format
