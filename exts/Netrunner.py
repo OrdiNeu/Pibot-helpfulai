@@ -371,9 +371,7 @@ class Netrunner:
             if card['image_url'] != "":
                 return Netrunner.fix_https(card['image_url'])
         url_search = re.search(r"(https://netrunnerdb\.com/card_image/)(\d*)\..*$", card)
-        if url_search is not None:
-            return url_search
-        return None
+        return url_search
 
     def transform_api_items_to_printable_format(self, api_key, value):
         # this function transforms the internal keys used in the api to a more user friendly print format
@@ -604,7 +602,7 @@ class Netrunner:
             embed_response = discord.Embed(title="[{}]".format(i), type="rich")
             url_search = self.get_card_url(card)
             if url_search is not None:
-                embed_response.set_image(url=card)
+                embed_response.set_image(url=url_search)
                 embed_response.description = "'{}'".format(card)
                 await self.bot.say(embed=embed_response)
             else:
