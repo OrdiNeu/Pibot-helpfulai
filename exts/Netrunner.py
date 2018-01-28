@@ -611,6 +611,8 @@ class Netrunner:
             return error_embed
 
     async def find_and_say_card(self, string_to_parse, use_embed=True):
+        if not self.init_api:
+            self.refresh_nr_api()
         await self.bot.say("debug print, the arguments were '{}'".format(string_to_parse))
         search_criteria_list, render_option, error_string = self.flag_parse(string_to_parse)
         num_matches = 0
@@ -646,6 +648,7 @@ class Netrunner:
 
     @commands.command(aliases=['nr', 'netrunner'])
     async def nr_flags(self, *, string_to_parse: str):
+        await self.bot.say("nr debug print, the arguments were '{}'".format(string_to_parse))
         self.find_and_say_card(string_to_parse + " --image-only ", use_embed=True)
 
     @commands.command(aliases=['nrcr', 'cache_refresh'])
