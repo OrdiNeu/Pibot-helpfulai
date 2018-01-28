@@ -573,89 +573,6 @@ class Netrunner:
                 error_string = error_string[:self.max_message_len - 10] + "\ncont..."
         return search_criteria_list, render_option, error_string
 
-    async def find_and_say_card(self, string_to_parse, use_embed=True):
-        search_criteria_list, render_option, error_string = self.flag_parse(string_to_parse)
-        num_matches = 0
-        for card in self.card_list:
-            if card.search_card_match(search_criteria_list):
-                num_matches += 1
-                if num_matches > self.max_card_search:
-                    continue
-                time.sleep(0.5)
-                if use_embed:
-                    await self.bot.say(embed=card.render_embed(render_option))
-                else:
-                    await self.bot.say(card.render_text(render_option))
-        if error_string:
-            time.sleep(0.5)
-            await self.bot.say("I saw these errors: '{}'".format(error_string))
-        # TODO It'd be nice to calculate the pool of cards by legality that we searched...
-        time.sleep(0.5)
-        await self.bot.say("listed {} of {} matched cards (total {})".format(
-            min(num_matches, self.max_card_search, ), num_matches, len(self.card_list)))
-
-    @commands.command(name="flag_nets", aliases=['nets'])
-    async def arg_parse_nets(self, *, string_to_parse: str):
-        self.find_and_say_card(string_to_parse, use_embed=False)
-
-    @commands.command(name="flag_nets_cr", aliases=['netscr'])
-    async def arg_parse_nets_cr(self, *, string_to_parse: str):
-        self.find_and_say_card(string_to_parse + " --legality cr ", use_embed=False)
-
-    @commands.command(name="flag_nets_legacy", aliases=['netslegacy'])
-    async def arg_parse_nets_legacy(self, *, string_to_parse: str):
-        self.find_and_say_card(string_to_parse + " --legality legacy ", use_embed=False)
-
-    @staticmethod
-    def apply_title_transform_jokes(card_title_criteria):
-        # Auto-correct some card names (and inside jokes)
-        query_corrections = {
-            "smc": "self-modifying code",
-            "jesus": "jackson howard",
-            "neh": "near earth hub",
-            "sot": "same old thing",
-            "tilde": "blackat",
-            "neko": "blackat",
-            "<:stoned:259424190111678464>": "mr. Stone",
-            "<:dan:302195700136148994>": "deuces wild",
-            "<:snare:230408123079196672>": "snare",
-            "<:abomb:269152319004868610>": "emp device",
-            "<:moonman:249217069185368064>": "shoot the moon",
-        }
-        if card_title_criteria.lower() in query_corrections.keys():
-            card_title_criteria = query_corrections[card_title_criteria.lower()]
-        return card_title_criteria
-
-    @staticmethod
-    def apply_title_redirect_jokes(card_title_criteria):
-        # Auto-link some images instead of other users' names
-        query_redirects = {
-            "nyan": "http://i.imgur.com/TnwGEhG.jpg",  # http://i.imgur.com/AtqdQiP.jpg
-            "ordineu": "http://i.imgur.com/PDySfQ7.png",
-            "kika": "http://i.imgur.com/WnsNJho.jpg",
-            "leg": "http://i.imgur.com/53dBofH.png",
-            "triffids": "http://run4games.com/wp-content/gallery/altcard_runner_id_shaper/Nasir-by-stentorr-001.jpg",
-            "dee": "http://i.imgur.com/vrQmmOf.png",
-            "garvin": "http://i.imgur.com/KtvboU8.jpg",
-            "cyberface": "http://i.imgur.com/cV7EAtx.png",
-        }
-        if card_title_criteria.lower() in query_redirects.keys():
-            return query_redirects[card_title_criteria.lower()]
-        else:
-            return None
-
-    @commands.command(aliases=['nr', 'netrunner'])
-    async def nr_flags(self, *, string_to_parse: str):
-        self.find_and_say_card(string_to_parse + " --image-only ", use_embed=True)
-
-    @commands.command(aliases=['nrcr', 'cache_refresh'])
-    async def cr_flags(self, *, string_to_parse: str):
-        self.find_and_say_card(string_to_parse + " --image-only --legality cr ", use_embed=True)
-
-    @commands.command(aliases=['nrleg', 'nr_legacy'])
-    async def legacy_flags(self, *, string_to_parse: str):
-        self.find_and_say_card(string_to_parse + " --image-only --legality legacy ", use_embed=True)
-
     def rich_embed_deck_parse(self, deck_id):
         # m_response = ""
         m_api_prefex = "https://netrunnerdb.com/api/2.0/public/decklist/"
@@ -692,6 +609,56 @@ class Netrunner:
             error_embed = discord.Embed(title="badUrlError", type="rich")
             error_embed.description = badUrlError.msg
             return error_embed
+
+    async def find_and_say_card(self, string_to_parse, use_embed=True):
+        await self.bot.say("debug print, the arguments were '{}'".format(string_to_parse))
+        search_criteria_list, render_option, error_string = self.flag_parse(string_to_parse)
+        num_matches = 0
+        for card in self.card_list:
+            if card.search_card_match(search_criteria_list):
+                num_matches += 1
+                if num_matches > self.max_card_search:
+                    continue
+                time.sleep(0.5)
+                if use_embed:
+                    await self.bot.say(embed=card.render_embed(render_option))
+                else:
+                    await self.bot.say(card.render_text(render_option))
+        if error_string:
+            time.sleep(0.5)
+            await self.bot.say("I saw these errors: '{}'".format(error_string))
+        # TODO It'd be nice to calculate the pool of cards by legality that we searched...
+        time.sleep(0.5)
+        await self.bot.say("listed {} of {} matched cards (total {})".format(
+            min(num_matches, self.max_card_search, ), num_matches, len(self.card_list)))
+
+    @commands.command(name="flag_nets", aliases=['nets'])
+    async def arg_parse_nets(self, *, string_to_parse: str):
+        self.find_and_say_card(string_to_parse, use_embed=False)
+
+    @commands.command(name="flag_nets_cr", aliases=['netscr'])
+    async def arg_parse_nets_cr(self, *, string_to_parse: str):
+        self.find_and_say_card(string_to_parse + " --legality cr ", use_embed=False)
+
+    @commands.command(name="flag_nets_legacy", aliases=['netslegacy'])
+    async def arg_parse_nets_legacy(self, *, string_to_parse: str):
+        self.find_and_say_card(string_to_parse + " --legality legacy ", use_embed=False)
+
+    @commands.command(aliases=['nr', 'netrunner'])
+    async def nr_flags(self, *, string_to_parse: str):
+        self.find_and_say_card(string_to_parse + " --image-only ", use_embed=True)
+
+    @commands.command(aliases=['nrcr', 'cache_refresh'])
+    async def cr_flags(self, *, string_to_parse: str):
+        self.find_and_say_card(string_to_parse + " --image-only --legality cr ", use_embed=True)
+
+    @commands.command(aliases=['nrleg', 'nr_legacy'])
+    async def legacy_flags(self, *, string_to_parse: str):
+        self.find_and_say_card(string_to_parse + " --image-only --legality legacy ", use_embed=True)
+
+    @commands.command(aliases=['broke'])
+    async def nr_debug(self, *, cmd: str):
+        await self.bot.say("debug print, the arguments were '{}'".format(cmd))
 
     @commands.command(aliases=['nd'])
     async def deck(self, *, decklist: str):
@@ -761,6 +728,44 @@ class Netrunner:
                 await self.bot.say(se.value)
             if quiz_opts.exit_message is not None:
                 await self.bot.say(quiz_opts.exit_message)
+
+    @staticmethod
+    def apply_title_transform_jokes(card_title_criteria):
+        # Auto-correct some card names (and inside jokes)
+        query_corrections = {
+            "smc": "self-modifying code",
+            "jesus": "jackson howard",
+            "neh": "near earth hub",
+            "sot": "same old thing",
+            "tilde": "blackat",
+            "neko": "blackat",
+            "<:stoned:259424190111678464>": "mr. Stone",
+            "<:dan:302195700136148994>": "deuces wild",
+            "<:snare:230408123079196672>": "snare",
+            "<:abomb:269152319004868610>": "emp device",
+            "<:moonman:249217069185368064>": "shoot the moon",
+        }
+        if card_title_criteria.lower() in query_corrections.keys():
+            card_title_criteria = query_corrections[card_title_criteria.lower()]
+        return card_title_criteria
+
+    @staticmethod
+    def apply_title_redirect_jokes(card_title_criteria):
+        # Auto-link some images instead of other users' names
+        query_redirects = {
+            "nyan": "http://i.imgur.com/TnwGEhG.jpg",  # http://i.imgur.com/AtqdQiP.jpg
+            "ordineu": "http://i.imgur.com/PDySfQ7.png",
+            "kika": "http://i.imgur.com/WnsNJho.jpg",
+            "leg": "http://i.imgur.com/53dBofH.png",
+            "triffids": "http://run4games.com/wp-content/gallery/altcard_runner_id_shaper/Nasir-by-stentorr-001.jpg",
+            "dee": "http://i.imgur.com/vrQmmOf.png",
+            "garvin": "http://i.imgur.com/KtvboU8.jpg",
+            "cyberface": "http://i.imgur.com/cV7EAtx.png",
+        }
+        if card_title_criteria.lower() in query_redirects.keys():
+            return query_redirects[card_title_criteria.lower()]
+        else:
+            return None
 
     @staticmethod
     def search_card(card_list, search_criteria):
