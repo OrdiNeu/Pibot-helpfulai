@@ -242,8 +242,9 @@ class NetrunnerDBCard:
     def get_card_image_url(self):
         # so we need to find the best image we can
         # first we'll check for a listed URL in the card itself, newer cards use this syntax
-        if "https" in self.image_url:
-            return self.image_url
+        if self.image_url is not None:
+            if "https" in self.image_url:
+                return self.image_url
         # else form the netrunnerdb image url
         # format the code from int to 0 back-filled string
         return "https://netrunnerdb.com/card_image/{:06}.png".format(self.code)
