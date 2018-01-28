@@ -572,65 +572,8 @@ class Netrunner:
                 # truncate message if it exceed the character limit
                 error_string = error_string[:self.max_message_len - 10] + "\ncont..."
         return search_criteria_list, render_option, error_string
-# def get_search_text(self, search_criteria_list, render_option):
-#     m_response = ""
-#     m_match_list = self.search_card(self.card_list, search_criteria_list)
-#     # redirecting to special images for specific input
-#     # redirect = self.apply_title_redirect_jokes(string_to_parse.split()[0])
-#     # if redirect:
-#     #     m_response = redirect
-#     #if len(m_match_list) == 0:
-#     #    m_response = "Search criteria returned 0 results\n"
-#     #    m_response += string_to_parse
-#     #else:
-#     #  figure out how we're going to respond, if we're images only, skip parsing and use this.
-#     if render_option.image_only:
-#         for i, card in enumerate(m_match_list[:5]):
-#             m_response += self.get_card_url(card)
-#         if len(m_match_list) > 5:
-#             m_response += "[{0}/{1}]".format(5, len(m_match_list))
-#     else:
-#         for i, card in enumerate(m_match_list):
-#             c_response = ""
-#             # we have a card, so let's add the default type fields, if any by type
-#             if card['type_code'] in extra_type_fields:
-#                 for extra_field in extra_type_fields[card['type_code']]:
-#                     if extra_field not in default_print_fields:
-#                         type_fields_appends.append(extra_field)
-#             # if the flag is set, skip all text info
-#             if result_config["title-only"]:
-#                 print_fields = ['title']
-#             else:
-#                 # our list of fields to print starts with the default list of keys for all cards
-#                 print_fields = default_print_fields
-#                 # Add any fields that the particular card needs by its type
-#                 for field in type_fields_appends:
-#                     if field not in print_fields:
-#                         print_fields.append(field)
-#                 # add any fields that the user explicitly searched for
-#                 for field in search_fields_appends:
-#                     if field not in print_fields:
-#                         print_fields.append(field)
-#             c_response += "```\n"
-#             for c_key in print_fields:
-#                 if c_key in card.keys():
-#                     c_response += self.transform_api_items_to_printable_format(c_key, card[c_key])
-#                     # if c_key not in special_fields:
-#                     #    c_response += "{0}:\"{1}\"\n".format(
-#                     #        c_key, self.replace_api_text_with_emoji(card[c_key]))
-#                     # else:
-#                     #    if c_key in 'uniqueness' and card[c_key] is True:
-#                     #        c_response += '🔹:'
-#                     #    if c_key in 'code':
-#                     #        c_response += "http://netrunnerdb.com/card_image/{0}.png\n".format(
-#                     #           card[c_key])
-#             c_response += "```\n"
-#             if (len(m_response) + len(c_response)) >= (self.max_message_len - 20):
-#                 m_response += "\n[{0}/{1}]\n".format(i, len(m_match_list))
-#                 break
-#             else:
-#                 m_response += c_response
-    def find_and_say_card(self, string_to_parse, use_embed=True):
+
+    async def find_and_say_card(self, string_to_parse, use_embed=True):
         search_criteria_list, render_option, error_string = self.flag_parse(string_to_parse)
         num_matches = 0
         for card in self.card_list:
@@ -640,28 +583,28 @@ class Netrunner:
                     continue
                 time.sleep(0.5)
                 if use_embed:
-                    self.bot.say(embed=card.render_embed(render_option))
+                    await self.bot.say(embed=card.render_embed(render_option))
                 else:
-                    self.bot.say(card.render_text(render_option))
+                    await self.bot.say(card.render_text(render_option))
         if error_string:
             time.sleep(0.5)
-            self.bot.say("I saw these errors: '{}'".format(error_string))
+            await self.bot.say("I saw these errors: '{}'".format(error_string))
         # TODO It'd be nice to calculate the pool of cards by legality that we searched...
         time.sleep(0.5)
-        self.bot.say("listed {} of {} matched cards (total {})".format(
+        await self.bot.say("listed {} of {} matched cards (total {})".format(
             min(num_matches, self.max_card_search, ), num_matches, len(self.card_list)))
 
     @commands.command(name="flag_nets", aliases=['nets'])
     async def arg_parse_nets(self, *, string_to_parse: str):
-        await self.find_and_say_card(string_to_parse, use_embed=False)
+        self.find_and_say_card(string_to_parse, use_embed=False)
 
     @commands.command(name="flag_nets_cr", aliases=['netscr'])
     async def arg_parse_nets_cr(self, *, string_to_parse: str):
-        await self.find_and_say_card(string_to_parse + " --legality cr ", use_embed=False)
+        self.find_and_say_card(string_to_parse + " --legality cr ", use_embed=False)
 
     @commands.command(name="flag_nets_legacy", aliases=['netslegacy'])
     async def arg_parse_nets_legacy(self, *, string_to_parse: str):
-        await self.find_and_say_card(string_to_parse + " --legality legacy ", use_embed=False)
+        self.find_and_say_card(string_to_parse + " --legality legacy ", use_embed=False)
 
     @staticmethod
     def apply_title_transform_jokes(card_title_criteria):
@@ -703,15 +646,15 @@ class Netrunner:
 
     @commands.command(aliases=['nr', 'netrunner'])
     async def nr_flags(self, *, string_to_parse: str):
-        await self.find_and_say_card(string_to_parse + " --image-only ", use_embed=True)
+        self.find_and_say_card(string_to_parse + " --image-only ", use_embed=True)
 
     @commands.command(aliases=['nrcr', 'cache_refresh'])
     async def cr_flags(self, *, string_to_parse: str):
-        await self.find_and_say_card(string_to_parse + " --image-only --legality cr ", use_embed=True)
+        self.find_and_say_card(string_to_parse + " --image-only --legality cr ", use_embed=True)
 
     @commands.command(aliases=['nrleg', 'nr_legacy'])
     async def legacy_flags(self, *, string_to_parse: str):
-        await self.find_and_say_card(string_to_parse + " --image-only --legality legacy ", use_embed=True)
+        self.find_and_say_card(string_to_parse + " --image-only --legality legacy ", use_embed=True)
 
     def rich_embed_deck_parse(self, deck_id):
         # m_response = ""

@@ -283,6 +283,7 @@ class Uncategorised:
         role_search = re.compile("(.*?[!?]clan\s)(.*)")
         search_role = role_search.search(ctx.message.content)
         valid_clans = ["crab", "crane", "dragon", "lion", "mantis", "phoenix", "scorpion", "unicorn", "spider", "ronin"]
+        clan_emojii = [":crab:"]
         valid_roles = list()
         new_valid_role = None
         user_roles = ctx.message.author.roles
