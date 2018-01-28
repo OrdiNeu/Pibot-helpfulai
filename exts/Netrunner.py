@@ -445,7 +445,9 @@ class Netrunner:
             "minimum_deck_size": "Deck Minimum Size",
         }
         self.union_keys = ["pack_code"]
-
+        self.default_print_fields = [
+            'uniqueness', 'base_link', 'title', 'cost', 'type_code', 'keywords', 'text', 'strength', 'trash_cost',
+            'faction_code', 'faction_cost', ]
         # 2 decimal prefix: Any prefix except core2.0 + three decimal suffix
         self.legacy_legal_code_regex = "((00)|(01)|(02)|(03)|(04)|(05)|(06)|(07)|(08)|(09)|(10)|(11)|(12)|(13))(\d\d\d)"
         # 2 decimal prefix:  C&C | H&P | O&C | D&D | TD | Flashpoint | Red Sand | Core2.0 + three decimal suffix
@@ -534,7 +536,7 @@ class Netrunner:
                 if key in concat_categories:
                     if parser_dictionary[key] is not None:
                         # Add the key to the printed result, if it's not already included
-                        if key not in render_option.default_print_fields:
+                        if key not in self.default_print_fields:
                             render_option.print_fields.append(key)
                         # search parameters come in key: [['string'], ['other', 'string']
                         # for an input like: --flag string --flag other string
@@ -550,7 +552,7 @@ class Netrunner:
                 # then check the lists that are done literally
                 if key in single_categories:
                     if parser_dictionary[key] is not None:
-                        if key not in render_option.default_print_fields:
+                        if key not in self.default_print_fields:
                             render_option.print_fields.append(key)
                         search_criteria_list.append({key, list(parser_dictionary[key])})
             # Apply legality set
@@ -660,46 +662,6 @@ class Netrunner:
     @commands.command(name="flag_nets_legacy", aliases=['netslegacy'])
     async def arg_parse_nets_legacy(self, *, string_to_parse: str):
         await self.find_and_say_card(string_to_parse + " --legality legacy ", use_embed=False)
-
-#def search_text(self, criteria):
-#        legal_code_re = re.compile(self.search_legality_regex)
-#        m_match = []
-#        card_match = True
-#        for i, s_card in enumerate(self.nr_api):
-#            if legal_code_re.search(s_card['code']):  # first exclude cards based on legality set
-#                card_match = True
-#                for c_key, c_value in criteria:
-#                    if c_key in s_card.keys():
-#                        try:
-#                            if isinstance(c_value, int):
-#                                if not isinstance(s_card[c_key], int):
-#                                    if not int(c_value) == int(s_card[c_key]):
-#                                        card_match = False
-#                                        break
-#                            elif isinstance(s_card[c_key], int):
-#                                if not int(c_value) == s_card[c_key]:
-#                                    card_match = False
-#                                    break
-#                            elif s_card[c_key] is None:
-#                                break
-#                                # print("None value from search for on " + s_card['code'])
-#                            else:
-#                                if not unidecode(c_value.lower()) in unidecode(s_card[c_key]).lower():
-#                                    card_match = False
-#                                    break
-#                                    # print("match on " + c_value)
-#                        except ValueError:
-#                            return []
-#                            # m_response += "Value error parsing search!" + s_card['code'] + "\n"
-#                            # return m_response
-#                            # print("ValueError on value from search " +
-#                            #  c_key + " for " + c_value + " on " + s_card['code'])
-#                    else:
-#                        card_match = False
-#                        break
-#                if card_match:
-#                    m_match.append(s_card)
-#        return m_match
 
     @staticmethod
     def apply_title_transform_jokes(card_title_criteria):
