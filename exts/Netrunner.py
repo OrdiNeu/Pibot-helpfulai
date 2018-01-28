@@ -294,6 +294,11 @@ class RenderOptions:
         self.image_only = False
         self.print_fields = list()
 
+    def to_string(self):
+        return "debug: '{}'\ntitle_only: '{}'\nimage_only: '{}'\nprint_fields: '{}'\n".format(
+            self.debug, self.title_only, self.image_only, self.print_fields)
+
+
 
 class NetrunQuiz(MsgListener):
     ANSWER_TRANSFORMS = {
@@ -499,10 +504,10 @@ class Netrunner:
         nets_parser.add_argument('--flavor', '-a', nargs="+", action='append', dest="flavor_text")
         nets_parser.add_argument('--illustrator', '-i', nargs="+", action='append', dest="illustrator")
         # These flags capture a single type from a single word
-        single_categories = ['type_code', 'faction_code', 'side_code', 'cost', 'advancement_cost', 'memory_cost',
-                             'faction_cost', 'strength', 'agenda_points', 'base_link', 'deck_limit',
-                             'minimum_deck_size', 'code',
-                             'trash_cost', 'unique', 'pack_code']
+        single_categories = [
+            'type_code', 'faction_code', 'side_code', 'cost', 'advancement_cost', 'memory_cost', 'faction_cost',
+            'strength', 'agenda_points', 'base_link', 'deck_limit', 'minimum_deck_size', 'code','trash_cost', 'unique',
+            'pack_code']
         nets_parser.add_argument('-t', '--type', action='store', dest="type_code")
         nets_parser.add_argument('-f', '--faction', action='store', dest="faction_code")
         nets_parser.add_argument('-d', '--side', action='store', dest="side_code")
@@ -562,9 +567,9 @@ class Netrunner:
             render_option.image_only = parser_dictionary['image-only']
             render_option.debug = parser_dictionary['debug-flags']
             if parser_dictionary['debug-flags']:
-                error_string += "\noriginal args = '{}'\n".format(str(args))
+                error_string += "\noriginal args = '{}'\n".format(parser_dictionary)
                 error_string += "\nsearch_criteria_list = '{}'\n".format(search_criteria_list)
-                error_string += "\nrender_option = '{}'\n".format(render_option)
+                error_string += "\nrender_option = '{}'\n".format(render_option.to_string())
         except DiscordArgparseParseError as dape:
             if dape.value is not None:
                 error_string += dape.value
