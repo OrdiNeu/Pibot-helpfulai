@@ -452,7 +452,7 @@ class Netrunner:
         self.union_keys = ["pack_code"]
         self.default_print_fields = [
             'uniqueness', 'base_link', 'title', 'cost', 'type_code', 'keywords', 'text', 'strength', 'trash_cost',
-            'faction_code', 'faction_cost', ]
+            'faction_code', 'faction_cost', 'legality']
         # 2 decimal prefix: Any prefix except core2.0 + three decimal suffix
         self.legacy_legal_code_regex = "((00)|(01)|(02)|(03)|(04)|(05)|(06)|(07)|(08)|(09)|(10)|(11)|(12)|(13))(\d\d\d)"
         # 2 decimal prefix:  C&C | H&P | O&C | D&D | TD | Flashpoint | Red Sand | Core2.0 + three decimal suffix
@@ -556,7 +556,7 @@ class Netrunner:
                         search_criteria_list.append({key: concat_list})
                         # Add the key to the printed result, if it's not already included
                         if key not in self.default_print_fields and key not in render_option.print_fields:
-                            render_option.print_fields += key
+                            render_option.print_fields.append(key)
                 # then check the lists that are done with single value:
                 # looks like this: {'str': 5}
                 if key in single_categories:
@@ -565,7 +565,7 @@ class Netrunner:
                         value_list.append(parser_dictionary[key])
                         search_criteria_list.append({key: value_list})
                         if key not in self.default_print_fields and key not in render_option.print_fields:
-                            render_option.print_fields += key
+                            render_option.print_fields.append(key)
             # form print/display options
             render_option.title_only = parser_dictionary['title-only']
             render_option.image_only = parser_dictionary['image-only']
