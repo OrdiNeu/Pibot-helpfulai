@@ -222,11 +222,12 @@ class NetrunnerDBCard:
                 'hardware': 7, 'resource': 8, 'program': 9}[self.type_code]
     def search_card_match(self, search_criteria):
         """
-        :param search_criteria: should be a list of dictionary keys pointing to a tuple of matching criteria
-         [{'title': (Noise, Reina)}, {'base_link': (1)}]
+        :param search_criteria: should be a list of dictionary keys pointing to a list of matching criteria
+         [{'title': [Noise, Reina]}, {'base_link': [1]}]
         :return:
         """
         for criteria in search_criteria:
+            criteria_passed = False
             # first sanitize that the key is in this object
             search_key = list(criteria.keys())[0]
             if search_key in self.__dict__:
@@ -238,10 +239,10 @@ class NetrunnerDBCard:
                 for match_value in criteria[search_key]:
                     if match_value in self.__dict__[search_key]:
                         # one of the values matched, so move on to the next criteria
-                        break
+                        criteria_passed = True
                     # failed to match on one of the criteria, so it's not a match
-                    return False
-        # matched every requested key
+            if not criteria_passed:
+                return False
         return True
     def render_text(self, render_option):
         """
@@ -297,7 +298,6 @@ class RenderOptions:
     def to_string(self):
         return "debug: '{}'\ntitle_only: '{}'\nimage_only: '{}'\nprint_fields: '{}'\n".format(
             self.debug, self.title_only, self.image_only, self.print_fields)
-
 
 
 class NetrunQuiz(MsgListener):
@@ -673,7 +673,6 @@ class Netrunner:
         await self.bot.say("debug print, the arguments were '{}'".format(cmd))
         search_criteria_list, render_option, error_string = self.flag_parse(cmd)
         await self.bot.say("debug print, finished with error string '{}'".format(error_string))
-
 
     @commands.command(aliases=['nd'])
     async def deck(self, *, decklist: str):
