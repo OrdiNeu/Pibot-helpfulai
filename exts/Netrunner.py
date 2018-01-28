@@ -161,6 +161,9 @@ class NetrunnerDBCard:
             "code": "\nhttp://netrunnerdb.com/card_image/{0}.png".format(value)
         }
         return key_transform[field]
+    @staticmethod
+    def clean_api_value_for_compare(api_value):
+        return unidecode(api_value.strip().lower())
     def parse_trace_tag(self, api_string):
         trace_tag_g = re.sub("(<trace>Trace )(\d)(</trace>)", self.transform_trace, api_string, flags=re.I)
         return trace_tag_g
@@ -237,10 +240,11 @@ class NetrunnerDBCard:
                     return False
                 # if this card does have this key, if none of the values we're looking for match, it's not a match
                 for match_value in criteria[search_key]:
-                    if match_value in self.__dict__[search_key]:
+                    if self.clean_api_value_for_compare(match_value) in \
+                            self.clean_api_value_for_compare(self.__dict__[search_key]):
                         # one of the values matched, so move on to the next criteria
                         criteria_passed = True
-                    # failed to match on one of the criteria, so it's not a match
+            # failed to match on one of the criteria, so it's not a match
             if not criteria_passed:
                 return False
         return True
