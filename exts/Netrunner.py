@@ -507,7 +507,7 @@ class Netrunner:
         single_categories = [
             'type_code', 'faction_code', 'side_code', 'cost', 'advancement_cost', 'memory_cost', 'faction_cost',
             'strength', 'agenda_points', 'base_link', 'deck_limit', 'minimum_deck_size', 'code','trash_cost', 'unique',
-            'pack_code']
+            'pack_code', 'legality']
         nets_parser.add_argument('-t', '--type', action='store', dest="type_code")
         nets_parser.add_argument('-f', '--faction', action='store', dest="faction_code")
         nets_parser.add_argument('-d', '--side', action='store', dest="side_code")
@@ -558,12 +558,10 @@ class Netrunner:
                 if key in single_categories:
                     if parser_dictionary[key] is not None:
                         value_list = list()
-                        value_list += parser_dictionary[key]
+                        value_list.append(parser_dictionary[key])
                         search_criteria_list.append({key, value_list})
                         if key not in self.default_print_fields:
                             render_option.print_fields.append(key)
-            # Apply legality set
-            search_criteria_list.append({'legality': list(parser_dictionary['legality'].lower())})
             # form print/display options
             render_option.title_only = parser_dictionary['title-only']
             render_option.image_only = parser_dictionary['image-only']
