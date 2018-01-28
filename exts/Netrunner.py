@@ -538,28 +538,30 @@ class Netrunner:
             # and add them to the list, if they're in the args
             for key in parser_dictionary.keys():
                 # first build up the parameters that need to be concatenated
+                # entries in concat_category look like key: [['string], ['string']]
                 if key in concat_categories:
                     if parser_dictionary[key] is not None:
-                        # Add the key to the printed result, if it's not already included
-                        if key not in self.default_print_fields:
-                            render_option.print_fields.append(key)
                         # search parameters come in key: [['string'], ['other', 'string']
                         # for an input like: --flag string --flag other string
                         # we'll treat each --flag {value} as a separate criteria that must be met, and join the
                         # 'other' 'string' into a match 'other string' exactly.
+                        concat_list = list()
                         for word_list in parser_dictionary[key]:
-                            concat_string = ""
-                            for word in word_list:
-                                concat_string += word + " "
-                            if key in "title":
-                                concat_string = self.apply_title_transform_jokes(concat_string.strip())
-                            search_criteria_list.append({key: list(concat_string.strip())})
+                            concat_list += word_list[:]
+                        # if key in "title":
+                        #    concat_string = self.apply_title_transform_jokes(concat_string.strip())
+                        search_criteria_list.append({key: concat_list})
+                        # Add the key to the printed result, if it's not already included
+                        if key not in self.default_print_fields:
+                            render_option.print_fields.append(key)
                 # then check the lists that are done literally
                 if key in single_categories:
                     if parser_dictionary[key] is not None:
+                        value_list = list()
+                        value_list += parser_dictionary[key]
+                        search_criteria_list.append({key, value_list})
                         if key not in self.default_print_fields:
                             render_option.print_fields.append(key)
-                        search_criteria_list.append({key, list(parser_dictionary[key])})
             # Apply legality set
             search_criteria_list.append({'legality': list(parser_dictionary['legality'].lower())})
             # form print/display options
