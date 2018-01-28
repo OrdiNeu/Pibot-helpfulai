@@ -506,8 +506,8 @@ class Netrunner:
         # These flags capture a single type from a single word
         single_categories = [
             'type_code', 'faction_code', 'side_code', 'cost', 'advancement_cost', 'memory_cost', 'faction_cost',
-            'strength', 'agenda_points', 'base_link', 'deck_limit', 'minimum_deck_size', 'code','trash_cost', 'unique',
-            'pack_code', 'legality']
+            'strength', 'agenda_points', 'base_link', 'deck_limit', 'minimum_deck_size', 'code', 'trash_cost', 'unique',
+            'pack_code']  # 'legality'
         nets_parser.add_argument('-t', '--type', action='store', dest="type_code")
         nets_parser.add_argument('-f', '--faction', action='store', dest="faction_code")
         nets_parser.add_argument('-d', '--side', action='store', dest="side_code")
