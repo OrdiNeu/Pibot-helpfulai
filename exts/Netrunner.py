@@ -329,6 +329,7 @@ class NetrunnerDBCard:
             embed_response.set_image(url=image_url)
         if not render_option.image_only:
             embed_response.description = "{}".format(self.render_text(render_option))
+            embed_response += image_url
         if render_option.debug:
             embed_response.description += self.get_card_image_url()
         return embed_response
