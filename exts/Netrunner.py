@@ -562,7 +562,9 @@ class Netrunner:
             render_option.image_only = parser_dictionary['image-only']
             render_option.debug = parser_dictionary['debug-flags']
             if parser_dictionary['debug-flags']:
-                error_string += str(args) + "\n"
+                error_string += "\noriginal args = '{}'\n".format(str(args))
+                error_string += "\nsearch_criteria_list = '{}'\n".format(search_criteria_list)
+                error_string += "\nrender_option = '{}'\n".format(render_option)
         except DiscordArgparseParseError as dape:
             if dape.value is not None:
                 error_string += dape.value
@@ -636,29 +638,27 @@ class Netrunner:
 
     @commands.command(name="flag_nets", aliases=['nets'])
     async def arg_parse_nets(self, *, string_to_parse: str):
-        await self.bot.say("flag_nets debug print, the arguments were '{}'".format(string_to_parse))
         await self.find_and_say_card(string_to_parse, use_embed=False)
 
     @commands.command(name="flag_nets_cr", aliases=['netscr'])
     async def arg_parse_nets_cr(self, *, string_to_parse: str):
-        self.find_and_say_card(string_to_parse + " --legality cr ", use_embed=False)
+        await self.find_and_say_card(string_to_parse + " --legality cr ", use_embed=False)
 
     @commands.command(name="flag_nets_legacy", aliases=['netslegacy'])
     async def arg_parse_nets_legacy(self, *, string_to_parse: str):
-        self.find_and_say_card(string_to_parse + " --legality legacy ", use_embed=False)
+        await self.find_and_say_card(string_to_parse + " --legality legacy ", use_embed=False)
 
     @commands.command(aliases=['nr', 'netrunner'])
     async def nr_flags(self, *, string_to_parse: str):
-        await self.bot.say("nr debug print, the arguments were '{}'".format(string_to_parse))
-        self.find_and_say_card(string_to_parse + " --image-only ", use_embed=True)
+        await self.find_and_say_card(string_to_parse + " --image-only ", use_embed=True)
 
     @commands.command(aliases=['nrcr', 'cache_refresh'])
     async def cr_flags(self, *, string_to_parse: str):
-        self.find_and_say_card(string_to_parse + " --image-only --legality cr ", use_embed=True)
+        await self.find_and_say_card(string_to_parse + " --image-only --legality cr ", use_embed=True)
 
     @commands.command(aliases=['nrleg', 'nr_legacy'])
     async def legacy_flags(self, *, string_to_parse: str):
-        self.find_and_say_card(string_to_parse + " --image-only --legality legacy ", use_embed=True)
+        await self.find_and_say_card(string_to_parse + " --image-only --legality legacy ", use_embed=True)
 
     @commands.command(aliases=['broke'])
     async def nr_debug(self, *, cmd: str):
