@@ -3,7 +3,6 @@
 import asyncio
 import re
 import random
-import threading
 import time
 from unidecode import unidecode
 
@@ -90,22 +89,100 @@ class NetrunnerDBCard:
         if 'trash_cost' in api_dict:
             if api_dict['trash_cost'] is not None:
                 self.trash_cost = int(api_dict['trash_cost'])
-
         # type should be list(str)
         self.keywords = list()
         if 'keywords' in api_dict:
             for keyword in api_dict['keywords'].split("-"):
                 self.keywords.append(keyword.strip())
         # things that aren't cards
+        self.legality = list()
+        self.assign_legality()
         self.type_code_sort = {
             'identity': 0, 'agenda': 1, 'asset': 2, 'upgrade': 3, 'operation': 4, 'ice': 5,
             'event': 6, 'hardware': 7, 'resource': 8, 'program': 9}
-
+        self.extra_type_fields = {
+            'agenda': ('advancement_cost', 'agenda_points',),
+            'identity': ('minimum_deck_size', 'influence_limit',),
+            'program': ('memory_cost',),
+            # 'ice': ('strength', ),
+        }
+        self.default_print_fields = [
+            'uniqueness', 'base_link', 'title', 'cost', 'type_code', 'keywords', 'text', 'strength', 'trash_cost',
+            'faction_code', 'faction_cost', ]
+    def assign_legality(self):
+        self.legality = list()
+        # 2 decimal prefix: Any prefix except core2.0 + three decimal suffix
+        legacy_legal_code_regex = "((00)|(01)|(02)|(03)|(04)|(05)|(06)|(07)|(08)|(09)|(10)|(11)|(12)|(13))(\d\d\d)"
+        # 2 decimal prefix:  C&C | H&P | O&C | D&D | TD | Flashpoint | Red Sand | Core2.0 + three decimal suffix
+        cache_refresh_legal_code_regex = "((03)|(05)|(07)|(09)|(13)|(11)|(12)|(20))(\d\d\d)"
+        # 2 decimal prefix:  C&C | H&P | Lunar| O&C | SanSan | D&D | Mumbad | Flashpoint | Red Sand | TD |
+        # Core2.0 + three decimal suffix
+        rotation_legal_code_regex = "((03)|(05)|(06)|(07)|(08)|(09)|(10)|(11)|(12)|(13)|(20))(\d\d\d)"
+        # (rotation)|(legacy)|(cr)
+        if re.search(legacy_legal_code_regex, "{:06}".format(self.code)):
+            self.legality.append('legacy')
+        if re.search(cache_refresh_legal_code_regex, "{:06}".format(self.code)):
+            self.legality.append('cr')
+        if re.search(rotation_legal_code_regex, "{:06}".format(self.code)):
+            self.legality.append('rotation')
+    def transform_api_field_to_printable_format(self, field):
+        # this function transforms the internal keys used in the api to a more user friendly print format
+        value = self.replace_api_text_with_emoji(self.__dict__[field])
+        # value = self.parse_trace_tag(value)
+        # value = self.parse_strong_tag(value)
+        if value is True:
+            unique_str = "🔹"
+        else:
+            unique_str = ""
+        key_transform = {
+            "title": "{0}".format(value),
+            "text": "\n\"{0}\"".format(value),
+            "cost": "\nCost: {0}".format(value),
+            "strength": "\nStr: {0}".format(value),
+            "keywords": ": {0}".format(value),
+            "type_code": "\n{0}".format(value),
+            "uniqueness": unique_str,
+            "faction_cost": " {0}▪".format(value),
+            "memory_cost": "\nMU: {0}".format(value),
+            "trash_cost": "\n{0}🗑".format(value),
+            "advancement_cost": "\nAdv: {0}".format(value),
+            "agenda_points": "\nAP: {0}".format(value),
+            "side_code": "\nside: {0}".format(value),
+            "faction_code": "\nfaction: {0}".format(value),
+            "pack_code": "\npack: {0}".format(value),
+            "position": "\nposition: {0}".format(value),
+            "quantity": "\nquantity: {0}\n".format(value),
+            "base_link": "{0}🔁".format(value),
+            "influence_limit": "/{0}\n".format(value),
+            "deck_limit": "\ndeck limit: {0}".format(value),
+            "minimum_deck_size": "\ndeck: {0}".format(value),
+            "flavor": "\n{0}".format(value),
+            "illustrator": "\nillustrator: {0}".format(value),
+            "code": "\nhttp://netrunnerdb.com/card_image/{0}.png".format(value)
+        }
+        return key_transform[field]
+    def parse_trace_tag(self, api_string):
+        trace_tag_g = re.sub("(<trace>Trace )(\d)(</trace>)", self.transform_trace, api_string, flags=re.I)
+        return trace_tag_g
+    @staticmethod
+    def parse_strong_tag(api_string):
+        strong_g = re.sub("(<strong>)(.*?)(</strong>)", "**\g<2>**", api_string)
+        return strong_g
+    def replace_api_text_with_emoji(self, api_string):
+        if isinstance(api_string, str):
+            api_string = re.sub("(\[click\])", "🕖", api_string)
+            api_string = re.sub("(\[recurring-credit\])", "💰⮐", api_string)
+            api_string = re.sub("(\[credit\])", "💰", api_string)
+            api_string = re.sub("(\[subroutine\])", "↳", api_string)
+            api_string = re.sub("(\[trash\])", "🗑", api_string)
+            api_string = re.sub("(\[mu\])", "μ", api_string)
+            api_string = self.parse_trace_tag(api_string)
+            api_string = self.parse_strong_tag(api_string)
+        return api_string
     @staticmethod
     def fix_https(url):
         # Fixes http:// to https:// from image urls
         return re.sub('^http:', 'https:', url)
-
     @staticmethod
     def is_valid_card_dict(api_card_dict):
         primitive_keys = [
@@ -115,7 +192,23 @@ class NetrunnerDBCard:
             if key not in api_card_dict:
                 return False
         return True
-
+    @staticmethod
+    def transform_trace(re_obj):
+        ss_conv = {
+            '0': '⁰',
+            '1': '¹',
+            '2': '²',
+            '3': '³',
+            '4': '⁴',
+            '5': '⁵',
+            '6': '⁶',
+            '7': '⁷',
+            '8': '⁸',
+            '9': '⁹',
+        }
+        ret_string = "Trace"
+        ret_string += ss_conv[re_obj.group(2)] + " -"
+        return ret_string
     def get_card_image_url(self):
         # so we need to find the best image we can
         # first we'll check for a listed URL in the card itself, newer cards use this syntax
@@ -124,6 +217,82 @@ class NetrunnerDBCard:
         # else form the netrunnerdb image url
         # format the code from int to 0 back-filled string
         return "https://netrunnerdb.com/card_image/{:06}.png".format(self.code)
+    def get_type_code_sort_val(self):
+        return {'identity': 0, 'agenda': 1, 'asset': 2, 'upgrade': 3, 'operation': 4, 'ice': 5, 'event': 6,
+                'hardware': 7, 'resource': 8, 'program': 9}[self.type_code]
+    def search_card_match(self, search_criteria):
+        """
+        :param search_criteria: should be a list of dictionary keys pointing to a tuple of matching criteria
+         [{'title': (Noise, Reina)}, {'base_link': (1)}]
+        :return:
+        """
+        for criteria in search_criteria:
+            # first sanitize that the key is in this object
+            search_key = list(criteria.keys())[0]
+            if search_key in self.__dict__:
+                # if this card doesn't have a value for this key, it must not match
+                if self.__dict__[search_key] is None:
+                    # print("didn't find key '{}' in card".format(search_key))
+                    return False
+                # if this card does have this key, if none of the values we're looking for match, it's not a match
+                for match_value in criteria[search_key]:
+                    if match_value in self.__dict__[search_key]:
+                        # one of the values matched, so move on to the next criteria
+                        break
+                    # failed to match on one of the criteria, so it's not a match
+                    return False
+        # matched every requested key
+        return True
+    def render_text(self, render_option):
+        """
+        :param render_option: options class with our settings for this card
+        :return: string with formatted fields requested from this card
+        """
+        description = ""
+        # build the description of the card
+        # we have a card, so let's add the default type fields, if any by type
+        print_fields = list()
+        print_fields += self.default_print_fields
+        # next any additional fields specified by the search criteria
+        for field in render_option.print_fields:
+            if field not in print_fields:
+                print_fields.append(field)
+        # now add the fields that are relevant based on card type
+        if self.type_code in self.extra_type_fields:
+            for extra_field in self.extra_type_fields[self.type_code]:
+                if extra_field not in render_option.print_fields:
+                    print_fields.append(extra_field)
+        # if we selected to only list the tile, skip the rest of the fields
+        if render_option.title_only:
+            if 'title' in self.__dict__:
+                description += self.transform_api_field_to_printable_format('title')
+        # render the text from this class's nrdb_api_text transformer
+        else:
+            for field in print_fields:
+                if field in self.__dict__:
+                    description += self.transform_api_field_to_printable_format(field)
+        return description
+    def render_embed(self, render_option):
+        """
+        :param render_option: options class with our settings for this card
+        :return: discord.Embed object built to display this one card
+        """
+        # maybe don't always embed with title?
+        embed_response = discord.Embed(title="[{}]".format(self.title), type="rich")
+        image_url = self.get_card_image_url()
+        if image_url is not None:
+            embed_response.set_image(url=image_url)
+        # I was trying to wrap it in a css formatter, but it didn't seem to work right
+        embed_response.description = "'{}'".format(self.render_text(render_option))
+        return embed_response
+
+
+class RenderOptions:
+    def __init__(self):
+        self.debug = False
+        self.title_only = False
+        self.image_only = False
+        self.print_fields = list()
 
 
 class NetrunQuiz(MsgListener):
@@ -261,9 +430,6 @@ class Netrunner:
                         "keywords, type_code,\nuniqueness, faction_cost, memory_cost, trash_cost, advancement_cost," \
                         " agenda_points,\nside_code, faction_code, pack_code, position, quantity, \n" \
                         "base_link, influence_limit, deck_limit, minimum_deck_size,  flavor, illustrator, code```"
-        self.type_code_sort = {'identity': 0, 'agenda': 1, 'asset': 2, 'upgrade': 3, 'operation': 4, 'ice': 5,
-                               'event': 6,
-                               'hardware': 7, 'resource': 8, 'program': 9}
         self.key_transforms = {
             "cost": "Cost",
             "strength": "Strength",
@@ -292,20 +458,35 @@ class Netrunner:
         self.nr_api_last_updated = ""
         self.nr_api_version_number = ""
         self.nr_api_total = 0
+        self.max_card_search = 10
+
+    def refresh_nr_api(self):
+        nr_api_all = requests.get('https://netrunnerdb.com/api/2.0/public/cards').json()
+        if nr_api_all['success']:
+            self.nr_api_version_number = nr_api_all['version_number']
+            self.nr_api_url_template = nr_api_all['imageUrlTemplate']
+            self.nr_api_total = nr_api_all['total']
+            self.nr_api_last_updated = nr_api_all['last_updated']
+            self.nr_api = sorted([c for c in nr_api_all['data']], key=lambda card: card['code'])
+            self.init_api = True
+        self.build_card_list()
+
+    def build_card_list(self):
+        if not self.init_api:
+            self.refresh_nr_api()
+        for api_card_dict in self.nr_api:
+            if NetrunnerDBCard.is_valid_card_dict(api_card_dict):
+                self.card_list.append(NetrunnerDBCard(api_card_dict))
 
     def flag_parse(self, string_to_parse):
-        m_response = ""
-        m_criteria_list = []
-        default_print_fields = ['uniqueness', 'base_link', 'title', 'cost', 'type_code', 'keywords', 'text',
-                                'strength', 'trash_cost', 'faction_code', 'faction_cost', ]
-        search_fields_appends = []
-        type_fields_appends = []
-        extra_type_fields = {
-            'agenda': ('advancement_cost', 'agenda_points',),
-            'identity': ('minimum_deck_size', 'influence_limit',),
-            'program': ('memory_cost',),
-            # 'ice': ('strength', ),
-        }
+        """
+        :param string_to_parse: take in the cmd input from one of the netrunner search functions
+        :return: tuple with (search_criteria, display_configuration, error_string)
+        """
+        error_string = ""
+        render_option = RenderOptions()
+        # search_criteria_list is supposed to form data struct like [{'title': (Noise, Reina)}, {'base_link': (1)}]
+        search_criteria_list = list()
         special_fields = ['code', 'uniqueness']
         nets_parser = DiscordArgParse(prog='flag_nets')
         # These first flags capture multiple words that follow, rather than the first word
@@ -343,23 +524,21 @@ class Netrunner:
         nets_parser.add_argument('-c', '--legality', action='store', dest="legality", default="rotation",
                                  help="Pick among legality subsets: rotation | legacy | cr")
         try:
+            # use the python module to turn the cmd string into a dictionary of card search criteria and print design
             args = nets_parser.parse_args(string_to_parse.split())
-            # return args
             parser_dictionary = vars(args)
-            if parser_dictionary['debug-flags']:
-                m_response += str(args) + "\n"
             # run through each key that we need to build up a list of words to check for exact existence,
             # and add them to the list, if they're in the args
             for key in parser_dictionary.keys():
-                # first build up the parameters that need to be concatonated
+                # first build up the parameters that need to be concatenated
                 if key in concat_categories:
                     if parser_dictionary[key] is not None:
                         # Add the key to the printed result, if it's not already included
-                        if key not in default_print_fields:
-                            search_fields_appends.append(key)
+                        if key not in render_option.default_print_fields:
+                            render_option.print_fields.append(key)
                         # search parameters come in key: [['string'], ['other', 'string']
                         # for an input like: --flag string --flag other string
-                        # we'll treat each --flag {value} as a seperate criteria that must be met, and join the
+                        # we'll treat each --flag {value} as a separate criteria that must be met, and join the
                         # 'other' 'string' into a match 'other string' exactly.
                         for word_list in parser_dictionary[key]:
                             concat_string = ""
@@ -367,279 +546,160 @@ class Netrunner:
                                 concat_string += word + " "
                             if key in "title":
                                 concat_string = self.apply_title_transform_jokes(concat_string.strip())
-                            m_criteria_list.append((key, concat_string.strip()))
+                            search_criteria_list.append({key: list(concat_string.strip())})
                 # then check the lists that are done literally
                 if key in single_categories:
                     if parser_dictionary[key] is not None:
-                        if key not in default_print_fields:
-                            search_fields_appends.append(key)
-                        m_criteria_list.append((key, parser_dictionary[key]))
-            if not self.init_api:
-                self.refresh_nr_api()
+                        if key not in render_option.default_print_fields:
+                            render_option.print_fields.append(key)
+                        search_criteria_list.append({key, list(parser_dictionary[key])})
             # Apply legality set
-            check_legality_arg = re.search("(rotation)|(legacy)|(cr)", parser_dictionary['legality'].lower())
-            if check_legality_arg is not None:
-                if check_legality_arg.group(2) is not None:
-                    self.search_legality_regex = self.legacy_legal_code_regex
-                elif check_legality_arg.group(3) is not None:
-                    self.search_legality_regex = self.cache_refresh_legal_code_regex
-                else:  # check_legality_arg.group(1) is not None:
-                    self.search_legality_regex = self.rotation_legal_code_regex
-            else:
-                self.search_legality_regex = self.rotation_legal_code_regex
-            m_match_list = self.search_text(m_criteria_list)
-            # redirecting to special images for specific input
-            redirect = self.apply_title_redirect_jokes(string_to_parse.split()[0])
-            if redirect:
-                m_response = redirect
-            elif len(m_match_list) == 0:
-                m_response = "Search criteria returned 0 results\n"
-                m_response += string_to_parse
-            else:
-                #  figure out how we're going to respond, if we're images only, skip parsing and use this.
-                if parser_dictionary["image-only"]:
-                    for i, card in enumerate(m_match_list[:5]):
-                        m_response += self.get_card_url(card)
-                    if len(m_match_list) > 5:
-                        m_response += "[{0}/{1}]".format(5, len(m_match_list))
-                else:
-                    for i, card in enumerate(m_match_list):
-                        c_response = ""
-                        # we have a card, so let's add the default type fields, if any by type
-                        if card['type_code'] in extra_type_fields:
-                            for extra_field in extra_type_fields[card['type_code']]:
-                                if extra_field not in default_print_fields:
-                                    type_fields_appends.append(extra_field)
-                        # if the flag is set, skip all text info
-                        if parser_dictionary["title-only"]:
-                            print_fields = ['title']
-                        else:
-                            # our list of fields to print starts with the default list of keys for all cards
-                            print_fields = default_print_fields
-                            # Add any fields that the particular card needs by its type
-                            for field in type_fields_appends:
-                                if field not in print_fields:
-                                    print_fields.append(field)
-                            # add any fields that the user explicitly searched for
-                            for field in search_fields_appends:
-                                if field not in print_fields:
-                                    print_fields.append(field)
-                        c_response += "```\n"
-                        for c_key in print_fields:
-                            if c_key in card.keys():
-                                c_response += self.transform_api_items_to_printable_format(c_key, card[c_key])
-                                # if c_key not in special_fields:
-                                #    c_response += "{0}:\"{1}\"\n".format(
-                                #        c_key, self.replace_api_text_with_emoji(card[c_key]))
-                                # else:
-                                #    if c_key in 'uniqueness' and card[c_key] is True:
-                                #        c_response += '🔹:'
-                                #    if c_key in 'code':
-                                #        c_response += "http://netrunnerdb.com/card_image/{0}.png\n".format(
-                                #           card[c_key])
-                        c_response += "```\n"
-                        if (len(m_response) + len(c_response)) >= (self.max_message_len - 20):
-                            m_response += "\n[{0}/{1}]\n".format(i, len(m_match_list))
-                            break
-                        else:
-                            m_response += c_response
+            search_criteria_list.append({'legality': list(parser_dictionary['legality'].lower())})
+            # form print/display options
+            render_option.title_only = parser_dictionary['title-only']
+            render_option.image_only = parser_dictionary['image-only']
+            render_option.debug = parser_dictionary['debug-flags']
+            if parser_dictionary['debug-flags']:
+                error_string += str(args) + "\n"
         except DiscordArgparseParseError as dape:
             if dape.value is not None:
-                m_response += dape.value
+                error_string += dape.value
             if nets_parser.exit_message is not None:
-                m_response += nets_parser.exit_message
-        if len(m_response) >= self.max_message_len:
-            # truncate message if it exceed the character limit
-            m_response = m_response[:self.max_message_len - 10] + "\ncont..."
-        return m_response
+                error_string += nets_parser.exit_message
+            if len(error_string) >= self.max_message_len:
+                # truncate message if it exceed the character limit
+                error_string = error_string[:self.max_message_len - 10] + "\ncont..."
+        return search_criteria_list, render_option, error_string
+# def get_search_text(self, search_criteria_list, render_option):
+#     m_response = ""
+#     m_match_list = self.search_card(self.card_list, search_criteria_list)
+#     # redirecting to special images for specific input
+#     # redirect = self.apply_title_redirect_jokes(string_to_parse.split()[0])
+#     # if redirect:
+#     #     m_response = redirect
+#     #if len(m_match_list) == 0:
+#     #    m_response = "Search criteria returned 0 results\n"
+#     #    m_response += string_to_parse
+#     #else:
+#     #  figure out how we're going to respond, if we're images only, skip parsing and use this.
+#     if render_option.image_only:
+#         for i, card in enumerate(m_match_list[:5]):
+#             m_response += self.get_card_url(card)
+#         if len(m_match_list) > 5:
+#             m_response += "[{0}/{1}]".format(5, len(m_match_list))
+#     else:
+#         for i, card in enumerate(m_match_list):
+#             c_response = ""
+#             # we have a card, so let's add the default type fields, if any by type
+#             if card['type_code'] in extra_type_fields:
+#                 for extra_field in extra_type_fields[card['type_code']]:
+#                     if extra_field not in default_print_fields:
+#                         type_fields_appends.append(extra_field)
+#             # if the flag is set, skip all text info
+#             if result_config["title-only"]:
+#                 print_fields = ['title']
+#             else:
+#                 # our list of fields to print starts with the default list of keys for all cards
+#                 print_fields = default_print_fields
+#                 # Add any fields that the particular card needs by its type
+#                 for field in type_fields_appends:
+#                     if field not in print_fields:
+#                         print_fields.append(field)
+#                 # add any fields that the user explicitly searched for
+#                 for field in search_fields_appends:
+#                     if field not in print_fields:
+#                         print_fields.append(field)
+#             c_response += "```\n"
+#             for c_key in print_fields:
+#                 if c_key in card.keys():
+#                     c_response += self.transform_api_items_to_printable_format(c_key, card[c_key])
+#                     # if c_key not in special_fields:
+#                     #    c_response += "{0}:\"{1}\"\n".format(
+#                     #        c_key, self.replace_api_text_with_emoji(card[c_key]))
+#                     # else:
+#                     #    if c_key in 'uniqueness' and card[c_key] is True:
+#                     #        c_response += '🔹:'
+#                     #    if c_key in 'code':
+#                     #        c_response += "http://netrunnerdb.com/card_image/{0}.png\n".format(
+#                     #           card[c_key])
+#             c_response += "```\n"
+#             if (len(m_response) + len(c_response)) >= (self.max_message_len - 20):
+#                 m_response += "\n[{0}/{1}]\n".format(i, len(m_match_list))
+#                 break
+#             else:
+#                 m_response += c_response
+    def find_and_say_card(self, string_to_parse, use_embed=True):
+        search_criteria_list, render_option, error_string = self.flag_parse(string_to_parse)
+        num_matches = 0
+        for card in self.card_list:
+            if card.search_card_match(search_criteria_list):
+                num_matches += 1
+                if num_matches > self.max_card_search:
+                    continue
+                time.sleep(0.5)
+                if use_embed:
+                    self.bot.say(embed=card.render_embed(render_option))
+                else:
+                    self.bot.say(card.render_text(render_option))
+        if error_string:
+            time.sleep(0.5)
+            self.bot.say("I saw these errors: '{}'".format(error_string))
+        # TODO It'd be nice to calculate the pool of cards by legality that we searched...
+        time.sleep(0.5)
+        self.bot.say("listed {} of {} matched cards (total {})".format(
+            min(num_matches, self.max_card_search, ), num_matches, len(self.card_list)))
 
     @commands.command(name="flag_nets", aliases=['nets'])
     async def arg_parse_nets(self, *, string_to_parse: str):
-        m_response = self.flag_parse(string_to_parse)
-        await self.bot.say(m_response)
+        await self.find_and_say_card(string_to_parse, use_embed=False)
 
     @commands.command(name="flag_nets_cr", aliases=['netscr'])
     async def arg_parse_nets_cr(self, *, string_to_parse: str):
-        m_response = self.flag_parse(string_to_parse + " --legality cr")
-        await self.bot.say(m_response)
+        await self.find_and_say_card(string_to_parse + " --legality cr ", use_embed=False)
 
     @commands.command(name="flag_nets_legacy", aliases=['netslegacy'])
     async def arg_parse_nets_legacy(self, *, string_to_parse: str):
-        m_response = self.flag_parse(string_to_parse + " --legality cr")
-        await self.bot.say(m_response)
+        await self.find_and_say_card(string_to_parse + " --legality legacy ", use_embed=False)
 
-    @staticmethod
-    def fix_https(url):
-        # Fixes http:// to https:// from image urls
-        return re.sub('^http:', 'https:', url)
-
-    @staticmethod
-    def get_card_url(card):
-        # so we need to find the best image we can
-        # first we'll check for a listed URL in the card itself, newer cards use this syntax
-        if 'image_url' in card:
-            if card['image_url']:
-                return Netrunner.fix_https(card['image_url'])
-        # return "https://netrunnerdb.com/card_image/{}.png".format(card['code'])
-        return card
-
-    def transform_api_items_to_printable_format(self, api_key, value):
-        # this function transforms the internal keys used in the api to a more user friendly print format
-        value = self.replace_api_text_with_emoji(value)
-        if value is True:
-            unique_str = "🔹"
-        else:
-            unique_str = ""
-
-        key_transform = {
-            "title": "{0}".format(value),
-            "text": "\n\"{0}\"".format(value),
-            "cost": "\nCost: {0}".format(value),
-            "strength": "\nStr: {0}".format(value),
-            "keywords": ": {0}".format(value),
-            "type_code": "\n{0}".format(value),
-            "uniqueness": unique_str,
-            "faction_cost": " {0}▪".format(value),
-            "memory_cost": "\nMU: {0}".format(value),
-            "trash_cost": "\n{0}🗑".format(value),
-            "advancement_cost": "\nAdv: {0}".format(value),
-            "agenda_points": "\nAP: {0}".format(value),
-            "side_code": "\nside: {0}".format(value),
-            "faction_code": "\nfaction: {0}".format(value),
-            "pack_code": "\npack: {0}".format(value),
-            "position": "\nposition: {0}".format(value),
-            "quantity": "\nquantity: {0}\n".format(value),
-            "base_link": "{0}🔁".format(value),
-            "influence_limit": "/{0}\n".format(value),
-            "deck_limit": "\ndeck limit: {0}".format(value),
-            "minimum_deck_size": "\ndeck: {0}".format(value),
-            "flavor": "\n{0}".format(value),
-            "illustrator": "\nillustrator: {0}".format(value),
-            "code": "\nhttp://netrunnerdb.com/card_image/{0}.png".format(value)
-        }
-        return key_transform[api_key]
-
-    def parse_trace_tag(self, api_string):
-        trace_tag_g = re.sub("(<trace>Trace )(\d)(</trace>)", self.transform_trace, api_string, flags=re.I)
-        return trace_tag_g
-
-    def parse_strong_tag(self, api_string):
-        strong_g = re.sub("(<strong>)(.*?)(</strong>)", "**\g<2>**", api_string)
-        return strong_g
-
-    def replace_api_text_with_emoji(self, api_string):
-        if isinstance(api_string, str):
-            api_string = re.sub("(\[click\])", "🕖", api_string)
-            api_string = re.sub("(\[recurring-credit\])", "💰⮐", api_string)
-            api_string = re.sub("(\[credit\])", "💰", api_string)
-            api_string = re.sub("(\[subroutine\])", "↳", api_string)
-            api_string = re.sub("(\[trash\])", "🗑", api_string)
-            api_string = re.sub("(\[mu\])", "μ", api_string)
-            api_string = self.parse_trace_tag(api_string)
-            api_string = self.parse_strong_tag(api_string)
-        return api_string
-
-    @staticmethod
-    def replace_emoji_with_api_text(emoji_string):
-        emoji_string = emoji.demojize(emoji_string)
-        emoji_string = re.sub("🕖", "\[click\]", emoji_string)
-        emoji_string = re.sub("💰", "\[credit\]", emoji_string)
-        emoji_string = re.sub("💰⮐", "\[recurring-credit\)", emoji_string)
-        emoji_string = re.sub("↳", "\[subroutine\)", emoji_string)
-        emoji_string = re.sub("🗑", "\[trash\)", emoji_string)
-        emoji_string = re.sub("μ", "\[mu\)", emoji_string)
-
-        return emoji_string
-
-    """
-    criteria should be list of str.key:str.value tuples to be checked for exist in for each card
-    """
-
-    def sort_cards(self, cards):
-        # input should be a list of full card dictionaries to be sorted
-        # first sort by title
-        cards = sorted(cards, key=lambda card: card['title'])
-        # I should pre-sort the cards by sub types, before adding them to type major sort
-        # todo add that before this line.
-        # next sort by type
-        cards = sorted(cards, key=lambda card: self.type_code_sort[card['type_code']])
-        return cards
-
-    def search_text(self, criteria):
-        legal_code_re = re.compile(self.search_legality_regex)
-        m_match = []
-        card_match = True
-        for i, s_card in enumerate(self.nr_api):
-            if legal_code_re.search(s_card['code']):  # first exclude cards based on legality set
-                card_match = True
-                for c_key, c_value in criteria:
-                    if c_key in s_card.keys():
-                        try:
-                            if isinstance(c_value, int):
-                                if not isinstance(s_card[c_key], int):
-                                    if not int(c_value) == int(s_card[c_key]):
-                                        card_match = False
-                                        break
-                            elif isinstance(s_card[c_key], int):
-                                if not int(c_value) == s_card[c_key]:
-                                    card_match = False
-                                    break
-                            elif s_card[c_key] is None:
-                                break
-                                # print("None value from search for on " + s_card['code'])
-                            else:
-                                if not unidecode(c_value.lower()) in unidecode(s_card[c_key]).lower():
-                                    card_match = False
-                                    break
-                                    # print("match on " + c_value)
-                        except ValueError:
-                            return []
-                            # m_response += "Value error parsing search!" + s_card['code'] + "\n"
-                            # return m_response
-                            # print("ValueError on value from search " +
-                            #  c_key + " for " + c_value + " on " + s_card['code'])
-                    else:
-                        card_match = False
-                        break
-                if card_match:
-                    m_match.append(s_card)
-        return m_match
-
-    def refresh_nr_api(self):
-        nr_api_all = requests.get('https://netrunnerdb.com/api/2.0/public/cards').json()
-        if nr_api_all['success']:
-            self.nr_api_version_number = nr_api_all['version_number']
-            self.nr_api_url_template = nr_api_all['imageUrlTemplate']
-            self.nr_api_total = nr_api_all['total']
-            self.nr_api_last_updated = nr_api_all['last_updated']
-            self.nr_api = sorted([c for c in nr_api_all['data']], key=lambda card: card['code'])
-            self.init_api = True
-        self.build_card_list()
-
-    def build_card_list(self):
-        if not self.init_api:
-            self.refresh_nr_api()
-        for api_card_dict in self.nr_api:
-            if NetrunnerDBCard.is_valid_card_dict(api_card_dict):
-                self.card_list.append(NetrunnerDBCard(api_card_dict))
-
-    @staticmethod
-    def transform_trace(re_obj):
-        ss_conv = {
-            '0': '⁰',
-            '1': '¹',
-            '2': '²',
-            '3': '³',
-            '4': '⁴',
-            '5': '⁵',
-            '6': '⁶',
-            '7': '⁷',
-            '8': '⁸',
-            '9': '⁹',
-        }
-        ret_string = "Trace"
-        ret_string += ss_conv[re_obj.group(2)] + " -"
-        return ret_string
+#def search_text(self, criteria):
+#        legal_code_re = re.compile(self.search_legality_regex)
+#        m_match = []
+#        card_match = True
+#        for i, s_card in enumerate(self.nr_api):
+#            if legal_code_re.search(s_card['code']):  # first exclude cards based on legality set
+#                card_match = True
+#                for c_key, c_value in criteria:
+#                    if c_key in s_card.keys():
+#                        try:
+#                            if isinstance(c_value, int):
+#                                if not isinstance(s_card[c_key], int):
+#                                    if not int(c_value) == int(s_card[c_key]):
+#                                        card_match = False
+#                                        break
+#                            elif isinstance(s_card[c_key], int):
+#                                if not int(c_value) == s_card[c_key]:
+#                                    card_match = False
+#                                    break
+#                            elif s_card[c_key] is None:
+#                                break
+#                                # print("None value from search for on " + s_card['code'])
+#                            else:
+#                                if not unidecode(c_value.lower()) in unidecode(s_card[c_key]).lower():
+#                                    card_match = False
+#                                    break
+#                                    # print("match on " + c_value)
+#                        except ValueError:
+#                            return []
+#                            # m_response += "Value error parsing search!" + s_card['code'] + "\n"
+#                            # return m_response
+#                            # print("ValueError on value from search " +
+#                            #  c_key + " for " + c_value + " on " + s_card['code'])
+#                    else:
+#                        card_match = False
+#                        break
+#                if card_match:
+#                    m_match.append(s_card)
+#        return m_match
 
     @staticmethod
     def apply_title_transform_jokes(card_title_criteria):
@@ -679,76 +739,17 @@ class Netrunner:
         else:
             return None
 
-    """
-    Experimental section to test string parsing
-    I want to turn
-    !nr "title:deja influence:"
-    title:value|text:value|influence:number
-    by default?
-    but also still support
-    !nr <title>
-    <card image link>
-    """
-
     @commands.command(aliases=['nr', 'netrunner'])
-    async def nr_flags(self, *, card_search: str):
-        m_response = self.flag_parse(card_search + " --image-only")
-        # await self.bot.say(m_response)
-        description = ""
-        for i, card in enumerate(m_response.split("\n")):
-            time.sleep(0.5)
-            embed_response = discord.Embed(title="[{}]".format(i), type="rich")
-            url_search = self.get_card_url(card)
-            if url_search is not None:
-                embed_response.set_image(url=url_search)
-                embed_response.description = "'{}'".format(card)
-                await self.bot.say(embed=embed_response)
-            else:
-                description += card
-        if len(description) > 0:
-            embed_response = discord.Embed(title="search results:", type="rich")
-            embed_response.description = description
-            await self.bot.say(embed=embed_response)
+    async def nr_flags(self, *, string_to_parse: str):
+        await self.find_and_say_card(string_to_parse + " --image-only ", use_embed=True)
 
     @commands.command(aliases=['nrcr', 'cache_refresh'])
-    async def cr_flags(self, *, card_search: str):
-        m_response = self.flag_parse(card_search + " --image-only --legality cr")
-        # await self.bot.say(m_response)
-        description = ""
-        for i, card in enumerate(m_response.split("\n")):
-            time.sleep(0.5)
-            embed_response = discord.Embed(title="[{}]".format(i), type="rich")
-            url_search = self.get_card_url(card)
-            if url_search is not None:
-                embed_response.set_image(url=url_search)
-                embed_response.description = "'{}'".format(card)
-                await self.bot.say(embed=embed_response)
-            else:
-                description += card
-        if len(description) > 0:
-            embed_response = discord.Embed(title="search results:", type="rich")
-            embed_response.description = description
-            await self.bot.say(embed=embed_response)
+    async def cr_flags(self, *, string_to_parse: str):
+        await self.find_and_say_card(string_to_parse + " --image-only --legality cr ", use_embed=True)
 
     @commands.command(aliases=['nrleg', 'nr_legacy'])
-    async def legacy_flags(self, *, card_search: str):
-        m_response = self.flag_parse(card_search + " --image-only --legality legacy")
-        # await self.bot.say(m_response)
-        description = ""
-        for i, card in enumerate(m_response.split("\n")):
-            time.sleep(0.5)
-            embed_response = discord.Embed(title="[{}]".format(i), type="rich")
-            url_search = self.get_card_url(card)
-            if url_search is not None:
-                embed_response.set_image(url=url_search)
-                embed_response.description = "'{}'".format(card)
-                await self.bot.say(embed=embed_response)
-            else:
-                description += card
-        if len(description) > 0:
-            embed_response = discord.Embed(title="search results:", type="rich")
-            embed_response.description = description
-            await self.bot.say(embed=embed_response)
+    async def legacy_flags(self, *, string_to_parse: str):
+        await self.find_and_say_card(string_to_parse + " --image-only --legality legacy ", use_embed=True)
 
     def rich_embed_deck_parse(self, deck_id):
         # m_response = ""
@@ -855,6 +856,30 @@ class Netrunner:
                 await self.bot.say(se.value)
             if quiz_opts.exit_message is not None:
                 await self.bot.say(quiz_opts.exit_message)
+
+    @staticmethod
+    def search_card(card_list, search_criteria):
+        """
+        :param card_list: take in a list of card obj to search for a subset of
+        :param search_criteria: criteria by which we subset the card
+        :return: list(NetrunnerDBCard)
+        """
+        final_list = list()
+        for card in card_list:
+            if card.search_card_match(search_criteria):
+                final_list.append(card)
+        return final_list
+
+    @staticmethod
+    def sort_cards(cards):
+        # input should be a list of full card dictionaries to be sorted
+        # first sort by title
+        cards = sorted(cards, key=lambda card: card.title)
+        # I should pre-sort the cards by sub types, before adding them to type major sort
+        # todo add that before this line.
+        # next sort by type
+        cards = sorted(cards, key=lambda card: card.get_type_code_sort_val())
+        return cards
 
 
 def test_arg_parse_nets(string_to_parse: str):
