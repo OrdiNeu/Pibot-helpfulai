@@ -636,7 +636,8 @@ class Netrunner:
 
     @commands.command(name="flag_nets", aliases=['nets'])
     async def arg_parse_nets(self, *, string_to_parse: str):
-        self.find_and_say_card(string_to_parse, use_embed=False)
+        await self.bot.say("flag_nets debug print, the arguments were '{}'".format(string_to_parse))
+        await self.find_and_say_card(string_to_parse, use_embed=False)
 
     @commands.command(name="flag_nets_cr", aliases=['netscr'])
     async def arg_parse_nets_cr(self, *, string_to_parse: str):
