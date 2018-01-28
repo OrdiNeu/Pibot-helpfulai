@@ -109,6 +109,12 @@ class NetrunnerDBCard:
         self.default_print_fields = [
             'uniqueness', 'base_link', 'title', 'cost', 'type_code', 'keywords', 'text', 'strength', 'trash_cost',
             'faction_code', 'faction_cost', ]
+        self.all_print_fields = [
+            'code', 'deck_limit', 'faction_code', 'flavor', 'illustrator', 'influence_limit', 'keywords',
+             'minimum_deck_size', 'pack_code', 'position', 'quantity', 'side_code', 'text', 'title', 'type_code',
+             'uniqueness', 'base_link', 'cost', 'faction_cost', 'memory_cost', 'strength', 'advancement_cost',
+             'agenda_points', 'trash_cost', 'image_url', 'legality',
+        ]
 
     def assign_legality(self):
         self.legality = list()
@@ -169,7 +175,9 @@ class NetrunnerDBCard:
             "minimum_deck_size": "\ndeck: {0}".format(value),
             "flavor": "\n{0}".format(value),
             "illustrator": "\nillustrator: {0}".format(value),
-            "code": "\nhttp://netrunnerdb.com/card_image/{0}.png".format(value)
+            "code": "\n{0}".format(value),
+            "legality": "\n{}".format(value),
+            "image_url": "\n{}".format(value),
         }
         return key_transform[field]
 
@@ -295,6 +303,8 @@ class NetrunnerDBCard:
             for extra_field in self.extra_type_fields[self.type_code]:
                 if extra_field not in render_option.print_fields:
                     print_fields.append(extra_field)
+        if render_option.debug:
+            render_option.print_fields = self.all_print_fields
         # if we selected to only list the tile, skip the rest of the fields
         if render_option.title_only:
             if 'title' in self.__dict__:
@@ -316,7 +326,6 @@ class NetrunnerDBCard:
         image_url = self.get_card_image_url()
         if image_url is not None:
             embed_response.set_image(url=image_url)
-        # I was trying to wrap it in a css formatter, but it didn't seem to work right
         if not render_option.image_only:
             embed_response.description = "{}".format(self.render_text(render_option))
         return embed_response
