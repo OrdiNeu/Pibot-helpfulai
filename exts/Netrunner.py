@@ -672,6 +672,8 @@ class Netrunner:
     @commands.command(aliases=['broke'])
     async def nr_debug(self, *, cmd: str):
         await self.bot.say("debug print, the arguments were '{}'".format(cmd))
+        search_criteria_list, render_option, error_string = self.flag_parse(cmd)
+
 
     @commands.command(aliases=['nd'])
     async def deck(self, *, decklist: str):
