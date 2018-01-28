@@ -175,9 +175,9 @@ class NetrunnerDBCard:
             "minimum_deck_size": "\ndeck: {0}".format(value),
             "flavor": "\n{0}".format(value),
             "illustrator": "\nillustrator: {0}".format(value),
-            "code": "\n{0}".format(value),
-            "legality": "\n{}".format(value),
-            "image_url": "\n{}".format(value),
+            "code": "\nnrdb_code '{0}'".format(value),
+            "legality": "\nlegality sets '{}'".format(value),
+            "image_url": "\nimage_url'{}'".format(value),
         }
         return key_transform[field]
 
