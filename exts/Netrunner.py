@@ -497,14 +497,12 @@ class Netrunner:
         special_fields = ['code', 'uniqueness']
         nets_parser = DiscordArgParse(prog='flag_nets')
         # These first flags capture multiple words that follow, rather than the first word
-        concat_categories = ['title', 'text', 'keywords', 'flavor_text', 'illustrator', 'legality']
+        concat_categories = ['title', 'text', 'keywords', 'flavor_text', 'illustrator']
         nets_parser.add_argument(nargs="*", action="append", dest="title")
         nets_parser.add_argument('--text', '-x', nargs="+", action='append', dest="text")
         nets_parser.add_argument('--subtype', '-s', nargs="+", action='append', dest="keywords")
         nets_parser.add_argument('--flavor', '-a', nargs="+", action='append', dest="flavor_text")
         nets_parser.add_argument('--illustrator', '-i', nargs="+", action='append', dest="illustrator")
-        nets_parser.add_argument('-c', '--legality', action='store', dest="legality", default="rotation",
-                                 help="Pick among legality subsets: rotation | legacy | cr")
         # These flags capture a single type from a single word
         single_categories = [
             'type_code', 'faction_code', 'side_code', 'cost', 'advancement_cost', 'memory_cost', 'faction_cost',
@@ -526,6 +524,8 @@ class Netrunner:
         nets_parser.add_argument('-z', '--minimum-deck-size', action='store', type=int, dest="minimum_deck_size")
         nets_parser.add_argument('-b', '--trash', action='store', type=int, dest="trash_cost")
         nets_parser.add_argument('-u', '--unique', action='store', type=bool, dest="unique")
+        nets_parser.add_argument('-c', '--legality', action='store', dest="legality", default="rotation",
+                                 help="Pick among legality subsets: rotation | legacy | cr")
         # special flags
         nets_parser.add_argument('--title-only', action='store_true', dest="title-only")
         nets_parser.add_argument('--image-only', action='store_true', dest="image-only")
