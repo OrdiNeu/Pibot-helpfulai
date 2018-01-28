@@ -127,13 +127,17 @@ class NetrunnerDBCard:
             self.legality.append('rotation')
     def transform_api_field_to_printable_format(self, field):
         # this function transforms the internal keys used in the api to a more user friendly print format
-        value = self.replace_api_text_with_emoji(self.__dict__[field])
-        # value = self.parse_trace_tag(value)
-        # value = self.parse_strong_tag(value)
-        if value is True:
-            unique_str = "🔹"
+        value_list = list()
+        value = ""
+        unique_str = ""
+        if type(self.__dict__[field]) is not list:
+            value_list.append(self.__dict__[field])
         else:
-            unique_str = ""
+            value_list = self.__dict__[field]
+        for v in value_list:
+            if v is True:
+                unique_str = "🔹"
+            value += self.replace_api_text_with_emoji(v) + " "
         key_transform = {
             "title": "{0}".format(value),
             "text": "\n\"{0}\"".format(value),
@@ -240,8 +244,13 @@ class NetrunnerDBCard:
                     return False
                 # if this card does have this key, if none of the values we're looking for match, it's not a match
                 for match_value in criteria[search_key]:
-                    if self.clean_api_value_for_compare(match_value) in \
-                            self.clean_api_value_for_compare(self.__dict__[search_key]):
+                    clean_match_val = self.clean_api_value_for_compare(match_value)
+                    # some card values are lists, if so, we iterate over their members
+                    if type(self.__dict__[search_key]) == list:
+                        for card_val in self.__dict__[search_key]:
+                            if clean_match_val in self.clean_api_value_for_compare(card_val):
+                                criteria_passed = True
+                    if clean_match_val in self.clean_api_value_for_compare(self.__dict__[search_key]):
                         # one of the values matched, so move on to the next criteria
                         criteria_passed = True
             # failed to match on one of the criteria, so it's not a match
