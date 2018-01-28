@@ -46,7 +46,7 @@ class NetrunnerDBCard:
             self.text = api_dict['text']
         self.image_url = None
         if 'image_url' in api_dict:
-            if api_dict['image_url'] is not None:
+            if api_dict['image_url']:
                 self.image_url = self.fix_https(api_dict['image_url'])
         # type should be int
         self.influence_limit = None
@@ -317,8 +317,8 @@ class NetrunnerDBCard:
         if image_url is not None:
             embed_response.set_image(url=image_url)
         # I was trying to wrap it in a css formatter, but it didn't seem to work right
-        if not render_option.title_only:
-            embed_response.description = "'{}'".format(self.render_text(render_option))
+        if not render_option.image_only:
+            embed_response.description = "{}".format(self.render_text(render_option))
         return embed_response
 
 
