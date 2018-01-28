@@ -563,7 +563,7 @@ class Netrunner:
                     if parser_dictionary[key] is not None:
                         value_list = list()
                         value_list.append(parser_dictionary[key])
-                        search_criteria_list += {key, value_list}
+                        search_criteria_list += {key: value_list}
                         if key not in self.default_print_fields:
                             render_option.print_fields.append(key)
             # form print/display options
