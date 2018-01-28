@@ -109,6 +109,7 @@ class NetrunnerDBCard:
         self.default_print_fields = [
             'uniqueness', 'base_link', 'title', 'cost', 'type_code', 'keywords', 'text', 'strength', 'trash_cost',
             'faction_code', 'faction_cost', ]
+
     def assign_legality(self):
         self.legality = list()
         # 2 decimal prefix: Any prefix except core2.0 + three decimal suffix
@@ -125,6 +126,7 @@ class NetrunnerDBCard:
             self.legality.append('cr')
         if re.search(rotation_legal_code_regex, "{:06}".format(self.code)):
             self.legality.append('rotation')
+
     def transform_api_field_to_printable_format(self, field):
         # this function transforms the internal keys used in the api to a more user friendly print format
         value_list = list()
@@ -135,6 +137,8 @@ class NetrunnerDBCard:
         else:
             value_list = self.__dict__[field]
         for v in value_list:
+            if v is None:
+                return ""
             if v is True:
                 unique_str = "🔹"
             if type(v) is str:
@@ -168,16 +172,20 @@ class NetrunnerDBCard:
             "code": "\nhttp://netrunnerdb.com/card_image/{0}.png".format(value)
         }
         return key_transform[field]
+
     @staticmethod
     def clean_api_value_for_compare(api_value):
         return unidecode(api_value.strip().lower())
+
     def parse_trace_tag(self, api_string):
         trace_tag_g = re.sub("(<trace>Trace )(\d)(</trace>)", self.transform_trace, api_string, flags=re.I)
         return trace_tag_g
+
     @staticmethod
     def parse_strong_tag(api_string):
         strong_g = re.sub("(<strong>)(.*?)(</strong>)", "**\g<2>**", api_string)
         return strong_g
+
     def replace_api_text_with_emoji(self, api_string):
         if isinstance(api_string, str):
             api_string = re.sub("(\[click\])", "🕖", api_string)
@@ -189,10 +197,12 @@ class NetrunnerDBCard:
             api_string = self.parse_trace_tag(api_string)
             api_string = self.parse_strong_tag(api_string)
         return api_string
+
     @staticmethod
     def fix_https(url):
         # Fixes http:// to https:// from image urls
         return re.sub('^http:', 'https:', url)
+
     @staticmethod
     def is_valid_card_dict(api_card_dict):
         primitive_keys = [
@@ -202,6 +212,7 @@ class NetrunnerDBCard:
             if key not in api_card_dict:
                 return False
         return True
+
     @staticmethod
     def transform_trace(re_obj):
         ss_conv = {
@@ -219,6 +230,7 @@ class NetrunnerDBCard:
         ret_string = "Trace"
         ret_string += ss_conv[re_obj.group(2)] + " -"
         return ret_string
+
     def get_card_image_url(self):
         # so we need to find the best image we can
         # first we'll check for a listed URL in the card itself, newer cards use this syntax
@@ -227,9 +239,11 @@ class NetrunnerDBCard:
         # else form the netrunnerdb image url
         # format the code from int to 0 back-filled string
         return "https://netrunnerdb.com/card_image/{:06}.png".format(self.code)
+
     def get_type_code_sort_val(self):
         return {'identity': 0, 'agenda': 1, 'asset': 2, 'upgrade': 3, 'operation': 4, 'ice': 5, 'event': 6,
                 'hardware': 7, 'resource': 8, 'program': 9}[self.type_code]
+
     def search_card_match(self, search_criteria):
         """
         :param search_criteria: should be a list of dictionary keys pointing to a list of matching criteria
@@ -261,6 +275,7 @@ class NetrunnerDBCard:
             if not criteria_passed:
                 return False
         return True
+
     def render_text(self, render_option):
         """
         :param render_option: options class with our settings for this card
@@ -290,6 +305,7 @@ class NetrunnerDBCard:
                 if field in self.__dict__:
                     description += self.transform_api_field_to_printable_format(field)
         return description
+
     def render_embed(self, render_option):
         """
         :param render_option: options class with our settings for this card
@@ -301,7 +317,8 @@ class NetrunnerDBCard:
         if image_url is not None:
             embed_response.set_image(url=image_url)
         # I was trying to wrap it in a css formatter, but it didn't seem to work right
-        embed_response.description = "'{}'".format(self.render_text(render_option))
+        if not render_option.title_only:
+            embed_response.description = "'{}'".format(self.render_text(render_option))
         return embed_response
 
 
