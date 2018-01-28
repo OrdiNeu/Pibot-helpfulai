@@ -137,7 +137,7 @@ class NetrunnerDBCard:
         for v in value_list:
             if v is True:
                 unique_str = "🔹"
-            if type(v) is not bool:
+            if type(v) is str:
                 value += self.replace_api_text_with_emoji(v) + " "
             else:
                 value = v
