@@ -497,12 +497,14 @@ class Netrunner:
         special_fields = ['code', 'uniqueness']
         nets_parser = DiscordArgParse(prog='flag_nets')
         # These first flags capture multiple words that follow, rather than the first word
-        concat_categories = ['title', 'text', 'keywords', 'flavor_text', 'illustrator']
+        concat_categories = ['title', 'text', 'keywords', 'flavor_text', 'illustrator', 'legality']
         nets_parser.add_argument(nargs="*", action="append", dest="title")
         nets_parser.add_argument('--text', '-x', nargs="+", action='append', dest="text")
         nets_parser.add_argument('--subtype', '-s', nargs="+", action='append', dest="keywords")
         nets_parser.add_argument('--flavor', '-a', nargs="+", action='append', dest="flavor_text")
         nets_parser.add_argument('--illustrator', '-i', nargs="+", action='append', dest="illustrator")
+        nets_parser.add_argument('-c', '--legality', action='store', dest="legality", default="rotation",
+                                 help="Pick among legality subsets: rotation | legacy | cr")
         # These flags capture a single type from a single word
         single_categories = [
             'type_code', 'faction_code', 'side_code', 'cost', 'advancement_cost', 'memory_cost', 'faction_cost',
@@ -528,8 +530,6 @@ class Netrunner:
         nets_parser.add_argument('--title-only', action='store_true', dest="title-only")
         nets_parser.add_argument('--image-only', action='store_true', dest="image-only")
         nets_parser.add_argument('--debug-flags', action='store_true', dest="debug-flags")
-        nets_parser.add_argument('-c', '--legality', action='store', dest="legality", default="rotation",
-                                 help="Pick among legality subsets: rotation | legacy | cr")
         try:
             # use the python module to turn the cmd string into a dictionary of card search criteria and print design
             args = nets_parser.parse_args(string_to_parse.split())
@@ -537,6 +537,9 @@ class Netrunner:
             # run through each key that we need to build up a list of words to check for exact existence,
             # and add them to the list, if they're in the args
             for key in parser_dictionary.keys():
+                if type(key) == list:
+                    error_string += "found a key '{}' which was a list()???\n"
+                    continue
                 # first build up the parameters that need to be concatenated
                 # entries in concat_category look like key: [['string], ['string']]
                 if key in concat_categories:
