@@ -624,7 +624,6 @@ class Netrunner:
     async def find_and_say_card(self, string_to_parse, use_embed=True):
         if not self.init_api:
             self.refresh_nr_api()
-        await self.bot.say("debug print, the arguments were '{}'".format(string_to_parse))
         search_criteria_list, render_option, error_string = self.flag_parse(string_to_parse)
         num_matches = 0
         for card in self.card_list:
@@ -673,6 +672,7 @@ class Netrunner:
     async def nr_debug(self, *, cmd: str):
         await self.bot.say("debug print, the arguments were '{}'".format(cmd))
         search_criteria_list, render_option, error_string = self.flag_parse(cmd)
+        await self.bot.say("debug print, finished with error string '{}'".format(error_string))
 
 
     @commands.command(aliases=['nd'])
