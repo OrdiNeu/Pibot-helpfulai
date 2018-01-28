@@ -250,9 +250,10 @@ class NetrunnerDBCard:
                         for card_val in self.__dict__[search_key]:
                             if clean_match_val in self.clean_api_value_for_compare(card_val):
                                 criteria_passed = True
-                    if clean_match_val in self.clean_api_value_for_compare(self.__dict__[search_key]):
-                        # one of the values matched, so move on to the next criteria
-                        criteria_passed = True
+                    else:
+                        if clean_match_val in self.clean_api_value_for_compare(self.__dict__[search_key]):
+                            # one of the values matched, so move on to the next criteria
+                            criteria_passed = True
             # failed to match on one of the criteria, so it's not a match
             if not criteria_passed:
                 return False
