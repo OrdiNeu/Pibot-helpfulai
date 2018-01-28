@@ -553,19 +553,19 @@ class Netrunner:
                             concat_list += word_list[:]
                         # if key in "title":
                         #    concat_string = self.apply_title_transform_jokes(concat_string.strip())
-                        search_criteria_list += {key: concat_list}
+                        search_criteria_list.append({key: concat_list})
                         # Add the key to the printed result, if it's not already included
-                        if key not in self.default_print_fields:
-                            render_option.print_fields.append(key)
+                        if key not in self.default_print_fields and key not in render_option.print_fields:
+                            render_option.print_fields += key
                 # then check the lists that are done with single value:
                 # looks like this: {'str': 5}
                 if key in single_categories:
                     if parser_dictionary[key] is not None:
                         value_list = list()
                         value_list.append(parser_dictionary[key])
-                        search_criteria_list += {key: value_list}
-                        if key not in self.default_print_fields:
-                            render_option.print_fields.append(key)
+                        search_criteria_list.append({key: value_list})
+                        if key not in self.default_print_fields and key not in render_option.print_fields:
+                            render_option.print_fields += key
             # form print/display options
             render_option.title_only = parser_dictionary['title-only']
             render_option.image_only = parser_dictionary['image-only']
