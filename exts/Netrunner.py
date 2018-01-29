@@ -894,8 +894,8 @@ class Netrunner:
         # I should pre-sort the cards by sub types, before adding them to type major sort
         # todo add that before this line.
         # next sort by type
-        for card, count in sorted(deck_list0.items(), key=lambda item: item[0].get_type_code_sort_val())
-            deck_list1 [card] = count
+        for card, count in sorted(deck_list0.items(), key=lambda item: item[0].get_type_code_sort_val()):
+            deck_list1[card] = count
         return deck_list1
 
 
