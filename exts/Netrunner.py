@@ -889,11 +889,13 @@ class Netrunner:
         deck_list1 = OrderedDict()
         # input should be a list of full card dictionaries to be sorted
         # first sort by title
-        deck_list0 += sorted(cards.items(), key=lambda item: item[0].title)
+        for card, count in sorted(cards.items(), key=lambda item: item[0].title):
+            deck_list0[card] = count
         # I should pre-sort the cards by sub types, before adding them to type major sort
         # todo add that before this line.
         # next sort by type
-        deck_list1 += sorted(deck_list0.items(), key=lambda item: item[0].get_type_code_sort_val())
+        for card, count in sorted(deck_list0.items(), key=lambda item: item[0].get_type_code_sort_val())
+            deck_list1 [card] = count
         return deck_list1
 
 
