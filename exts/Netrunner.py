@@ -290,13 +290,19 @@ class NetrunnerDBCard:
                     clean_match_val = self.clean_api_value_for_compare(match_value)
                     # some card values are lists, if so, we iterate over their members
                     if type(self.__dict__[search_key]) == list:
+                        criteria_passed = True
                         for card_val in self.__dict__[search_key]:
-                            if clean_match_val in self.clean_api_value_for_compare(card_val):
-                                criteria_passed = True
+                            if clean_match_val not in self.clean_api_value_for_compare(card_val):
+                                criteria_passed = False
                     else:
-                        if clean_match_val in self.clean_api_value_for_compare(self.__dict__[search_key]):
-                            # one of the values matched, so move on to the next criteria
-                            criteria_passed = True
+                        card_val = self.clean_api_value_for_compare(self.__dict__[search_key])
+                        if type(clean_match_val) is int and type(card_val) is int:
+                            if clean_match_val == card_val:
+                                criteria_passed = True
+                        else:
+                            if clean_match_val in card_val:
+                                # the values matched, so move on to the next criteria
+                                criteria_passed = True
             # failed to match on one of the criteria, so it's not a match
             if not criteria_passed:
                 return False
