@@ -198,6 +198,8 @@ class NetrunnerDBCard:
 
     @staticmethod
     def clean_api_value_for_compare(api_value):
+        if type(api_value) is int:
+            return api_value
         return unidecode(api_value.strip().lower())
 
     def parse_trace_tag(self, api_string):
