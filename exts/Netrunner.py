@@ -685,8 +685,8 @@ class Netrunner:
             type_section = ""
             last_type = ""
             # grab the deck ID, and use its colour as the embed color
-            deck_id = card_sort_list.get(0)
-            e_response.colour = deck_id.faction_color[deck_id.type_code]
+            # deck_id = card_sort_list.get(0)
+            # e_response.colour = deck_id.faction_color[deck_id.type_code]
             for card, count in card_sort_list.items():
                 # if this is the first card of its type, we'll print the previous cards as a new section
                 if card.type_code not in last_type:
