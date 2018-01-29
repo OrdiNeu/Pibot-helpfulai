@@ -9,6 +9,7 @@ from unidecode import unidecode
 import discord
 import emoji
 import requests
+from collections import OrderedDict
 from tabulate import tabulate
 from json.decoder import JSONDecodeError
 from discord.ext import commands
@@ -117,7 +118,7 @@ class NetrunnerDBCard:
         ]
         self.faction_color = {
             'jinteki': 0x660000,
-            'haas-bioroid': 0x9C4AC0,
+            'haas-bioroid': 0x4B285A,
             'weyland-consortium': 0x385547,
             'nbn': 0xFFEB2C,
             'neutral-corp': 0x574D43,
@@ -647,10 +648,8 @@ class Netrunner:
         return search_criteria_list, render_option, error_string
 
     def rich_embed_deck_parse(self, deck_id):
-        # m_response = ""
+        deck_list = dict()
         m_api_prefex = "https://netrunnerdb.com/api/2.0/public/decklist/"
-        card_sort_list = []
-        last_type = ""
         if not self.init_api:
             self.refresh_nr_api()
         try:
@@ -658,25 +657,28 @@ class Netrunner:
             # decklist_data[0]['cards'] is a dict with card_id keys to counts {'10005': 1}
             e_response = discord.Embed(title=decklist_data[0]['name'], type="rich")
             # build a list of tuples in the pairs, value(number of card), key (id of card)
-            for number, card_id in [(v, k) for (k, v) in decklist_data[0]['cards'].items()]:
-                # for number, card_id, in num_card_tup:
-                card_list = self.search_text([('code', card_id)])
-                if len(card_list) > 0:
-                    card = card_list[0]
-                # add a key to the dictionary with the number of instances, to use later
-                card['number'] = number
-                card_sort_list.append(card)
-            card_sort_list = self.sort_cards(card_sort_list)
-            # for each card, sorted by type, we'll create a new field, and add all cards from the list
+            for count, card_id in [(v, k) for (k, v) in decklist_data[0]['cards'].items()]:
+                search_criteria = [{'code': card_id}]
+                card_list = self.search_card(self.card_list, search_criteria)
+                # if more than one card matches somehow, we'll pick the last one
+                deck_list[card_list[-1]] = count
+            card_sort_list = self.sort_cards(deck_list)
+            # for each card, now sorted by type, we'll create a new field, and add all cards from the list
             type_section = ""
-            for card in card_sort_list:
-                type_section += "{0}x {1}\n".format(card['number'], card['title'])
-                if card['type_code'] not in last_type:
-                    # response_addr += "**{0}**\n".format
-                    format_code = card['type_code'][0].upper() + card['type_code'][1:]
-                    e_response.add_field(name=format_code, value=type_section, inline=False)
-                    last_type = card['type_code']
+            last_type = ""
+            # grab the deck ID, and use its colour as the embed color
+            deck_id = card_sort_list.get(0)
+            e_response.colour = deck_id.faction_color[deck_id.type_code]
+            for card, count in card_sort_list.items():
+                # if this is the first card of its type, we'll print the previous cards as a new section
+                if card.type_code not in last_type:
+                    # skip empty sections
+                    if last_type and type_section:
+                        e_response.add_field(name=last_type.upper(), value=type_section, inline=False)
                     type_section = ""
+                # add this card's title and count
+                type_section += "{}x {}\n".format(count, card.title)
+                last_type = card.type_code
             return e_response
         except JSONDecodeError as badUrlError:
             error_embed = discord.Embed(title="badUrlError", type="rich")
@@ -861,14 +863,20 @@ class Netrunner:
 
     @staticmethod
     def sort_cards(cards):
+        """
+        :param cards: dict to be ordered
+        :return: OrderedDict based on card order
+        """
+        deck_list0 = OrderedDict()
+        deck_list1 = OrderedDict()
         # input should be a list of full card dictionaries to be sorted
         # first sort by title
-        cards = sorted(cards, key=lambda card: card.title)
+        deck_list0 += sorted(cards.items(), key=lambda item: item[0].title)
         # I should pre-sort the cards by sub types, before adding them to type major sort
         # todo add that before this line.
         # next sort by type
-        cards = sorted(cards, key=lambda card: card.get_type_code_sort_val())
-        return cards
+        deck_list1 += sorted(deck_list0.items(), key=lambda item: item[0].get_type_code_sort_val())
+        return deck_list1
 
 
 def test_arg_parse_nets(string_to_parse: str):
