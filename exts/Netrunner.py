@@ -775,7 +775,6 @@ class Netrunner:
 
     @commands.command(aliases=['ndrand'])
     async def rand_deck(self):
-        m_response = ""
         today = time.strftime("%Y-%m-%d")
         decks = [c for c in requests.get(
             'https://netrunnerdb.com/api/2.0/public/decklists/by_date/%s' % today).json()['data']]
@@ -783,9 +782,9 @@ class Netrunner:
         id = str(decks[selection]['id'])
         hyphen_name = decks[selection]['name'].replace(" ", "-").lower()
         link = r"https://netrunnerdb.com/en/decklist/" + id + "/" + hyphen_name
-        m_response += link + "\n"
-        m_response += self.rich_embed_deck_parse(id)
-        await self.bot.say(m_response[:2000])
+        await self.bot.say(link + "\n")
+        time.sleep(0.1)
+        await self.bot.say(embed=self.rich_embed_deck_parse(id))
 
     @commands.command(pass_context=True)
     async def quiz(self, ctx):
