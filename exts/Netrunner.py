@@ -109,7 +109,7 @@ class NetrunnerDBCard:
         }
         self.default_print_fields = [
             'uniqueness', 'base_link', 'title', 'cost', 'type_code', 'keywords', 'text', 'strength', 'trash_cost',
-            'faction_code', 'faction_cost', ]
+            'faction_code', 'faction_cost', 'legality']
         self.all_print_fields = [
             'code', 'deck_limit', 'faction_code', 'flavor', 'illustrator', 'influence_limit', 'keywords',
              'minimum_deck_size', 'pack_code', 'position', 'quantity', 'side_code', 'text', 'title', 'type_code',
