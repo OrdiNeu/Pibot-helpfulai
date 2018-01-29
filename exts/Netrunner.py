@@ -719,7 +719,10 @@ class Netrunner:
     async def nr_debug(self, *, cmd: str):
         await self.bot.say("debug print, the arguments were '{}'".format(cmd))
         search_criteria_list, render_option, error_string = self.flag_parse(cmd)
-        await self.bot.say("debug print, finished with error string '{}'".format(error_string))
+        for card in self.card_list:
+            if card.search_card_match(search_criteria_list):
+                await self.bot.say("debug print, card is '{}', url is '{}'".format(
+                    card.code, card.get_card_image_url()))
 
     @commands.command(aliases=['nd'])
     async def deck(self, *, decklist: str):
