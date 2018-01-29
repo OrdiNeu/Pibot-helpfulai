@@ -247,7 +247,7 @@ class NetrunnerDBCard:
                 return self.image_url
         # else form the netrunnerdb image url
         # format the code from int to 0 back-filled string
-        return "https://netrunnerdb.com/card_image/{:06}.png".format(self.code)
+        return "https://netrunnerdb.com/card_image/{:05}.png".format(self.code)
 
     def get_type_code_sort_val(self):
         return {'identity': 0, 'agenda': 1, 'asset': 2, 'upgrade': 3, 'operation': 4, 'ice': 5, 'event': 6,
@@ -693,15 +693,15 @@ class Netrunner:
 
     @commands.command(name="flag_nets", aliases=['nets'])
     async def arg_parse_nets(self, *, string_to_parse: str):
-        await self.find_and_say_card(string_to_parse, use_embed=False)
+        await self.find_and_say_card(string_to_parse, use_embed=True)
 
     @commands.command(name="flag_nets_cr", aliases=['netscr'])
     async def arg_parse_nets_cr(self, *, string_to_parse: str):
-        await self.find_and_say_card(string_to_parse + " --legality cr ", use_embed=False)
+        await self.find_and_say_card(string_to_parse + " --legality cr ", use_embed=True)
 
     @commands.command(name="flag_nets_legacy", aliases=['netslegacy'])
     async def arg_parse_nets_legacy(self, *, string_to_parse: str):
-        await self.find_and_say_card(string_to_parse + " --legality legacy ", use_embed=False)
+        await self.find_and_say_card(string_to_parse + " --legality legacy ", use_embed=True)
 
     @commands.command(aliases=['nr', 'netrunner'])
     async def nr_flags(self, *, string_to_parse: str):
