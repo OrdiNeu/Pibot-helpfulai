@@ -115,6 +115,20 @@ class NetrunnerDBCard:
              'uniqueness', 'base_link', 'cost', 'faction_cost', 'memory_cost', 'strength', 'advancement_cost',
              'agenda_points', 'trash_cost', 'image_url', 'legality',
         ]
+        self.faction_color = {
+            'jinteki': 0x660000,
+            'haas-bioroid': 0x9C4AC0,
+            'weyland-consortium': 0x385547,
+            'nbn': 0xFFEB2C,
+            'neutral-corp': 0x574D43,
+            'shaper': 0x38CD2E,
+            'anarch': 0xCD632E,
+            'criminal': 0x2E78CD,
+            'adam': 0x878710,
+            'sunny-lebeau': 0x491349,
+            'apex': 0xA20323,
+            'neutral-runner': 0xF0EBE6,
+        }
 
     def assign_legality(self):
         self.legality = list()
@@ -325,11 +339,12 @@ class NetrunnerDBCard:
         # maybe don't always embed with title?
         embed_response = discord.Embed(title="[{}]".format(self.title), type="rich")
         image_url = self.get_card_image_url()
+        if self.faction_code in self.faction_color:
+            embed_response.colour = self.faction_color[self.faction_code]
         if image_url is not None:
             embed_response.set_image(url=image_url)
         if not render_option.image_only:
             embed_response.description = "{}".format(self.render_text(render_option))
-            embed_response.description += "\nimage_url\n '{}'".format(image_url)
         if render_option.debug:
             embed_response.description += self.get_card_image_url()
         return embed_response
