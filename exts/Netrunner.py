@@ -287,15 +287,19 @@ class NetrunnerDBCard:
                     return False
                 # if this card does have this key, if none of the values we're looking for match, it's not a match
                 clean_match_values = list()
+                clean_card_values = list()
                 for match_value in criteria[search_key]:
                     clean_match_values.append(self.clean_api_value_for_compare(match_value))
                 # some card values are lists, if so, we're checking our criteria is in the set, not exact matches
                 if type(self.__dict__[search_key]) == list:
+                    for card_value in self.__dict__[search_key]:
+                        clean_card_values.append(self.clean_api_value_for_compare(self.__dict__[card_value]))
+                    # each criteria in the match_value must exist in this card
                     criteria_passed = True
-                    for card_val in self.__dict__[search_key]:
-                        if clean_match_values not in self.clean_api_value_for_compare(card_val):
+                    for clean_match_value in clean_match_values:
+                        if clean_match_value not in clean_card_values:
                             criteria_passed = False
-                # if the card type is not a list, we want every criteria to be met or in the value
+                # if the card type is not a list, we want the single criteria to be met or in the value
                 else:
                     card_val = self.clean_api_value_for_compare(self.__dict__[search_key])
                     if type(criteria[search_key]) is int and type(card_val) is int:
