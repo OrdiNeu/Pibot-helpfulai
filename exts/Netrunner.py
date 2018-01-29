@@ -697,6 +697,9 @@ class Netrunner:
                 # add this card's title and count
                 type_section += "{}x {}\n".format(count, card.title)
                 last_type = card.type_code
+            # finally write the last type
+            if last_type and type_section:
+                e_response.add_field(name=last_type.upper(), value=type_section, inline=False)
             return e_response
         except JSONDecodeError as badUrlError:
             error_embed = discord.Embed(title="badUrlError", type="rich")
