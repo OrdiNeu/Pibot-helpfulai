@@ -286,23 +286,25 @@ class NetrunnerDBCard:
                     # print("didn't find key '{}' in card".format(search_key))
                     return False
                 # if this card does have this key, if none of the values we're looking for match, it's not a match
+                clean_match_values = list()
                 for match_value in criteria[search_key]:
-                    clean_match_val = self.clean_api_value_for_compare(match_value)
-                    # some card values are lists, if so, we iterate over their members
-                    if type(self.__dict__[search_key]) == list:
-                        criteria_passed = True
-                        for card_val in self.__dict__[search_key]:
-                            if clean_match_val not in self.clean_api_value_for_compare(card_val):
-                                criteria_passed = False
+                    clean_match_values.append(self.clean_api_value_for_compare(match_value))
+                # some card values are lists, if so, we're checking our criteria is in the set, not exact matches
+                if type(self.__dict__[search_key]) == list:
+                    criteria_passed = True
+                    for card_val in self.__dict__[search_key]:
+                        if clean_match_values not in self.clean_api_value_for_compare(card_val):
+                            criteria_passed = False
+                # if the card type is not a list, we want every criteria to be met or in the value
+                else:
+                    card_val = self.clean_api_value_for_compare(self.__dict__[search_key])
+                    if type(criteria[search_key]) is int and type(card_val) is int:
+                        if criteria[search_key] == card_val:
+                            criteria_passed = True
                     else:
-                        card_val = self.clean_api_value_for_compare(self.__dict__[search_key])
-                        if type(clean_match_val) is int and type(card_val) is int:
-                            if clean_match_val == card_val:
-                                criteria_passed = True
-                        else:
-                            if clean_match_val in card_val:
-                                # the values matched, so move on to the next criteria
-                                criteria_passed = True
+                        if criteria[search_key] in card_val:
+                            # the values matched, so move on to the next criteria
+                            criteria_passed = True
             # failed to match on one of the criteria, so it's not a match
             if not criteria_passed:
                 return False
