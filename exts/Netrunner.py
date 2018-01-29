@@ -675,10 +675,11 @@ class Netrunner:
             e_response = discord.Embed(title=decklist_data[0]['name'], type="rich")
             # build a list of tuples in the pairs, value(number of card), key (id of card)
             for count, card_id in [(v, k) for (k, v) in decklist_data[0]['cards'].items()]:
-                search_criteria = [{'code': int(card_id)}]
-                card_list = self.search_card(self.card_list, search_criteria)
-                # if more than one card matches somehow, we'll pick the last one
-                deck_list[card_list[-1]] = count
+                search_criteria = [{'code': [int(card_id), ]}]
+                for card in self.card_list:
+                    if card.search_card_match(search_criteria):
+                        deck_list[card] = count
+                        break
             card_sort_list = self.sort_cards(deck_list)
             # for each card, now sorted by type, we'll create a new field, and add all cards from the list
             type_section = ""
