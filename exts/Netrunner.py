@@ -134,12 +134,15 @@ class NetrunnerDBCard:
     def assign_legality(self):
         self.legality = list()
         # 2 decimal prefix: Any prefix except core2.0 + three decimal suffix
+        # big boxes # core1(00) | C&C(03) | H&P(05) | O&C(07) | D&D(09) | TD(13) | core2 (20)
+        # first rotation # | Gen(01) | Spn (02) # second  # spin(04) | lunar(06)
+        # third sansan(08) | Mumbad (10) # fourth flashpoint(11) | Red Sand (12) # fifth kitara (21)
         legacy_legal_code_regex = "((00)|(01)|(02)|(03)|(04)|(05)|(06)|(07)|(08)|(09)|(10)|(11)|(12)|(13))(\d\d\d)"
-        # 2 decimal prefix:  C&C | H&P | O&C | D&D | TD | Flashpoint | Red Sand | Core2.0 + three decimal suffix
-        cache_refresh_legal_code_regex = "((03)|(05)|(07)|(09)|(13)|(11)|(12)|(20))(\d\d\d)"
+        # 2 decimal prefix:                 | Flashpoint | Red Sand | Core2.0 + three decimal suffix
+        cache_refresh_legal_code_regex = "((03)|(05)|(07)|(09)|(13)|(20)|(12)|(21)(\d\d\d)"
         # 2 decimal prefix:  C&C | H&P | Lunar| O&C | SanSan | D&D | Mumbad | Flashpoint | Red Sand | TD |
         # Core2.0 + three decimal suffix
-        rotation_legal_code_regex = "((03)|(05)|(06)|(07)|(08)|(09)|(10)|(11)|(12)|(13)|(20))(\d\d\d)"
+        rotation_legal_code_regex = "((03)|(05)|(07)|(09)|(13)|(20)|(04)|(06)|(08)|(10)|(11)|(12)|(21)(\d\d\d)"
         # (rotation)|(legacy)|(cr)
         if re.search(legacy_legal_code_regex, "{:06}".format(self.code)):
             self.legality.append('legacy')
