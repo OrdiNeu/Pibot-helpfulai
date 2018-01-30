@@ -139,10 +139,10 @@ class NetrunnerDBCard:
         # third sansan(08) | Mumbad (10) # fourth flashpoint(11) | Red Sand (12) # fifth kitara (21)
         legacy_legal_code_regex = "((00)|(01)|(02)|(03)|(04)|(05)|(06)|(07)|(08)|(09)|(10)|(11)|(12)|(13))(\d\d\d)"
         # 2 decimal prefix:                 | Flashpoint | Red Sand | Core2.0 + three decimal suffix
-        cache_refresh_legal_code_regex = "((03)|(05)|(07)|(09)|(13)|(20)|(12)|(21)(\d\d\d)"
+        cache_refresh_legal_code_regex = "((03)|(05)|(07)|(09)|(13)|(20)|(12)|(21))(\d\d\d)"
         # 2 decimal prefix:  C&C | H&P | Lunar| O&C | SanSan | D&D | Mumbad | Flashpoint | Red Sand | TD |
         # Core2.0 + three decimal suffix
-        rotation_legal_code_regex = "((03)|(05)|(07)|(09)|(13)|(20)|(04)|(06)|(08)|(10)|(11)|(12)|(21)(\d\d\d)"
+        rotation_legal_code_regex = "((03)|(05)|(07)|(09)|(13)|(20)|(04)|(06)|(08)|(10)|(11)|(12)|(21))(\d\d\d)"
         # (rotation)|(legacy)|(cr)
         if re.search(legacy_legal_code_regex, "{:06}".format(self.code)):
             self.legality.append('legacy')
