@@ -16,7 +16,7 @@ class Fortune:
         self.bot = bot
         self.fortuned_users = {}
         self.last_check = datetime.date.today().day
-        self.banned_roles = ["The Tree of Woe", "The Cubes", "THE TESSERACT"]
+        self.banned_roles = ["the tree of woe", "the cubes", "the tesseract"]
 
     @staticmethod
     def check_fortune(val, minum, maxum):
@@ -43,7 +43,7 @@ class Fortune:
             if self.last_check == 13:
                 rand_val = int(rand_val / 2)
             for role in author_roles:
-                if role in self.banned_roles:
+                if role.lower().strip() in self.banned_roles:
                     await self.bot.say(":classical_building:")
                     rand_val = int((rand_val * 2) / 3)
             self.fortuned_users[author_id] = rand_val
