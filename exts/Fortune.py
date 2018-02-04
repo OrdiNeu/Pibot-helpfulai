@@ -16,6 +16,7 @@ class Fortune:
         self.bot = bot
         self.fortuned_users = {}
         self.last_check = datetime.date.today().day
+        self.banned_roles = ["The Tree of Woe", "The Cubes", "THE TESSERACT"]
 
     @staticmethod
     def check_fortune(val, minum, maxum):
@@ -24,27 +25,34 @@ class Fortune:
         else:
             return False
 
-    async def get_fortune(self, author_id):
+    async def get_fortune(self, author_id, author_roles):
         """Grab today's fortune for the given user"""
+        for role in author_roles:
+            if role in self.banned_roles:
+                await self.bot.say(":classical_building:")
         # Refresh the fortunes if the day changes
         if datetime.date.today().day != self.last_check:
             self.fortuned_users = {}
+            self.last_check = datetime.date.today().day
         # Assign this user a fortune if they don't have one yet
         if author_id not in self.fortuned_users.keys():
             # set the seed to the author id + the day of the month + day of the year
-            random.seed(int(author_id) + datetime.date.today().day + datetime.date.today().month)
+            random.seed(int(author_id) + datetime.date.today().day +
+                        datetime.date.today().month + datetime.date.today().year)
             rand_val = random.randrange(0, 100)
             if self.last_check == 13:
                 rand_val = int(rand_val / 2)
-            if author_id in "101003766655885312":
-                rand_val = int((rand_val * 2) / 3)
+            for role in author_roles:
+                if role in self.banned_roles:
+                    await self.bot.say(":classical_building:")
+                    rand_val = int((rand_val * 2) / 3)
             self.fortuned_users[author_id] = rand_val
         return self.fortuned_users[author_id]
 
     @commands.command(aliases=['fortuna', 'bib'], pass_context=True)
     async def fortune(self, ctx):
         """Grabs your fortune for the day!"""
-        fort = await self.get_fortune(ctx.message.author.id)
+        fort = await self.get_fortune(ctx.message.author.id, ctx.message.author.roles)
         fortune = {
             self.check_fortune(fort, 99, 100): {
                 "text": "**PERFECT!**\nGo confess your love! Go ace that test! Today is your day!\nＹＡＨ♪☆0(＾＾0)＾＾(0＾＾)0☆♪ＹＡＨ",
