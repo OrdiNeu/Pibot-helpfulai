@@ -43,7 +43,7 @@ class Fortune:
             if self.last_check == 13:
                 rand_val = int(rand_val / 2)
             for role in author_roles:
-                if role.lower().strip() in self.banned_roles:
+                if role.name.lower().strip() in self.banned_roles:
                     await self.bot.say(":classical_building:")
                     rand_val = int((rand_val * 2) / 3)
             self.fortuned_users[author_id] = rand_val
