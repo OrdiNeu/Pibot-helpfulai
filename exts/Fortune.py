@@ -15,7 +15,8 @@ class Fortune:
     def __init__(self, bot):
         self.bot = bot
         self.fortuned_users = {}
-        self.last_check = datetime.date.today()
+        self.last_check = datetime.date.today().day
+        self.banned_roles = ["the tree of woe", "the cubes", "the tesseract"]
 
     @staticmethod
     def check_fortune(val, minum, maxum):
@@ -24,20 +25,34 @@ class Fortune:
         else:
             return False
 
-    async def get_fortune(self, author_id):
+    async def get_fortune(self, author_id, author_roles):
         """Grab today's fortune for the given user"""
+        for role in author_roles:
+            if role in self.banned_roles:
+                await self.bot.say(":classical_building:")
         # Refresh the fortunes if the day changes
-        if datetime.date.today() != self.last_check:
+        if datetime.date.today().day != self.last_check:
             self.fortuned_users = {}
+            self.last_check = datetime.date.today().day
         # Assign this user a fortune if they don't have one yet
-        if not author_id in self.fortuned_users.keys():
-            self.fortuned_users[author_id] = random.randrange(0, 100)
+        if author_id not in self.fortuned_users.keys():
+            # set the seed to the author id + the day of the month + day of the year
+            random.seed(int(author_id) + datetime.date.today().day +
+                        datetime.date.today().month + datetime.date.today().year)
+            rand_val = random.randrange(0, 100)
+            if self.last_check == 13:
+                rand_val = int(rand_val / 2)
+            for role in author_roles:
+                if role.name.lower().strip() in self.banned_roles:
+                    # await self.bot.say(":classical_building:")
+                    rand_val = int((rand_val * 2) / 3)
+            self.fortuned_users[author_id] = rand_val
         return self.fortuned_users[author_id]
 
-    @commands.command(aliases=['fortuna'], pass_context=True)
+    @commands.command(aliases=['fortuna', 'bib'], pass_context=True)
     async def fortune(self, ctx):
         """Grabs your fortune for the day!"""
-        fort = await self.get_fortune(ctx.message.author.id)
+        fort = await self.get_fortune(ctx.message.author.id, ctx.message.author.roles)
         fortune = {
             self.check_fortune(fort, 99, 100): {
                 "text": "**PERFECT!**\nGo confess your love! Go ace that test! Today is your day!\nＹＡＨ♪☆0(＾＾0)＾＾(0＾＾)0☆♪ＹＡＨ",
@@ -90,10 +105,10 @@ class Fortune:
                 "img": "http://68.media.tumblr.com/938a2d4fb94cae500839d9dccd3881be/tumblr_mn9j2tU3YU1s3kvg9o1_500.gif"
             }
         }
-        e = discord.Embed(description= "{}, your fortune is: {}".format(ctx.message.author.mention, fortune[True]["text"]),
-                          colour=int(fortune[True]["colour"], 16),
-                          )
-        if ctx.invoked_with == "fortuna":
+        e = discord.Embed(
+            description="{}, your fortune is: {}".format(ctx.message.author.mention, fortune[True]["text"]),
+            colour=int(fortune[True]["colour"], 16))
+        if ctx.invoked_with == "fortuna" or ctx.invoked_with == "bib":
             e.set_image(url=fortune[True]["img"])
         await self.bot.say(embed=e)
 

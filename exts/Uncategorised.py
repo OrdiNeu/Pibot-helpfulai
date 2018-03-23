@@ -27,7 +27,7 @@ class Uncategorised:
         response = "http://generated.inspirobot.me/0" + numberA + "/aXm" + str(number) + "xjU.jpg"
         await self.bot.say(response)
 
-    @commands.command()
+    @commands.command(aliases=['rat'])
     async def pokemon(self):
         """Posts a randomly fused Pokemon"""
         site = "http://pokemon.alexonsager.net/"
@@ -244,6 +244,79 @@ class Uncategorised:
         """Temporary testing rig for alarms"""
         new_alarm = Uncategorised.BugMe(self.bot, ctx.message.channel)
         new_alarm.attach(5)
+
+    @commands.command(aliases=['role_up'], pass_context=True)
+    async def add_role(self, ctx):
+        role_search = re.compile("(.*?[!?]role_up\s)(.*)")
+        server_roles = ctx.message.server.roles
+        user_roles = ctx.message.author.roles
+        search_role = role_search.search(ctx.message.content)
+        try:
+            if search_role is not None:
+                target_role = search_role.group(2)
+                for role in server_roles:
+                    if target_role in role.name:
+                        if role not in user_roles:
+                            await self.bot.add_roles(ctx.message.author, role)
+                            await self.bot.say(":ok_hand:")
+        except discord.Forbidden as df:
+            await self.bot.say("I lack sufficient permissions to do that: '{}".format(df.text))
+
+    @commands.command(aliases=['role_tide'], pass_context=True)
+    async def remove_role(self, ctx):
+        role_search = re.compile("(.*?[!?]role_tide\s)(.*)")
+        user_roles = ctx.message.author.roles
+        search_role = role_search.search(ctx.message.content)
+        try:
+            if role_search is not None:
+                target_role = search_role.group(2)
+                for role in user_roles:
+                    if target_role in role.name:
+                        await self.bot.remove_roles(ctx.message.author, role)
+                        await self.bot.say(":ok_hand:")
+
+        except discord.Forbidden as df:
+            await self.bot.say("I lack sufficient permissions to do that: '{}".format(df.text))
+
+    @commands.command(aliases=["clan"], pass_context=True)
+    async def swap_role(self, ctx):
+        role_search = re.compile("(.*?[!?]clan\s)(.*)")
+        search_role = role_search.search(ctx.message.content)
+        valid_clans = ["crab", "crane", "dragon", "lion", "mantis", "phoenix", "scorpion", "unicorn", "spider", "ronin"]
+        clan_emojii = [":crab:"]
+        valid_roles = list()
+        new_valid_role = None
+        user_roles = ctx.message.author.roles
+        if role_search is not None:
+            target_role = search_role.group(2).lower()
+            if target_role in valid_clans:
+                # find list of role objects
+                server_roles = ctx.message.server.roles
+                try:
+                    for role in server_roles:
+                        if role.name.lower() in valid_clans:
+                            valid_roles.append(role)
+                        # while we're searching, save the target role
+                        if role.name.lower() in target_role:
+                            new_valid_role = role
+                    # remove any current clans from current user's list
+                    for role in valid_roles:
+                        await self.bot.remove_roles(ctx.message.author, role)
+                    # Add the new role
+                    if new_valid_role is not None:
+                        await self.bot.add_roles(ctx.message.author, new_valid_role)
+                        await self.bot.say(":ok_hand:")
+                        if new_valid_role in valid_roles:
+                            valid_roles.remove(new_valid_role)
+                    # remove any current clans from current user's list
+                        for role in valid_roles:
+                            await self.bot.remove_roles(ctx.message.author, role)
+                except discord.Forbidden as df:
+                    await self.bot.say("I lack sufficient permissions to do that: '{}".format(df.text))
+            else:
+                await self.bot.say("I couldn't find the role '{}' to assign you to".format(target_role))
+
+
 
 def setup(bot):
     bot.add_cog(Uncategorised(bot))

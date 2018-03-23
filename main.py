@@ -4,6 +4,7 @@ import datetime
 import os
 import sys
 import traceback
+import re
 
 from discord.ext import commands
 import json
@@ -15,6 +16,7 @@ import exts.utils.alarm
 
 # CONSTANTS ###################################################################
 COMMAND_PREFIX = ['?', '!']
+COMMAND_REGEX = re.compile('((^[!?]\w*)(.*))|(\s([!?]\w*)(.*))')
 DESCRIPTION = 'OrdiNeu\'s Discord bot for the Netrunner channel.'
 HELP_ATTRS = {'hidden': True}
 EXTENSIONS = [
@@ -25,7 +27,8 @@ EXTENSIONS = [
     'exts.Fortune',
     'exts.Chan',
     'exts.reddit',
-    'exts.Uncategorised'
+    'exts.LFR',
+    'exts.Uncategorised',
 ]
 
 bot = commands.Bot(
@@ -40,6 +43,7 @@ ERR_EXIT_CODE = 1
 
 # File to store the channel id scavenge was called from
 SCAVENGE_FILE_NAME = 'scavenge_channel.txt'
+
 
 # DISCORD CLIENT EVENT HANDLERS ###############################################
 @bot.event
@@ -114,13 +118,16 @@ async def on_reaction(reaction, user, added):
             for listener in exts.utils.listener.reaction_listeners[channel.id]:
                 await listener._check_and_act(reaction, user, added)
 
+
 @bot.event
 async def on_reaction_add(reaction, user):
     await on_reaction(reaction, user, True)
 
+
 @bot.event
 async def on_reaction_remove(reaction, user):
     await on_reaction(reaction, user, False)
+
 
 @bot.event
 async def on_message(msg):
@@ -136,14 +143,24 @@ async def on_message(msg):
     else:
         print("(PM) : " + msg.author.name + ": " + msg.content)
 
+    # use our previously compiled regex search on the message
+    re_search = COMMAND_REGEX.search(msg.content)
+    # if the search matches, we'll parse out the command part
+    if re_search is not None:
+        # if the first group is not None, it's the classic start of string section
+        if re_search.group(1) is not None:
+            msg.content = re_search.group(2).lower() + re_search.group(3)
+        # else it's specified later in the string, remove the prefix that's not a command, and continue
+        elif re_search.group(4) is not None:
+            msg.content = re_search.group(5).lower() + re_search.group(6)
     # lowercase the first word of the command (if it starts with the prefix)
-    if msg.content.startswith(tuple(COMMAND_PREFIX)):
-        text = msg.content
-        prefix_end = text.find(" ")
-        if prefix_end > 0:  # I.e. there was a space
-            msg.content = text[0:prefix_end].lower() + text[prefix_end:]
-        else:
-            msg.content = text.lower()
+    # if msg.content.startswith(tuple(COMMAND_PREFIX)):
+    #    text = msg.content
+    #    prefix_end = text.find(" ")
+    #    if prefix_end > 0:  # I.e. there was a space
+    #        msg.content = text[0:prefix_end].lower() + text[prefix_end:]
+    #    else:
+    #        msg.content = text.lower()
 
     # Handle listeners, if any are set:
     if msg.channel:
@@ -153,10 +170,12 @@ async def on_message(msg):
 
     await bot.process_commands(msg)
 
+
 # LOGIN AND RUN ###############################################################
 def load_credentials():
     with open('../pibot-discord-cred.json') as f:
         return json.load(f)
+
 
 def load_twitter():
     with open('../pibot-twitter-cred.json') as f:
