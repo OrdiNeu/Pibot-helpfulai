@@ -27,7 +27,7 @@ class NetrunQuiz(MsgListener):
         }
     INVALID_CATEGORIES = ["code", "deck_limit", "flavor", "pack_code", "position",
                           "quantity", "side_code", "title", "illustrator", "text",
-                          "keywords", "uniqueness"]
+                          "keywords", "uniqueness", "image_url"]
     MODE_ONESHOT = 0
     MODE_ROUNDS = 1
     MODE_FPTP = 2
