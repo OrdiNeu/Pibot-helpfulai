@@ -61,14 +61,12 @@ class Uncategorised:
         # generate the random numbers Gen 1-5 pok numbers
         randface = random.randrange(1, 494)
         randbod = random.randrange(1, 494)
-
         # leave third option (color) at default for now it seems buggy
         img = requests.get(imgurl.format(randface, randbod, 0)).text
-        name_text = requests.get(nameurl).text
+        name_text = requests.get(nameurl.format(randface, randbod, 0)).text
         name_search = regex.search(name_text)
         if name_search is not None:
             name = name_search.group(1)
-
         # turn into embed
         e = discord.Embed(title=name)
         # colour=?
