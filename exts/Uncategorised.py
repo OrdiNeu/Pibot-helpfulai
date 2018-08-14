@@ -48,6 +48,33 @@ class Uncategorised:
         e.set_image(url=url)
         await self.bot.say(embed=e)
 
+    @commands.command(aliases=['pokfusion'])
+    async def pok2(self):
+        """Posts a randomly fused Pokemon"""
+        # name URL section looks like:
+        # <div style="z-index: 10;  position: relative; left: -95px;top: 105px;" align="center"><b>Swamturn</b>
+        nameurl = "http://pokefusion.japeal.com/PKMColourV5.php?ver=3.2&p1={}&p2={}&c={}&&e=noone"
+        imgurl = "http://pokefusion.japeal.com/upload/{}X{}X{}.png"
+        regex = re.compile("<div style=\"z-index: 10;  position: relative; left: -95px;top: 105px;"
+                           "\" align=\"center\"><b>([A-Za-z0-9\s]*)</b>")
+        name = ""
+        # generate the random numbers Gen 1-5 pok numbers
+        randface = random.randrange(1, 494)
+        randbod = random.randrange(1, 494)
+
+        # leave third option (color) at default for now it seems buggy
+        img = requests.get(imgurl.format(randface, randbod, 0)).text
+        name_text = requests.get(nameurl).text
+        name_search = regex.search(name_text)
+        if name_search is not None:
+            name = name_search.group(1)
+
+        # turn into embed
+        e = discord.Embed(title=name)
+        # colour=?
+        e.set_image(url=img)
+        await self.bot.say(embed=e)
+
     @commands.command()
     async def garfemon(self):
         """Posts a random Garfemon"""
