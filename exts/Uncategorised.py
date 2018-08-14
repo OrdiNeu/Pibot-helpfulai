@@ -70,7 +70,7 @@ class Uncategorised:
         # turn into embed
         e = discord.Embed(title=name)
         # colour=?
-        e.set_image(url=img)
+        e.image(img)
         await self.bot.say(embed=e)
 
     @commands.command()
