@@ -68,9 +68,7 @@ class Uncategorised:
         if name_search is not None:
             name = name_search.group(1)
         # turn into embed
-        e = discord.Embed(title=name)
-        # colour=?
-        e.image(img)
+        e = discord.Embed(title=name, image=imgurl.format(randface, randbod, 0))
         await self.bot.say(embed=e)
 
     @commands.command()
