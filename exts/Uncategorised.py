@@ -54,16 +54,19 @@ class Uncategorised:
         # name URL section looks like:
         # <div style="z-index: 10;  position: relative; left: -95px;top: 105px;" align="center"><b>Swamturn</b>
         nameurl = "http://pokefusion.japeal.com/PKMColourV5.php?ver=3.2&p1={}&p2={}&c={}&&e=noone"
-        imgurl_form = "http://pokefusion.japeal.com/upload/{}X{}X{}.png"
+        requests_url = "http://pokefusion.japeal.com/{}/{}/{}"
+        imgurl = "http://pokefusion.japeal.com/upload/{}X{}X{}.png"
         regex = re.compile("<div style=\"z-index: 10;  position: relative; left: -95px;top: 105px;"
                            "\" align=\"center\"><b>([A-Za-z0-9\s]*)</b>")
         name = ""
         # generate the random numbers Gen 1-5 pok numbers
         randface = random.randrange(1, 494)
         randbod = random.randrange(1, 494)
-        imgurl = imgurl_form.format(randface, randbod, 0)
         # request the url with image to try to avoid the broken image problem
-        requests.get(imgurl)
+        status_code = requests.get(requests_url.format(randface, randbod, 0)).status_code
+        if status_code != 200:
+            await self.bot.say("Bad Pok img, try again")
+            return
         # leave third option (color) at default for now it seems buggy
         name_text = requests.get(nameurl.format(randface, randbod, 0)).text
         name_search = regex.search(name_text)
@@ -71,7 +74,7 @@ class Uncategorised:
             name = name_search.group(1)
         # turn into embed
         e = discord.Embed(title=name)
-        print(imgurl_form.format(randface, randbod, 0))
+        print(imgurl.format(randface, randbod, 0))
         e.set_image(url=imgurl)
         await self.bot.say(embed=e)
 
