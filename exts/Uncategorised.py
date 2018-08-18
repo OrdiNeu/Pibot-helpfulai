@@ -2,6 +2,7 @@
 ### PREAMBLE ##################################################################
 import re
 import random
+import time
 
 import discord
 import requests
@@ -76,6 +77,7 @@ class Uncategorised:
         e = discord.Embed(title=name)
         # print(imgurl.format(randface, randbod, 0))
         e.set_image(url=imgurl.format(randface, randbod, 0))
+        time.sleep(0.2)
         await self.bot.say(embed=e)
 
     @commands.command()
