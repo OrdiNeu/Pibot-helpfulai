@@ -68,6 +68,7 @@ class Uncategorised:
             name = name_search.group(1)
         # turn into embed
         e = discord.Embed(title=name)
+        print(imgurl.format(randface, randbod, 0))
         e.set_image(url=imgurl.format(randface, randbod, 0))
         await self.bot.say(embed=e)
 
