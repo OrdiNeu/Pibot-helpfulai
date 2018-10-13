@@ -15,6 +15,7 @@ class Fortune:
     def __init__(self, bot):
         self.bot = bot
         self.fortuned_users = {}
+        self.yesterday_users = {}
         self.last_check = datetime.date.today().day
         self.banned_roles = ["the tree of woe", "the cubes", "the tesseract"]
 
@@ -27,11 +28,13 @@ class Fortune:
 
     async def get_fortune(self, author_id, author_roles):
         """Grab today's fortune for the given user"""
-        for role in author_roles:
-            if role in self.banned_roles:
-                await self.bot.say(":classical_building:")
+        minimum_rand = 0
+        maximum_rand = 100
         # Refresh the fortunes if the day changes
         if datetime.date.today().day != self.last_check:
+            # cache the faithful users who ask fortune every day
+            self.yesterday_users = self.fortuned_users
+            # reset today's fortune
             self.fortuned_users = {}
             self.last_check = datetime.date.today().day
         # Assign this user a fortune if they don't have one yet
@@ -39,13 +42,17 @@ class Fortune:
             # set the seed to the author id + the day of the month + day of the year
             random.seed(int(author_id) + datetime.date.today().day +
                         datetime.date.today().month + datetime.date.today().year)
-            rand_val = random.randrange(0, 100)
-            if self.last_check == 13:
-                rand_val = int(rand_val / 2)
+            # give bonus fortune for the faithful
+            if author_id in self.yesterday_users:
+                minimum_rand += int((0.5 * self.yesterday_users[author_id]) % 100)
+            # punish the judged
             for role in author_roles:
                 if role.name.lower().strip() in self.banned_roles:
                     # await self.bot.say(":classical_building:")
-                    rand_val = int((rand_val * 2) / 3)
+                    maximum_rand = int((0.66 * self.yesterday_users[author_id]) % 100)
+            if self.last_check == 13:
+                maximum_rand = int(0.66 * maximum_rand)
+            rand_val = random.randrange(minimum_rand, maximum_rand)
             self.fortuned_users[author_id] = rand_val
         return self.fortuned_users[author_id]
 
