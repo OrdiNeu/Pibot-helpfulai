@@ -49,7 +49,10 @@ class Fortune:
             for role in author_roles:
                 if role.name.lower().strip() in self.banned_roles:
                     # await self.bot.say(":classical_building:")
-                    maximum_rand = int((0.66 * self.yesterday_users[author_id]) % 100)
+                    if author_id in self.yesterday_users:
+                        maximum_rand = int((0.66 * self.yesterday_users[author_id]) % 100)
+                    else:
+                        maximum_rand = int((0.66 * maximum_rand) % 100)
             if self.last_check == 13:
                 maximum_rand = int(0.66 * maximum_rand)
             rand_val = random.randrange(minimum_rand, maximum_rand)
