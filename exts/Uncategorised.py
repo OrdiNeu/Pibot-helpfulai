@@ -22,6 +22,9 @@ class Uncategorised:
             178, 198, 207, 225, 227, 233, 249, 250, 255, 256, 257, 276, 277, 278, 279, 333, 334, 344, 357, 373, 380,
             381, 393, 394, 395, 396, 397, 398, 430, 441, 468, 474, 488,
         ]
+        self.rat_nums = [
+            19, 20, 25, 26, 27, 172, 311, 312, 494
+        ]
 
     async def pokemon2_request(self, rand_face, rand_body, rand_color=0):
         """Posts a randomly fused Pokemon"""
@@ -111,6 +114,22 @@ class Uncategorised:
         else:
             rand_face = random.randrange(1, self.max_supported_pok2)
             rand_body = random.choice(self.burd_nums)
+        await self.pokemon2_request(rand_face=rand_face, rand_body=rand_body)
+
+    @commands.command()
+    async def rat(self):
+        """
+        post a random "burd" pokemon
+        at least either the head or the body has to be a "burd"
+        :return:
+        """
+        use_head_or_body = random.choice([True, False])
+        if use_head_or_body:
+            rand_face = random.choice(self.rat_nums)
+            rand_body = random.randrange(1, self.max_supported_pok2)
+        else:
+            rand_face = random.randrange(1, self.max_supported_pok2)
+            rand_body = random.choice(self.rat_nums)
         await self.pokemon2_request(rand_face=rand_face, rand_body=rand_body)
 
     @commands.command()
