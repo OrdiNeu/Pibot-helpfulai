@@ -10,11 +10,49 @@ from discord.ext import commands
 
 from .utils import twitter, scrollable, youtube, alarm
 
+
 class Uncategorised:
     """Currently uncategorised commands"""
 
     def __init__(self, bot):
         self.bot = bot
+        self.max_supported_pok2 = 494
+        self.burd_nums = [
+            15, 16, 17, 18, 21, 22, 41, 42, 54, 55, 83, 84, 85, 137, 142, 144, 145, 146, 149, 163, 164, 169, 176, 177,
+            178, 198, 207, 225, 226, 227, 233, 249, 250, 255, 256, 257, 276, 277, 278, 279, 329, 330, 333, 334, 344,
+            357, 373, 380, 381, 393, 394, 395, 396, 397, 398, 430, 441, 468, 474, 488
+        ]
+
+    async def pokemon2_request(self, rand_face, rand_body, rand_color=0):
+        """Posts a randomly fused Pokemon"""
+        # name URL section looks like:
+        # <div style="z-index: 10;  position: relative; left: -95px;top: 105px;" align="center"><b>Swamturn</b>
+        nameurl = "http://pokefusion.japeal.com/PKMColourV5.php?ver=3.2&p1={}&p2={}&c={}&&e=noone"
+        "http://pokefusion.japeal.com/PKMColourV5.php?ver=3.2&p1=12&p2=148&c=0&&e=noone"
+        requests_url = "http://pokefusion.japeal.com/{}/{}/{}"
+        imgurl = "http://pokefusion.japeal.com/upload/{}X{}X{}.png"
+        regex = re.compile("<div style=\"z-index: 10;  position: relative; left: -95px;top: 105px;"
+                           "\" align=\"center\"><b>([A-Za-z0-9\s]*)</b>")
+        name = ""
+        # generate the random numbers Gen 1-5 pok numbers
+        # randface = random.randrange(1, 494)
+        # randbod = random.randrange(1, 494)
+        # request the url with image to try to avoid the broken image problem
+        status_code = requests.get(requests_url.format(rand_face, rand_body, rand_color)).status_code
+        if status_code != 200:
+            await self.bot.say("Bad Pok img, try again")
+            return
+        # leave third option (color) at default for now it seems buggy
+        name_text = requests.get(nameurl.format(rand_face, rand_body, rand_color)).text
+        name_search = regex.search(name_text)
+        if name_search is not None:
+            name = name_search.group(1)
+        # turn into embed
+        e = discord.Embed(title=name)
+        # print(imgurl.format(randface, randbod, rand_color))
+        e.set_image(url=imgurl.format(rand_face, rand_body, rand_color))
+        time.sleep(0.2)
+        await self.bot.say(embed=e)
 
     @commands.command()
     async def inspire(self):
@@ -51,34 +89,29 @@ class Uncategorised:
 
     @commands.command(aliases=['pokfusion'])
     async def pok2(self):
-        """Posts a randomly fused Pokemon"""
-        # name URL section looks like:
-        # <div style="z-index: 10;  position: relative; left: -95px;top: 105px;" align="center"><b>Swamturn</b>
-        nameurl = "http://pokefusion.japeal.com/PKMColourV5.php?ver=3.2&p1={}&p2={}&c={}&&e=noone"
-        requests_url = "http://pokefusion.japeal.com/{}/{}/{}"
-        imgurl = "http://pokefusion.japeal.com/upload/{}X{}X{}.png"
-        regex = re.compile("<div style=\"z-index: 10;  position: relative; left: -95px;top: 105px;"
-                           "\" align=\"center\"><b>([A-Za-z0-9\s]*)</b>")
-        name = ""
+        """
+        Posts a randomly fused Pokemon
+        """
         # generate the random numbers Gen 1-5 pok numbers
-        randface = random.randrange(1, 494)
-        randbod = random.randrange(1, 494)
-        # request the url with image to try to avoid the broken image problem
-        status_code = requests.get(requests_url.format(randface, randbod, 0)).status_code
-        if status_code != 200:
-            await self.bot.say("Bad Pok img, try again")
-            return
-        # leave third option (color) at default for now it seems buggy
-        name_text = requests.get(nameurl.format(randface, randbod, 0)).text
-        name_search = regex.search(name_text)
-        if name_search is not None:
-            name = name_search.group(1)
-        # turn into embed
-        e = discord.Embed(title=name)
-        # print(imgurl.format(randface, randbod, 0))
-        e.set_image(url=imgurl.format(randface, randbod, 0))
-        time.sleep(0.2)
-        await self.bot.say(embed=e)
+        rand_face = random.randrange(1, self.max_supported_pok2)
+        rand_body = random.randrange(1, self.max_supported_pok2)
+        await self.pokemon2_request(rand_face=rand_face, rand_body=rand_body, rand_color=0)
+
+    @commands.command()
+    async def burd(self):
+        """
+        post a random "burd" pokemon
+        at least either the head or the body has to be a "burd"
+        :return:
+        """
+        use_head_or_body = random.choice([True, False])
+        if use_head_or_body:
+            rand_face = random.choice(self.burd_nums)
+            rand_body = random.randrange(1, self.max_supported_pok2)
+        else:
+            rand_face = random.randrange(1, self.max_supported_pok2)
+            rand_body = random.choice(self.burd_nums)
+        await self.pokemon2_request(rand_face=rand_face, rand_body=rand_body)
 
     @commands.command()
     async def garfemon(self):
@@ -158,14 +191,14 @@ class Uncategorised:
             tweet_texts.append(tweet.text)
         response = scrollable.Scrollable(self.bot)
         await response.send(ctx.message.channel, tweet_texts)
-    
+
     @commands.command(aliases=['youtsube'], pass_context=True)
     async def youtube(self, ctx):
         """Grabs the YouTube upload list of the given user, as a scrollable."""
         if youtube.API is None:
             await self.bot.say("YouTube API not initialized")
             return
-        
+
         # Parse out the username
         username = ctx.message.content.split()
         if len(username) > 1:
@@ -177,12 +210,12 @@ class Uncategorised:
             elif uploads == youtube.ERROR_COULD_NOT_FIND_UPLOADS:
                 await self.bot.say("Couldn't find uploads by the given user")
             return
-        
+
         upload_urls = ["https://www.youtube.com/watch?v=" + s for s in uploads]
         response = scrollable.Scrollable(self.bot)
         await response.send(ctx.message.channel, upload_urls, locked_to=ctx.message.author)
 
-    @commands.command(aliases=['siivagunner', 'silvagunner'],pass_context=True)
+    @commands.command(aliases=['siivagunner', 'silvagunner'], pass_context=True)
     async def siiva(self, ctx):
         """Grabs the YouTube upload list of Siivagunner, an unregistered user."""
         if youtube.API is None:
@@ -190,12 +223,12 @@ class Uncategorised:
             return
 
         uploads = youtube.grabUploadsByPlaylistId("UU9ecwl3FTG66jIKA9JRDtmg")
-        
+
         upload_urls = ["https://www.youtube.com/watch?v=" + s for s in uploads]
         response = scrollable.Scrollable(self.bot)
         await response.send(ctx.message.channel, upload_urls, locked_to=ctx.message.author)
 
-    @commands.command(aliases=['flintstones'],pass_context=True)
+    @commands.command(aliases=['flintstones'], pass_context=True)
     async def flint(self, ctx):
         """Grabs the YouTube upload list of Siivagunner, an unregistered user."""
         if youtube.API is None:
@@ -209,6 +242,7 @@ class Uncategorised:
 
     class YouTubeAlarm(alarm.Alarm):
         """Waits for a new upload by the given YouTube channel, then tells everyone"""
+
         def __init__(self, bot, channel, playlistID):
             self.bot = bot
             self.playlistID = playlistID
@@ -227,12 +261,12 @@ class Uncategorised:
                 await self.bot.send_message(
                     self.channel,
                     'YouTube API not initialized'
-                    )
+                )
                 return
 
             uploads = youtube.grabUploadsByPlaylistId(self.playlistID)
             return uploads[0]
-    
+
         async def run(self):
             """Auto-run via alarm: check for a new upload"""
             newest_upload = await self.get_latest_upload
@@ -241,7 +275,7 @@ class Uncategorised:
                 await self.bot.send_message(
                     self.channel,
                     "https://www.youtube.com/watch?v=" + newest_upload
-                    )
+                )
             self.attach(3600)
 
     @commands.command(pass_context=True)
@@ -252,25 +286,26 @@ class Uncategorised:
             self.bot,
             ctx.message.channel,
             "UU9ecwl3FTG66jIKA9JRDtmg"
-            )
+        )
         await new_alarm.initialize()
         new_alarm.attach(3600)
         await self.bot.say("Ok, I will let you know when the next Siivagunner upload happens")
-    
+
     class BugMe(alarm.Alarm):
         """Temporary testing rig for alarms"""
+
         def __init__(self, bot, channel):
             self.bot = bot
             self.channel = channel
             super().__init__()
-        
+
         async def run(self):
             await self.bot.send_message(
                 self.channel,
                 'Test'
-                )
+            )
             self.attach(5)
-    
+
     @commands.command(pass_context=True)
     async def bugme(self, ctx):
         """Temporary testing rig for alarms"""
@@ -340,14 +375,13 @@ class Uncategorised:
                         await self.bot.say(":ok_hand:")
                         if new_valid_role in valid_roles:
                             valid_roles.remove(new_valid_role)
-                    # remove any current clans from current user's list
+                        # remove any current clans from current user's list
                         for role in valid_roles:
                             await self.bot.remove_roles(ctx.message.author, role)
                 except discord.Forbidden as df:
                     await self.bot.say("I lack sufficient permissions to do that: '{}".format(df.text))
             else:
                 await self.bot.say("I couldn't find the role '{}' to assign you to".format(target_role))
-
 
 
 def setup(bot):
