@@ -41,21 +41,25 @@ class Uncategorised:
         # randface = random.randrange(1, 494)
         # randbod = random.randrange(1, 494)
         # request the url with image to try to avoid the broken image problem
-        status_code = requests.get(requests_url.format(rand_face, rand_body, rand_color)).status_code
-        if status_code != 200:
-            await self.bot.say("Bad Pok img, try again")
-            return
-        # leave third option (color) at default for now it seems buggy
-        name_text = requests.get(nameurl.format(rand_face, rand_body, rand_color)).text
-        name_search = regex.search(name_text)
-        if name_search is not None:
-            name = name_search.group(1)
-        # turn into embed
-        e = discord.Embed(title=name)
-        # print(imgurl.format(randface, randbod, rand_color))
-        e.set_image(url=imgurl.format(rand_face, rand_body, rand_color))
-        time.sleep(0.2)
-        await self.bot.say(embed=e)
+        try:
+
+            status_code = requests.get(requests_url.format(rand_face, rand_body, rand_color)).status_code
+            if status_code != 200:
+                await self.bot.say("Bad Pok img, try again")
+                return
+            # leave third option (color) at default for now it seems buggy
+            name_text = requests.get(nameurl.format(rand_face, rand_body, rand_color)).text
+            name_search = regex.search(name_text)
+            if name_search is not None:
+                name = name_search.group(1)
+            # turn into embed
+            e = discord.Embed(title=name)
+            # print(imgurl.format(randface, randbod, rand_color))
+            e.set_image(url=imgurl.format(rand_face, rand_body, rand_color))
+            time.sleep(0.2)
+            await self.bot.say(embed=e)
+        except ConnectionError:
+            await self.bot.say("unable to generate pokemon right now, try later")
 
     @commands.command()
     async def inspire(self):
