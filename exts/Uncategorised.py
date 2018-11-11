@@ -127,8 +127,8 @@ class Uncategorised:
         both must be "burd"
         :return:
         """
-        rand_body = random.randrange(1, self.max_supported_pok2)
-        rand_face = random.randrange(1, self.max_supported_pok2)
+        rand_face = random.choice(self.burd_nums)
+        rand_body = random.choice(self.burd_nums)
         await self.pokemon2_request(rand_face=rand_face, rand_body=rand_body)
 
     @commands.command()
