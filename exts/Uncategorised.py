@@ -35,14 +35,13 @@ class Uncategorised:
         requests_url = "http://pokefusion.japeal.com/{}/{}/{}"
         imgurl = "http://pokefusion.japeal.com/upload/{}X{}X{}.png"
         regex = re.compile("<div style=\"z-index: 10;  position: relative; left: -95px;top: 105px;"
-                           "\" align=\"center\"><b>([A-Za-z0-9\s]*)</b>")
+                           "\" align=\"center\"><b>([A-Za-z0-9.♂♀'\-\s]*)</b>")
         name = ""
         # generate the random numbers Gen 1-5 pok numbers
         # randface = random.randrange(1, 494)
         # randbod = random.randrange(1, 494)
         # request the url with image to try to avoid the broken image problem
         try:
-
             status_code = requests.get(requests_url.format(rand_face, rand_body, rand_color)).status_code
             if status_code != 200:
                 await self.bot.say("Bad Pok img, try again")
@@ -111,7 +110,8 @@ class Uncategorised:
         at least either the head or the body has to be a "burd"
         :return:
         """
-        use_head_or_body = random.choice([True, False])
+        use_head_or_body = False
+        # random.choice([True, False])
         if use_head_or_body:
             rand_face = random.choice(self.burd_nums)
             rand_body = random.randrange(1, self.max_supported_pok2)
