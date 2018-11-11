@@ -121,6 +121,17 @@ class Uncategorised:
         await self.pokemon2_request(rand_face=rand_face, rand_body=rand_body)
 
     @commands.command()
+    async def burd2(self):
+        """
+        post a random "burd" pokemon
+        both must be "burd"
+        :return:
+        """
+        rand_body = random.randrange(1, self.max_supported_pok2)
+        rand_face = random.randrange(1, self.max_supported_pok2)
+        await self.pokemon2_request(rand_face=rand_face, rand_body=rand_body)
+
+    @commands.command()
     async def rat(self):
         """
         post a random "burd" pokemon
