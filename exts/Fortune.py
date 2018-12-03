@@ -9,6 +9,7 @@ from discord.ext import commands
 import requests
 import random
 
+
 class Fortune:
     """Fortune generating related commands"""
 
@@ -49,13 +50,18 @@ class Fortune:
             for role in author_roles:
                 if role.name.lower().strip() in self.banned_roles:
                     # await self.bot.say(":classical_building:")
-                    if author_id in self.yesterday_users:
-                        maximum_rand = int((0.66 * self.yesterday_users[author_id]) % 100)
-                    else:
-                        maximum_rand = int((0.66 * maximum_rand) % 100)
+                    # if author_id in self.yesterday_users:
+                    #    maximum_rand = int((0.66 * self.yesterday_users[author_id]) % 100)
+                    # else:
+                    maximum_rand = int((0.66 * maximum_rand) % 100)
             if self.last_check == 13:
                 maximum_rand = int(0.66 * maximum_rand)
-            rand_val = random.randrange(minimum_rand, maximum_rand)
+            if minimum_rand >= maximum_rand:
+                self.fortuned_users[author_id] = maximum_rand
+            if maximum_rand == minimum_rand:
+                rand_val = maximum_rand
+            else:
+                rand_val = random.randrange(minimum_rand, maximum_rand)
             self.fortuned_users[author_id] = rand_val
         return self.fortuned_users[author_id]
 
@@ -122,8 +128,10 @@ class Fortune:
             e.set_image(url=fortune[True]["img"])
         await self.bot.say(embed=e)
 
+
 def setup(bot):
     bot.add_cog(Fortune(bot))
+
 
 """
 fortune = {
