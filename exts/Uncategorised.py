@@ -6,6 +6,8 @@ import time
 
 import discord
 import requests
+from requests import HTTPError as _HTTPError
+from requests import ConnectionError as _ConnectionError
 from discord.ext import commands
 
 from .utils import twitter, scrollable, youtube, alarm
@@ -58,7 +60,11 @@ class Uncategorised:
             time.sleep(0.2)
             await self.bot.say(embed=e)
         except ConnectionError:
-            await self.bot.say("unable to generate pokemon right now, try later")
+            await self.bot.say("unable to generate pokemon right now, try later (0x1)")
+        except _ConnectionError:
+            await self.bot.say("unable to generate pokemon right now, try later (0x2)")
+        except _HTTPError:
+            await self.bot.say("Unable to generate pokemon right now, try later (0x3)")
 
     @commands.command()
     async def inspire(self):
