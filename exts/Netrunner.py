@@ -48,7 +48,10 @@ class NetrunnerDBCard:
         self.image_url = None
         if 'image_url' in api_dict:
             if api_dict['image_url']:
-                self.image_url = self.fix_https(api_dict['image_url'])
+                if api_dict['image_url'].startswith("https://www.cardgamedb.com"):
+                    self.image_url = self.unfix_https(api_dict['image_url'])
+                else:
+                    self.image_url = self.fix_https(api_dict['image_url'])
         # type should be int
         self.influence_limit = None
         if 'influence_limit' in api_dict:
@@ -232,6 +235,10 @@ class NetrunnerDBCard:
         return re.sub('^http:', 'https:', url)
 
     @staticmethod
+    def unfix_https(url):
+        return re.sub('^https:', "http:", url)
+
+    @staticmethod
     def is_valid_card_dict(api_card_dict):
         primitive_keys = [
             'code', 'title', 'deck_limit', 'faction_code', 'pack_code', 'position', 'quantity', 'side_code',
@@ -263,7 +270,7 @@ class NetrunnerDBCard:
         # so we need to find the best image we can
         # first we'll check for a listed URL in the card itself, newer cards use this syntax
         if self.image_url is not None:
-            if "https" in self.image_url:
+            if "http" in self.image_url:
                 return self.image_url
         # else form the netrunnerdb image url
         # format the code from int to 0 back-filled string
