@@ -48,8 +48,8 @@ class NetrunnerDBCard:
         self.image_url = None
         if 'image_url' in api_dict:
             if api_dict['image_url']:
-                if api_dict['image_url'].startswith("https://www.cardgamedb.com"):
-                    self.image_url = self.unfix_https(api_dict['image_url'])
+                if "www.cardgamedb.com" in api_dict['image_url']:
+                    self.image_url = api_dict['image_url']
                 else:
                     self.image_url = self.fix_https(api_dict['image_url'])
         # type should be int
