@@ -1,20 +1,18 @@
 # Netrunner extension for pibot
-### PREAMBLE ##################################################################
 import asyncio
-import re
 import random
+import re
 import time
-from  datetime import date as _date
+from collections import OrderedDict
+from datetime import date as _date
 from datetime import timedelta as _timedelta
-from unidecode import unidecode
+from json.decoder import JSONDecodeError
 
 import discord
-import emoji
 import requests
-from collections import OrderedDict
-from tabulate import tabulate
-from json.decoder import JSONDecodeError
 from discord.ext import commands
+from tabulate import tabulate
+from unidecode import unidecode
 
 from .utils.DiscordArgParse import DiscordArgparseParseError, DiscordArgParse
 from .utils.listener import MsgListener
@@ -114,9 +112,9 @@ class NetrunnerDBCard:
             'faction_code', 'faction_cost', 'legality']
         self.all_print_fields = [
             'code', 'deck_limit', 'faction_code', 'flavor', 'illustrator', 'influence_limit', 'keywords',
-             'minimum_deck_size', 'pack_code', 'position', 'quantity', 'side_code', 'text', 'title', 'type_code',
-             'uniqueness', 'base_link', 'cost', 'faction_cost', 'memory_cost', 'strength', 'advancement_cost',
-             'agenda_points', 'trash_cost', 'image_url', 'legality',
+            'minimum_deck_size', 'pack_code', 'position', 'quantity', 'side_code', 'text', 'title', 'type_code',
+            'uniqueness', 'base_link', 'cost', 'faction_cost', 'memory_cost', 'strength', 'advancement_cost',
+            'agenda_points', 'trash_cost', 'image_url', 'legality',
         ]
         self.faction_color = {
             'jinteki': 0x660000,
@@ -827,7 +825,6 @@ class Netrunner:
             elif args_dict["points"]:
                 num_rounds = args_dict["points"]
                 mode = NetrunQuiz.MODE_FPTP
-
             # Create the quiz
             if not self.init_api:
                 self.refresh_nr_api()
