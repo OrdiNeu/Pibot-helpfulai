@@ -4,6 +4,8 @@ import asyncio
 import re
 import random
 import time
+from  datetime import date as _date
+from datetime import timedelta as _timedelta
 from unidecode import unidecode
 
 import discord
@@ -780,10 +782,16 @@ class Netrunner:
             await self.bot.say(m_response[:2000])
 
     @commands.command(aliases=['ndrand'])
-    async def rand_deck(self):
-        today = time.strftime("%Y-%m-%d")
+    async def rand_deck(self, today=None):
+        if today is None:
+            today = time.strftime("%Y-%m-%d")
         decks = [c for c in requests.get(
             'https://netrunnerdb.com/api/2.0/public/decklists/by_date/%s' % today).json()['data']]
+        # adding a check for yesterday function, should return recursively from the previous date with a deck
+        if len(decks) is 0:
+            yesterday = _date.today() - _timedelta(1)
+            yesterday = yesterday.strftime("Y-%m-%d")
+            return self.rand_deck(yesterday)
         selection = random.randrange(len(decks))
         id = str(decks[selection]['id'])
         hyphen_name = decks[selection]['name'].replace(" ", "-").lower()
