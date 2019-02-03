@@ -29,6 +29,7 @@ EXTENSIONS = [
     'exts.reddit',
     'exts.LFR',
     'exts.Uncategorised',
+    'exts.third_party.gencon_hotel_check',
 ]
 
 bot = commands.Bot(
