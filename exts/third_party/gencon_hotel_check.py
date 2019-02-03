@@ -363,7 +363,7 @@ class GenconHotel:
         return search_resp
 
     async def search(self, search_resp, alert_fns, options):
-        bot_message = str()
+        bot_message = "```\n"
         global lastAlerts
         # search_resp.html.render()
         # logger.debug("Starting Parser")
@@ -374,9 +374,9 @@ class GenconHotel:
         json_string = clean_json(parser.data)
         # logger.debug("cleaned json string: '{}'".format(json_string))
         hotels = loads(json_string)
-        bot_message += "Results:   (%s)" % datetime.now()
+        bot_message += "Results:   (%s)\n" % datetime.now()
         alerts = []
-        bot_message += "   %-15s %-10s %-80s %s" % ('Distance', 'Price', 'Hotel', 'Room')
+        bot_message += "   %-15s %-10s %-80s %s\n" % ('Distance', 'Price', 'Hotel', 'Room')
         for hotel in hotels:
             for block in hotel['blocks']:
                 # Don't show hotels miles away unless requested
@@ -392,7 +392,7 @@ class GenconHotel:
                     'rooms': min(inv['available'] for inv in block['inventory']),
                     'room': unescape(block['name']),
                 }
-                result = "'''\n%-15s $%-9s %-80s (%d) %s\n'''" % (
+                result = "%-15s $%-9s %-80s (%d) %s" % (
                     simpleHotel['distance'], simpleHotel['price'], simpleHotel['name'], simpleHotel['rooms'],
                     simpleHotel['room'])
                 # I don't think these distances (yards, meters, kilometers) actually appear in the results,
@@ -407,10 +407,13 @@ class GenconHotel:
                     simpleHotel['room'])
                 if close_enough and cheap_enough and regex_match:
                     alerts.append(simpleHotel)
-                    bot_message += ' !'
+                    bot_message += ' !\n'
+                    bot_message += "\n```"
+                    await self.bot.say(bot_message)
                 else:
-                    bot_message += ' '
+                    bot_message += ' \n'
                     bot_message += result
+                    bot_message += "\n```"
                     await self.bot.say(bot_message)
         if alerts:
             alert_hash = {(alert['name'], alert['room']) for alert in alerts}
