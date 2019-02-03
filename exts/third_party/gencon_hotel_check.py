@@ -376,7 +376,7 @@ class GenconHotel:
         hotels = loads(json_string)
         bot_message += "Results:   (%s)\n" % datetime.now()
         alerts = []
-        bot_message += "   %-15s %-10s %-80s %s\n" % ('Distance', 'Price', 'Hotel', 'Room')
+        bot_message += "   %-12s %-7s %-50s %s\n" % ('Distance', 'Price', 'Hotel', 'Room')
         for hotel in hotels:
             for block in hotel['blocks']:
                 # Don't show hotels miles away unless requested
@@ -392,7 +392,7 @@ class GenconHotel:
                     'rooms': min(inv['available'] for inv in block['inventory']),
                     'room': unescape(block['name']),
                 }
-                result = "%-15s $%-9s %-80s (%d) %s" % (
+                result = "%-12s $%-7s %-50s (%d) %s" % (
                     simpleHotel['distance'], simpleHotel['price'], simpleHotel['name'], simpleHotel['rooms'],
                     simpleHotel['room'])
                 # I don't think these distances (yards, meters, kilometers) actually appear in the results,
