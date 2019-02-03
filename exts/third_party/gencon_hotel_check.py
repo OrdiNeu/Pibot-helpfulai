@@ -363,6 +363,7 @@ class GenconHotel:
         return search_resp
 
     async def search(self, search_resp, alert_fns, options):
+        bot_message = str()
         global lastAlerts
         # search_resp.html.render()
         # logger.debug("Starting Parser")
@@ -373,9 +374,9 @@ class GenconHotel:
         json_string = clean_json(parser.data)
         # logger.debug("cleaned json string: '{}'".format(json_string))
         hotels = loads(json_string)
-        await self.bot.say("Results:   (%s)" % datetime.now())
+        bot_message += "Results:   (%s)" % datetime.now()
         alerts = []
-        await self.bot.say("   %-15s %-10s %-80s %s" % ('Distance', 'Price', 'Hotel', 'Room'))
+        bot_message += "   %-15s %-10s %-80s %s" % ('Distance', 'Price', 'Hotel', 'Room')
         for hotel in hotels:
             for block in hotel['blocks']:
                 # Don't show hotels miles away unless requested
@@ -406,10 +407,11 @@ class GenconHotel:
                     simpleHotel['room'])
                 if close_enough and cheap_enough and regex_match:
                     alerts.append(simpleHotel)
-                    await self.bot.say(' !'),
+                    bot_message += ' !'
                 else:
-                    await self.bot.say('  '),
-                    await self.bot.say(result)
+                    bot_message += ' '
+                    bot_message += result
+                    await self.bot.say(bot_message)
         if alerts:
             alert_hash = {(alert['name'], alert['room']) for alert in alerts}
             if alert_hash <= lastAlerts:
