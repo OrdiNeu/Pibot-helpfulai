@@ -60,7 +60,7 @@ class PasskeyParser(HTMLParser):
             return
         attrs = dict(attrs)
         if tag == "script" and attrs.get("type") == "application/json":
-            logger.debug("Found tag '{}' under '{}' ".format(tag, attrs.get("id")))
+            # logger.debug("Found tag '{}' under '{}' ".format(tag, attrs.get("id")))
             self._collect_data = True
         else:
             return
@@ -69,11 +69,11 @@ class PasskeyParser(HTMLParser):
         if self._starttag == "ul":
             self._collect_data = False
             self._starttag = ""
-            logger.debug("endtag '{}'".format(tag))
+            # logger.debug("endtag '{}'".format(tag))
 
     def handle_data(self, data):
         if self._collect_data:
-            logger.debug("handle_data: '{}'".format(data))
+            # logger.debug("handle_data: '{}'".format(data))
             self.data = data
             self._collect_data = False
 
@@ -228,7 +228,7 @@ class GenconHotel:
         start_url = "https://book.passkey.com/reg/%s/null/null/1/null/null" % options.key
         alert_fns = self.setup_alert_handlers(start_url, options)
         while True:
-            logging.info("Starting session")
+            # logging.info("Starting session")
             search_resp = self.session_setup(event_url=event_url, start_url=start_url, options=options)
             if search_resp is not None:
                 await self.search(search_resp=search_resp, alert_fns=alert_fns, options=options)
@@ -311,17 +311,18 @@ class GenconHotel:
         if not success:
             exit(1)
         if not alert_fns:
-            logger.warning(
-                "Warning: You have no alert methods selected, so you're not going to know about a match unless you're"
-                " staring at this window when it happens. See the README for more information")
+            pass
+            # logger.warning(
+            #    "Warning: You have no alert methods selected, so you're not going to know about a match unless you're"
+            #    " staring at this window when it happens. See the README for more information")
         if options.test:
-            logger.debug("Testing alerts one at a time...")
+            # logger.debug("Testing alerts one at a time...")
             preamble = 'This is a test'
             hotels = [{'name': 'Test hotel 1', 'distance': '2 blocks', 'rooms': 1, 'room': 'Queen/Queen suite'},
                       {'name': 'Test hotel 2', 'distance': '5 blocks', 'rooms': 5, 'room': 'Standard King'}]
             for fn in alert_fns:
                 fn(preamble, hotels)
-            logger.info("Done")
+            # logger.info("Done")
             exit(0)
         return alert_fns
 
@@ -337,7 +338,7 @@ class GenconHotel:
         if not event_url_resp.cookies:
             await self.bot.say("No session cookie received. Is your key correct?")
             return None
-        logger.info("Searching... (%d %s, %d %s, %s - %s, %s)" % (
+        await self.bot.say("Searching... (%d %s, %d %s, %s - %s, %s)" % (
             options.guests, 'guest' if options.guests == 1 else 'guests', options.rooms,
             'room' if options.rooms == 1 else 'rooms',
             options.checkin, options.checkout,
@@ -364,13 +365,13 @@ class GenconHotel:
     async def search(self, search_resp, alert_fns, options):
         global lastAlerts
         # search_resp.html.render()
-        logger.debug("Starting Parser")
+        # logger.debug("Starting Parser")
         parser = PasskeyParser(str(search_resp.content))
         if not parser.data:
             await self.bot.say("Failed to find search results")
             return False
         json_string = clean_json(parser.data)
-        logger.debug("cleaned json string: '{}'".format(json_string))
+        # logger.debug("cleaned json string: '{}'".format(json_string))
         hotels = loads(json_string)
         await self.bot.say("Results:   (%s)" % datetime.now())
         alerts = []
@@ -412,7 +413,8 @@ class GenconHotel:
         if alerts:
             alert_hash = {(alert['name'], alert['room']) for alert in alerts}
             if alert_hash <= lastAlerts:
-                logger.info("Skipped alerts (no new rooms in nearby hotel list)")
+                pass
+                # logger.info("Skipped alerts (no new rooms in nearby hotel list)")
             else:
                 num_hotels = len(set(alert['name'] for alert in alerts))
                 preamble = "%d %s near the ICC:" % (num_hotels, 'hotel' if num_hotels == 1 else 'hotels')
@@ -420,7 +422,7 @@ class GenconHotel:
                     # Run each alert on its own thread since some (e.g. popups)
                     #  are blocking and some (e.g. e-mail) can throw
                     Thread(target=fn, args=(preamble, alerts)).start()
-                logger.info("Triggered alerts")
+                # logger.info("Triggered alerts")
         else:
             alert_hash = set()
         lastAlerts = alert_hash
