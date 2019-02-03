@@ -408,13 +408,12 @@ class GenconHotel:
                 if close_enough and cheap_enough and regex_match:
                     alerts.append(simpleHotel)
                     bot_message += ' !\n'
-                    bot_message += "\n```"
                     await self.bot.say(bot_message)
                 else:
                     bot_message += ' \n'
                     bot_message += result
-                    bot_message += "\n```"
-                    await self.bot.say(bot_message)
+        bot_message += "\n```"
+        await self.bot.say(bot_message)
         if alerts:
             alert_hash = {(alert['name'], alert['room']) for alert in alerts}
             if alert_hash <= lastAlerts:
