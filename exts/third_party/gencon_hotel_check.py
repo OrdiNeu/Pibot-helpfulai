@@ -229,10 +229,9 @@ class GenconHotel:
         alert_fns = self.setup_alert_handlers(start_url, options)
         while True:
             # logging.info("Starting session")
-            search_resp = self.session_setup(event_url=event_url, start_url=start_url, options=options)
+            search_resp = await self.session_setup(event_url=event_url, start_url=start_url, options=options)
             if search_resp is not None:
-                parser = PasskeyParser(str(search_resp.content))
-                await self.search(parser=parser, alert_fns=alert_fns, options=options)
+                await self.search(search_resp=search_resp, alert_fns=alert_fns, options=options)
                 if options.once:
                     return 0
             sleep(60 * options.delay)
@@ -363,11 +362,11 @@ class GenconHotel:
             return None
         return search_resp
 
-    async def search(self, parser, alert_fns, options):
+    async def search(self, search_resp, alert_fns, options):
         global lastAlerts
         # search_resp.html.render()
         # logger.debug("Starting Parser")
-
+        parser = PasskeyParser(str(search_resp.content))
         if not parser.data:
             await self.bot.say("Failed to find search results")
             return False
