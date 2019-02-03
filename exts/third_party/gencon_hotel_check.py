@@ -425,3 +425,7 @@ class GenconHotel:
             alert_hash = set()
         lastAlerts = alert_hash
         return True
+
+
+def setup(bot):
+    bot.add_cog(GenconHotel(bot))
