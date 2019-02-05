@@ -374,11 +374,13 @@ class GenconHotel:
         json_string = clean_json(parser.data)
         # logger.debug("cleaned json string: '{}'".format(json_string))
         hotels = loads(json_string)
-        bot_message += "Results:   (%s)\n" % datetime.now()
+        bot_message += "```Results:   (%s)\n" % datetime.now()
         alerts = []
-        bot_message += "   %-12s %-7s %-50s %s\n" % ('Distance', 'Price', 'Hotel', 'Room')
+        bot_message += "   %-12s %-7s %-50s %s\n" % ('Distance', 'Price', 'Hotel', 'Room```')
+        await self.bot.say(bot_message)
         for hotel in hotels:
             for block in hotel['blocks']:
+                bot_message = "```"
                 # Don't show hotels miles away unless requested
                 if hotel['distanceUnit'] == 3 and not options.show_all:
                     continue
@@ -407,13 +409,13 @@ class GenconHotel:
                     simpleHotel['room'])
                 if close_enough and cheap_enough and regex_match:
                     alerts.append(simpleHotel)
-                    bot_message += ' !\n'
+                    bot_message = ' !\n'
                     await self.bot.say(bot_message)
                 else:
                     bot_message += ' \n'
-                    bot_message += result
-        bot_message += "\n```"
-        await self.bot.say(bot_message)
+                bot_message += result
+                bot_message += "\n```"
+                await self.bot.say(bot_message)
         if alerts:
             alert_hash = {(alert['name'], alert['room']) for alert in alerts}
             if alert_hash <= lastAlerts:
