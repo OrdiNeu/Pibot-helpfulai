@@ -29,6 +29,7 @@ EXTENSIONS = [
     'exts.reddit',
     'exts.LFR',
     'exts.Uncategorised',
+    "extx.waifu",
 ]
 
 bot = commands.Bot(
