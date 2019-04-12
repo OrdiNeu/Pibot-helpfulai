@@ -23,8 +23,8 @@ class Fortune:
         except (requests.RequestException, requests.HTTPError, requests.ConnectionError) as connect_err:
             await self.bot.say("Unable to generate a waifu right now OwO")
             return
-        image_regex = re.search("<img src=\"(https://www.thiswaifudoesnotexist.net/example-[0-9]*\.jpg)", waifu.content)
-        snippet_regex = re.search("<div id=\"snippet-container\">(.*)</div>", waifu.content)
+        image_regex = re.search("<img src=\"(https://www.thiswaifudoesnotexist.net/example-[0-9]*\.jpg)", str(waifu.content))
+        snippet_regex = re.search("<div id=\"snippet-container\">(.*)</div>", str(waifu.content))
         e = discord.Embed(description="{}, your waifu is: \n{}".format(ctx.message.author.mention, snippet_regex))
         if image_regex is not None:
             e.set_image(url=image_regex.group(1))
