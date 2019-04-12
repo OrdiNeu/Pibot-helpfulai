@@ -25,12 +25,12 @@ class Fortune:
             return
         image_regex = re.search(
             "<img src=\"(https://www.thiswaifudoesnotexist.net/example-[0-9]*\.jpg)", str(waifu.content))
-        snippet_regex = re.search(
-            "<div id=\"snippet-container\">(.*)</div>", str(waifu.content))
+        # snippet_regex = re.search(
+        #    "<div id=\"snippet-container\">(.*)</div>", str(waifu.content))
         e = discord.Embed(
-            description="{}, your waifu is: \n{}".format(ctx.message.author.mention, snippet_regex.group(1)[:2000]))
+            description="{}, your waifu".format(ctx.message.author.mention))
         if image_regex is not None:
-            e.set_thumbnail(url=image_regex.group(1))
+            e.set_thumbnail(url="https://www.thiswaifudoesnotexist.net")
         await self.bot.say(embed=e)
 
 
