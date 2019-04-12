@@ -28,9 +28,9 @@ class Fortune:
         snippet_regex = re.search(
             "<div id=\"snippet-container\">(.*)</div>", str(waifu.content))
         e = discord.Embed(
-            description="{}, your waifu is: \n{}".format(ctx.message.author.mention, snippet_regex.group(1)))
+            description="{}, your waifu is: \n{}".format(ctx.message.author.mention, snippet_regex.group(1)[:2000]))
         if image_regex is not None:
-            e.set_image(url=image_regex.group(1))
+            e.set_thumbnail(url=image_regex.group(1))
         await self.bot.say(embed=e)
 
 
