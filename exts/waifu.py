@@ -1,10 +1,10 @@
 # Fortune-finding extension for pibot
 ### PREAMBLE ##################################################################
-import re
-
 import discord
-import requests
+
 from discord.ext import commands
+import selenium.webdriver
+import selenium.common.exceptions
 
 
 class Fortune:
@@ -18,19 +18,20 @@ class Fortune:
 
     @commands.command(aliases=['OwO'], pass_context=True)
     async def waifu(self, ctx):
+        driver = selenium.webdriver.Firefox()
         try:
-            waifu = requests.get(url="https://www.thiswaifudoesnotexist.net")
-        except (requests.RequestException, requests.HTTPError, requests.ConnectionError) as connect_err:
+            driver.get(url="https://www.thiswaifudoesnotexist.net")
+        except selenium.common.exceptions.WebDriverException as connect_err:
             await self.bot.say("Unable to generate a waifu right now OwO")
             return
-        image_regex = re.search(
-            "<img src=\"(https://www.thiswaifudoesnotexist.net/example-[0-9]*\.jpg)", str(waifu.content))
-        # snippet_regex = re.search(
-        #    "<div id=\"snippet-container\">(.*)</div>", str(waifu.content))
+        image_xpath = "/html/body/div[1]/div/div[1]/img"
+        image_url = driver.find_element_by_xpath(image_xpath).get_attribute("src")
+        snippet_xpath = """//*[@id="snippet-container"]"""
+        snippet_text = driver.find_element_by_xpath(snippet_xpath).text
+        driver.close()
         e = discord.Embed(
-            description="{}, your waifu".format(ctx.message.author.mention))
-        if image_regex is not None:
-            e.set_thumbnail(url="https://www.thiswaifudoesnotexist.net")
+            description="{}, your waifu \n{}".format(ctx.message.author.mention, snippet_text))
+        e.set_thumbnail(url=image_url)
         await self.bot.say(embed=e)
 
 
