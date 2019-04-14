@@ -190,8 +190,8 @@ def load_twitter():
 
 # Login and run
 if __name__ == '__main__':
-    load_twitter()
-    exts.utils.youtube.init("../pibot-google-secret.json")
+    #load_twitter()
+    #exts.utils.youtube.init("../pibot-google-secret.json")
     credentials = load_credentials()
     token = credentials['token']
 
