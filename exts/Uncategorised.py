@@ -46,7 +46,7 @@ class Uncategorised(commands.Cog):
         try:
             status_code = requests.get(requests_url.format(rand_face, rand_body, rand_color)).status_code
             if status_code != 200:
-                await self.bot.say("Bad Pok img, try again")
+                await ctx.channel.send("Bad Pok img, try again")
                 return
             # leave third option (color) at default for now it seems buggy
             name_text = requests.get(nameurl.format(rand_face, rand_body, rand_color)).text
@@ -214,7 +214,7 @@ class Uncategorised(commands.Cog):
         """Grabs the twitter feed of the given user, as a scrollable.
         Currently only grabs the latest 20 tweets"""
         if twitter.API is None:
-            await self.bot.say("Twitter API not initialized")
+            await ctx.channel.send("Twitter API not initialized")
             return
 
         # Parse out the timeline
@@ -236,7 +236,7 @@ class Uncategorised(commands.Cog):
     async def youtube(self, ctx):
         """Grabs the YouTube upload list of the given user, as a scrollable."""
         if youtube.API is None:
-            await self.bot.say("YouTube API not initialized")
+            await ctx.channel.send("YouTube API not initialized")
             return
 
         # Parse out the username
@@ -246,9 +246,9 @@ class Uncategorised(commands.Cog):
         uploads = youtube.grabUploads(username)
         if not type(uploads) is list:
             if uploads == youtube.ERROR_COULD_NOT_FIND_USER:
-                await self.bot.say("Couldn't find the given user")
+                await ctx.channel.send("Couldn't find the given user")
             elif uploads == youtube.ERROR_COULD_NOT_FIND_UPLOADS:
-                await self.bot.say("Couldn't find uploads by the given user")
+                await ctx.channel.send("Couldn't find uploads by the given user")
             return
 
         upload_urls = ["https://www.youtube.com/watch?v=" + s for s in uploads]
@@ -259,7 +259,7 @@ class Uncategorised(commands.Cog):
     async def siiva(self, ctx):
         """Grabs the YouTube upload list of Siivagunner, an unregistered user."""
         if youtube.API is None:
-            await self.bot.say("YouTube API not initialized")
+            await ctx.channel.send("YouTube API not initialized")
             return
 
         uploads = youtube.grabUploadsByPlaylistId("UU9ecwl3FTG66jIKA9JRDtmg")
@@ -272,7 +272,7 @@ class Uncategorised(commands.Cog):
     async def flint(self, ctx):
         """Grabs the YouTube upload list of Siivagunner, an unregistered user."""
         if youtube.API is None:
-            await self.bot.say("YouTube API not initialized")
+            await ctx.channel.send("YouTube API not initialized")
             return
 
         uploads = youtube.grabUploadsByPlaylistId("PLzDaKOnENQJ98YMmY5vrvzkm0Sc68IPa3")
@@ -329,7 +329,7 @@ class Uncategorised(commands.Cog):
         )
         await new_alarm.initialize()
         new_alarm.attach(3600)
-        await self.bot.say("Ok, I will let you know when the next Siivagunner upload happens")
+        await ctx.channel.send("Ok, I will let you know when the next Siivagunner upload happens")
 
     class BugMe(alarm.Alarm):
         """Temporary testing rig for alarms"""
@@ -365,9 +365,9 @@ class Uncategorised(commands.Cog):
                     if target_role in role.name:
                         if role not in user_roles:
                             await self.bot.add_roles(ctx.message.author, role)
-                            await self.bot.say(":ok_hand:")
+                            await ctx.channel.send(":ok_hand:")
         except discord.Forbidden as df:
-            await self.bot.say("I lack sufficient permissions to do that: '{}".format(df.text))
+            await ctx.channel.send("I lack sufficient permissions to do that: '{}".format(df.text))
 
     @commands.command(aliases=['role_tide'], pass_context=True)
     async def remove_role(self, ctx):
@@ -380,10 +380,10 @@ class Uncategorised(commands.Cog):
                 for role in user_roles:
                     if target_role in role.name:
                         await self.bot.remove_roles(ctx.message.author, role)
-                        await self.bot.say(":ok_hand:")
+                        await ctx.channel.send(":ok_hand:")
 
         except discord.Forbidden as df:
-            await self.bot.say("I lack sufficient permissions to do that: '{}".format(df.text))
+            await ctx.channel.send("I lack sufficient permissions to do that: '{}".format(df.text))
 
     @commands.command(aliases=["clan"], pass_context=True)
     async def swap_role(self, ctx):
@@ -412,16 +412,16 @@ class Uncategorised(commands.Cog):
                     # Add the new role
                     if new_valid_role is not None:
                         await self.bot.add_roles(ctx.message.author, new_valid_role)
-                        await self.bot.say(":ok_hand:")
+                        await ctx.channel.send(":ok_hand:")
                         if new_valid_role in valid_roles:
                             valid_roles.remove(new_valid_role)
                         # remove any current clans from current user's list
                         for role in valid_roles:
                             await self.bot.remove_roles(ctx.message.author, role)
                 except discord.Forbidden as df:
-                    await self.bot.say("I lack sufficient permissions to do that: '{}".format(df.text))
+                    await ctx.channel.send("I lack sufficient permissions to do that: '{}".format(df.text))
             else:
-                await self.bot.say("I couldn't find the role '{}' to assign you to".format(target_role))
+                await ctx.channel.send("I couldn't find the role '{}' to assign you to".format(target_role))
 
 
 def setup(bot):

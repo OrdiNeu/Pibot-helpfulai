@@ -152,7 +152,7 @@ class Dungeonman(commands.Cog):
             m_response = m_response[:self.max_message_len - 10] + "\ncont..."
         print(m_response)
     @commands.command(name="dm", aliases=['thy'])
-    async def thy(self, *, command: str):
+    async def thy(self, ctx, *, command: str):
         """
         !thy Dungeonman! :
         !thy HELP!
@@ -161,4 +161,4 @@ class Dungeonman(commands.Cog):
         if len(m_response) >= self.max_message_len:
             # truncate message if it exceed the character limit
             m_response = m_response[:self.max_message_len - 10] + "\ncont..."
-        await self.bot.say(m_response)
+        await ctx.channel.send(m_response)

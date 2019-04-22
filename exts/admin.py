@@ -28,40 +28,40 @@ class Admin(commands.Cog):
 
     @commands.command(hidden=True)
     @checks.is_admin()
-    async def load(self, *, module: str):
+    async def load(self, ctx, *, module: str):
         """Loads a module."""
         try:
             self.bot.load_extension(module)
         except Exception as e:
-            await self.bot.say('\N{PISTOL}')
-            await self.bot.say('{}: {}'.format(type(e).__name__, e))
+            await ctx.channel.send('\N{PISTOL}')
+            await ctx.channel.send('{}: {}'.format(type(e).__name__, e))
         else:
-            await self.bot.say('\N{OK HAND SIGN}')
+            await ctx.channel.send('\N{OK HAND SIGN}')
 
     @commands.command(hidden=True)
     @checks.is_admin()
-    async def unload(self, *, module: str):
+    async def unload(self, ctx, *, module: str):
         """Unloads a module."""
         try:
             self.bot.unload_extension(module)
         except Exception as e:
-            await self.bot.say('\N{PISTOL}')
-            await self.bot.say('{}: {}'.format(type(e).__name__, e))
+            await ctx.channel.send('\N{PISTOL}')
+            await ctx.channel.send('{}: {}'.format(type(e).__name__, e))
         else:
-            await self.bot.say('\N{OK HAND SIGN}')
+            await ctx.channel.send('\N{OK HAND SIGN}')
 
     @commands.command(name='reload', hidden=True)
     @checks.is_admin()
-    async def _reload(self, *, module: str):
+    async def _reload(self, ctx, *, module: str):
         """Reloads a module."""
         try:
             self.bot.unload_extension(module)
             self.bot.load_extension(module)
         except Exception as e:
-            await self.bot.say('\N{PISTOL}')
-            await self.bot.say('{}: {}'.format(type(e).__name__, e))
+            await ctx.channel.send('\N{PISTOL}')
+            await ctx.channel.send('{}: {}'.format(type(e).__name__, e))
         else:
-            await self.bot.say('\N{OK HAND SIGN}')
+            await ctx.channel.send('\N{OK HAND SIGN}')
 
     @commands.command(pass_context=True, hidden=True)
     @checks.is_admin()
@@ -87,16 +87,16 @@ class Admin(commands.Cog):
             if inspect.isawaitable(result):
                 result = await result
         except Exception as e:
-            await self.bot.say(python.format(type(e).__name__ + ': ' + str(e)))
+            await ctx.channel.send(python.format(type(e).__name__ + ': ' + str(e)))
             return
 
-        await self.bot.say(python.format(result))
+        await ctx.channel.send(python.format(result))
 
     @commands.command(hidden=True, pass_context=True)
     @checks.is_admin()
     async def scavenge(self, ctx):
         """Restarts the bot, and tries to pull the latest version of itself from git"""
-        await self.bot.say('Fire...')
+        await ctx.channel.send('Fire...')
         with open(SCAVENGE_FILE_NAME, 'w') as f:
             f.write(ctx.message.channel.id)
         sys.exit(GIT_RELOAD_EXIT_CODE)  # Expect our helper script to do the git reloading
@@ -117,15 +117,15 @@ class Admin(commands.Cog):
             else:
                 status_msg += '\N{OK HAND SIGN}'
             status_msg += "\n"
-        await self.bot.say(status_msg)
+        await ctx.channel.send(status_msg)
 
     @commands.command(hidden=True)
     @checks.is_admin()
-    async def locate(self):
+    async def locate(self, ctx):
         """Grabs the local and global IP of the bot"""
         globalip = os.popen("curl https://ipinfo.io/ip").read()
         localip = os.popen("ifconfig | grep -oP \"inet (addr:)?192.168.\\\\d+.\\\\d+\"").read()
-        await self.bot.say("Global IP: {}\nLocal IP: {}".format(globalip, localip))
+        await ctx.channel.send("Global IP: {}\nLocal IP: {}".format(globalip, localip))
 
     @commands.command(pass_context=True, hidden=True, aliases=['screenshot', 'wiretap'])
     @checks.is_admin()
