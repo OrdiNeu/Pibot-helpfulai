@@ -47,7 +47,7 @@ class Chan(commands.Cog):
             await ctx.channel.send_message("Can't find that board, boss.")
 
     @commands.command()
-    async def chan(self, *, msg: str):
+    async def chan(self, ctx, *, msg: str):
         """Finds a thread"""
         # Determine board/thread title
         keywords = msg.lower().split()
