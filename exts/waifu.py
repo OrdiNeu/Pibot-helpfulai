@@ -31,7 +31,7 @@ class waifu(commands.Cog):
         e = discord.Embed(
             description="{}, your waifu is: \n{}".format(ctx.message.author.mention, snippet))
         e.set_thumbnail(url=image_url)
-        await ctx.channel.say(embed=e)
+        await ctx.channel.send(embed=e)
 
 
 def setup(bot):
