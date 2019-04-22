@@ -44,7 +44,7 @@ class Chan(commands.Cog):
             response = scrollable.Scrollable(self.bot)
             await response.send(ctx.message.channel, potential_responses, random_pos)
         else:
-            await self.bot.say("Can't find that board, boss.")
+            await ctx.channel.send_message("Can't find that board, boss.")
 
     @commands.command()
     async def chan(self, *, msg: str):
@@ -80,9 +80,9 @@ class Chan(commands.Cog):
                     if matches == len(message):
                         response += "http://boards.4chan.org/" + board + "/thread/" + str(t["no"]) + "\n"
         if response != "":
-            await self.bot.say(response)
+            await ctx.channel.send_message(response)
         else:
-            await self.bot.say("No thread found.")
+            await ctx.channel.send_message("No thread found.")
 
 def setup(bot):
     bot.add_cog(Chan(bot))
