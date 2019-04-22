@@ -138,7 +138,7 @@ async def on_message(msg):
         return
 
     # Log the message
-    if msg.channel is discord.TextChannel:
+    if msg.channel is not discord.DMChannel:
         print(
             "<" + msg.channel.name + "> " + msg.author.name + ": "
             + msg.content)
