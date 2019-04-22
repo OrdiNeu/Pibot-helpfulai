@@ -87,7 +87,8 @@ async def on_ready():
     # Check for the existance of the scavenge file
     if os.path.isfile(SCAVENGE_FILE_NAME):
         with open(SCAVENGE_FILE_NAME, 'r') as f:
-            channel = bot.get_channel(f.read())
+            channel_id = f.read()
+            channel = bot.get_channel(int(channel_id))
             await channel.send_message("... and ichor...")
         os.remove(SCAVENGE_FILE_NAME)
         status_msg = ""
