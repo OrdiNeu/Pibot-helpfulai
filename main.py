@@ -89,7 +89,7 @@ async def on_ready():
         with open(SCAVENGE_FILE_NAME, 'r') as f:
             channel_id = f.read()
             channel = bot.get_channel(int(channel_id))
-            await channel.send_message("... and ichor...")
+            await channel.send("... and ichor...")
         os.remove(SCAVENGE_FILE_NAME)
         status_msg = ""
 
@@ -105,7 +105,7 @@ async def on_ready():
             else:
                 status_msg += '\N{OK HAND SIGN}'
             status_msg += "\n"
-        await bot.send_message(channel_id, status_msg)
+        await channel.send(status_msg)
 
 async def on_reaction(reaction, user, added):
     # Ignore reactions from bots
