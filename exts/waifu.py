@@ -7,7 +7,7 @@ import selenium.webdriver
 import selenium.common.exceptions
 
 
-class Waifu(commands.Cog):
+class waifu(commands.Cog):
     """Fortune generating related commands"""
 
     def __init__(self, bot):
@@ -22,7 +22,7 @@ class Waifu(commands.Cog):
         try:
             driver.get(url="https://www.thiswaifudoesnotexist.net")
         except selenium.common.exceptions.WebDriverException as connect_err:
-            await self.bot.say("Unable to generate a waifu right now OwO")
+            await ctx.channel.say("Unable to generate a waifu right now OwO")
             return
         image_xpath = "/html/body/div[1]/div/div[1]/img"
         image_url = driver.find_element_by_xpath(image_xpath).get_attribute("src")
@@ -32,11 +32,11 @@ class Waifu(commands.Cog):
         e = discord.Embed(
             description="{}, your waifu \n{}".format(ctx.message.author.mention, snippet_text))
         e.set_thumbnail(url=image_url)
-        await self.bot.say(embed=e)
+        await ctx.channel.say(embed=e)
 
 
 def setup(bot):
-    bot.add_cog(Waifu(bot))
+    bot.add_cog(waifu(bot))
 
 
 """

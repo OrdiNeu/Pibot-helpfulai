@@ -64,7 +64,7 @@ class Youtube_Lookup:
         """Grabs your fortune for the day!"""
         fort = await self.get_fortune(ctx.message.author.id)
 
-        await self.bot.say(fortune[True])
+        await ctx.channel.say(fortune[True])
 
 def setup(bot):
     bot.add_cog(Fortune(bot))
