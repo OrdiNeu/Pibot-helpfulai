@@ -98,7 +98,7 @@ class Admin(commands.Cog):
         """Restarts the bot, and tries to pull the latest version of itself from git"""
         await ctx.channel.send('Fire...')
         with open(SCAVENGE_FILE_NAME, 'w') as f:
-            f.write(ctx.message.channel.id)
+            f.write(str(ctx.message.channel.id))
         sys.exit(GIT_RELOAD_EXIT_CODE)  # Expect our helper script to do the git reloading
 
     @commands.command(hidden=True, pass_context=True, aliases=['st'])
