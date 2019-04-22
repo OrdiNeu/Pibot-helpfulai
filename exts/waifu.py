@@ -31,7 +31,7 @@ class waifu(commands.Cog):
         # Formulate the response
         e = discord.Embed(
             description="{}, your waifu is: {}\n".format(ctx.message.author.mention, snippet))
-        e.set_thumbnail(url=image_url)
+        e.set_image(url=image_url)
         await ctx.channel.send(embed=e)
 
 
