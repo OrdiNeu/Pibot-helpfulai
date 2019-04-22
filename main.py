@@ -9,6 +9,7 @@ import re
 import discord
 import json
 from discord.ext import commands
+from discord.ext.commands.errors import ExtensionNotLoaded
 
 import exts.utils.listener
 import exts.utils.twitter
@@ -95,9 +96,14 @@ async def on_ready():
 
         # Also get the status of our extensions
         for extension in EXTENSIONS:
+            status_msg += extension + ": "
             try:
-                status_msg += extension + ": "
                 bot.unload_extension(extension)
+            except ExtensionNotLoaded:
+                # Ignore, we don't care
+                pass
+
+            try:
                 bot.load_extension(extension)
             except Exception as e:
                 status_msg += '\N{PISTOL}'
