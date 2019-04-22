@@ -1,10 +1,12 @@
 # Fortune-finding extension for pibot
 ### PREAMBLE ##################################################################
+import random
+import requests
+
 import discord
 
 from discord.ext import commands
-import selenium.webdriver
-import selenium.common.exceptions
+
 
 
 class waifu(commands.Cog):
@@ -15,19 +17,19 @@ class waifu(commands.Cog):
 
     @commands.command(aliases=['OwO'], pass_context=True)
     async def waifu(self, ctx):
-        driver = selenium.webdriver.Firefox()
-        try:
-            driver.get(url="https://www.thiswaifudoesnotexist.net")
-        except selenium.common.exceptions.WebDriverException as connect_err:
-            await ctx.channel.say("Unable to generate a waifu right now OwO")
-            return
-        image_xpath = "/html/body/div[1]/div/div[1]/img"
-        image_url = driver.find_element_by_xpath(image_xpath).get_attribute("src")
-        snippet_xpath = """//*[@id="snippet-container"]"""
-        snippet_text = driver.find_element_by_xpath(snippet_xpath).text
-        driver.close()
+        # Obtain a random image and summary text
+        totalImages = 100000
+        totalTexts = totalImages
+        image_url = "https://www.thiswaifudoesnotexist.net/example-{}.jpg".format(random.randint(0, totalImages))
+        snippet_url = "https://www.thiswaifudoesnotexist.net/snippet-{}.txt".format(random.randint(0, totalTexts))
+
+        # Read the summary text
+        snippet = requests.get(text_url).text
+        snippet = snippet.encode('latin-1').decode('utf-8')  # Ungarble the text
+
+        # Formulate the response
         e = discord.Embed(
-            description="{}, your waifu \n{}".format(ctx.message.author.mention, snippet_text))
+            description="{}, your waifu is: \n{}".format(ctx.message.author.mention, snippet_text))
         e.set_thumbnail(url=image_url)
         await ctx.channel.say(embed=e)
 
