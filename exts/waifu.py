@@ -26,12 +26,13 @@ class waifu(commands.Cog):
         # Read the summary text
         snippet = requests.get(snippet_url).text
         snippet = snippet.encode('latin-1').decode('utf-8')  # Ungarble the text
+        snippet = snippet[0:2000]
 
         # Formulate the response
         e = discord.Embed(
-            description="{}, your waifu is: \n".format(ctx.message.author.mention))
+            description="{}, your waifu is: {}\n".format(ctx.message.author.mention, snippet))
         e.set_thumbnail(url=image_url)
-        await ctx.channel.send(content = snippet, embed=e)
+        await ctx.channel.send(embed=e)
 
 
 def setup(bot):
