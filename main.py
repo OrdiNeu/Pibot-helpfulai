@@ -49,7 +49,7 @@ SCAVENGE_FILE_NAME = 'scavenge_channel.txt'
 
 # DISCORD CLIENT EVENT HANDLERS ###############################################
 @bot.event
-async def on_command_error(error, ctx):
+async def on_command_error(ctx, error):
     channel = ctx.message.channel
     if isinstance(error, commands.NoPrivateMessage):
         await bot.send_message(
