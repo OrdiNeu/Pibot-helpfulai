@@ -24,7 +24,7 @@ class waifu(commands.Cog):
         snippet_url = "https://www.thiswaifudoesnotexist.net/snippet-{}.txt".format(random.randint(0, totalTexts))
 
         # Read the summary text
-        snippet = requests.get(text_url).text
+        snippet = requests.get(snippet_url).text
         snippet = snippet.encode('latin-1').decode('utf-8')  # Ungarble the text
 
         # Formulate the response
