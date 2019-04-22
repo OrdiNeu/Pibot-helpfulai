@@ -28,7 +28,7 @@ class Uncategorised(commands.Cog):
             19, 20, 25, 26, 27, 172, 311, 312, 494
         ]
 
-    async def pokemon2_request(self, rand_face, rand_body, rand_color=0):
+    async def pokemon2_request(self, ctx, rand_face, rand_body, rand_color=0):
         """Posts a randomly fused Pokemon"""
         # name URL section looks like:
         # <div style="z-index: 10;  position: relative; left: -95px;top: 105px;" align="center"><b>Swamturn</b>
@@ -58,16 +58,16 @@ class Uncategorised(commands.Cog):
             # print(imgurl.format(randface, randbod, rand_color))
             e.set_image(url=imgurl.format(rand_face, rand_body, rand_color))
             time.sleep(0.2)
-            await self.bot.say(embed=e)
+            await ctx.channel.send(embed=e)
         except ConnectionError:
-            await self.bot.say("unable to generate pokemon right now, try later (0x1)")
+            await ctx.channel.send("unable to generate pokemon right now, try later (0x1)")
         except _ConnectionError:
-            await self.bot.say("unable to generate pokemon right now, try later (0x2)")
+            await ctx.channel.send("unable to generate pokemon right now, try later (0x2)")
         except _HTTPError:
-            await self.bot.say("Unable to generate pokemon right now, try later (0x3)")
+            await ctx.channel.send("Unable to generate pokemon right now, try later (0x3)")
 
     @commands.command()
-    async def inspire(self):
+    async def inspire(self, ctx):
         """Posts a random inspirational image"""
         digitA = random.randint(0, 2)
         digitB = random.randint(0, 9)
@@ -76,10 +76,10 @@ class Uncategorised(commands.Cog):
             numberA = "30"
         number = random.randint(0, 9999)
         response = "http://generated.inspirobot.me/0" + numberA + "/aXm" + str(number) + "xjU.jpg"
-        await self.bot.say(response)
+        await ctx.channel.send(response)
 
     @commands.command()
-    async def pokemon(self):
+    async def pokemon(self, ctx):
         """Posts a randomly fused Pokemon"""
         site = "http://pokemon.alexonsager.net/"
         text = requests.get(site).text
@@ -97,20 +97,20 @@ class Uncategorised(commands.Cog):
         e = discord.Embed(title=name)
         # colour=?
         e.set_image(url=url)
-        await self.bot.say(embed=e)
+        await ctx.channel.send(embed=e)
 
     @commands.command(aliases=['pokfusion'])
-    async def pok2(self):
+    async def pok2(self, ctx):
         """
         Posts a randomly fused Pokemon
         """
         # generate the random numbers Gen 1-5 pok numbers
         rand_face = random.randrange(1, self.max_supported_pok2)
         rand_body = random.randrange(1, self.max_supported_pok2)
-        await self.pokemon2_request(rand_face=rand_face, rand_body=rand_body, rand_color=0)
+        await self.pokemon2_request(ctx, rand_face=rand_face, rand_body=rand_body, rand_color=0)
 
     @commands.command()
-    async def burd(self):
+    async def burd(self, ctx):
         """
         post a random "burd" pokemon
         at least either the head or the body has to be a "burd"
@@ -124,10 +124,10 @@ class Uncategorised(commands.Cog):
         else:
             rand_face = random.randrange(1, self.max_supported_pok2)
             rand_body = random.choice(self.burd_nums)
-        await self.pokemon2_request(rand_face=rand_face, rand_body=rand_body)
+        await self.pokemon2_request(ctx, rand_face=rand_face, rand_body=rand_body)
 
     @commands.command()
-    async def burd2(self):
+    async def burd2(self, ctx):
         """
         post a random "burd" pokemon
         both must be "burd"
@@ -135,10 +135,10 @@ class Uncategorised(commands.Cog):
         """
         rand_face = random.choice(self.burd_nums)
         rand_body = random.choice(self.burd_nums)
-        await self.pokemon2_request(rand_face=rand_face, rand_body=rand_body)
+        await self.pokemon2_request(ctx, rand_face=rand_face, rand_body=rand_body)
 
     @commands.command()
-    async def rat(self):
+    async def rat(self, ctx):
         """
         post a random "burd" pokemon
         at least either the head or the body has to be a "burd"
@@ -151,10 +151,10 @@ class Uncategorised(commands.Cog):
         else:
             rand_face = random.randrange(1, self.max_supported_pok2)
             rand_body = random.choice(self.rat_nums)
-        await self.pokemon2_request(rand_face=rand_face, rand_body=rand_body)
+        await self.pokemon2_request(ctx, rand_face=rand_face, rand_body=rand_body)
 
     @commands.command()
-    async def garfemon(self):
+    async def garfemon(self, ctx):
         """Posts a random Garfemon"""
         number = random.randint(1, 11)
         site = "http://garfemon.tumblr.com/page/" + str(number)
@@ -198,7 +198,7 @@ class Uncategorised(commands.Cog):
         # turn into embed
         e = discord.Embed(title=name, description=desc, colour=int("D68717", 16))
         e.set_image(url=img)
-        await self.bot.say(embed=e)
+        await ctx.channel.send(embed=e)
 
     @commands.command(pass_context=True)
     async def pok(self, ctx):
