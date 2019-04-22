@@ -52,13 +52,11 @@ SCAVENGE_FILE_NAME = 'scavenge_channel.txt'
 async def on_command_error(ctx, error):
     channel = ctx.message.channel
     if isinstance(error, commands.NoPrivateMessage):
-        await bot.send_message(
-            channel,
+        await channel.send(
             'This command cannot be used in private messages.'
             )
     elif isinstance(error, commands.DisabledCommand):
-        await bot.send_message(
-            channel,
+        await channel.send(
             'Sorry. This command is disabled and cannot be used.'
             )
     elif isinstance(error, commands.CommandInvokeError):
@@ -72,7 +70,7 @@ async def on_command_error(ctx, error):
             msg += tb_msg
         msg += '{0.__class__.__name__}: {0}'.format(error.original)
         msg += '\n```'
-        await bot.send_message(channel, msg)
+        await channel.send(msg)
 
 
 @bot.event
