@@ -13,9 +13,6 @@ class waifu(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
 
-    async def get_fortune(self, author_id, author_roles):
-        """Grab today's fortune for the given user"""
-
     @commands.command(aliases=['OwO'], pass_context=True)
     async def waifu(self, ctx):
         driver = selenium.webdriver.Firefox()
