@@ -126,7 +126,7 @@ class Fortune(commands.Cog):
             colour=int(fortune[True]["colour"], 16))
         if ctx.invoked_with == "fortuna" or ctx.invoked_with == "bib":
             e.set_image(url=fortune[True]["img"])
-        await self.bot.say(embed=e)
+        await ctx.channel.send(embed=e)
 
 
 def setup(bot):
