@@ -6,8 +6,9 @@ import sys
 import traceback
 import re
 
-from discord.ext import commands
+import discord
 import json
+from discord.ext import commands
 
 import exts.utils.listener
 import exts.utils.twitter
@@ -137,7 +138,7 @@ async def on_message(msg):
         return
 
     # Log the message
-    if msg.channel.name is not None:
+    if msg.channel is discord.TextChannel:
         print(
             "<" + msg.channel.name + "> " + msg.author.name + ": "
             + msg.content)
