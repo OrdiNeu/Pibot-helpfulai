@@ -10,7 +10,7 @@ import requests
 import random
 
 
-class Fortune:
+class Fortune(commands.Cog):
     """Fortune generating related commands"""
 
     def __init__(self, bot):

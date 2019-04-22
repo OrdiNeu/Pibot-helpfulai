@@ -13,7 +13,7 @@ from discord.ext import commands
 from .utils import twitter, scrollable, youtube, alarm
 
 
-class Uncategorised:
+class Uncategorised(commands.Cog):
     """Currently uncategorised commands"""
 
     def __init__(self, bot):

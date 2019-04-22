@@ -10,7 +10,7 @@ import requests
 from discord.ext import commands
 from .utils import scrollable
 
-class Reddit:
+class Reddit(commands.Cog):
     """Reddit-related commands"""
     def __init__(self, bot):
         self.bot = bot

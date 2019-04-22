@@ -511,7 +511,7 @@ class NetrunQuiz(MsgListener):
                 await self.ask_question(channel)
 
 
-class Netrunner:
+class Netrunner(commands.Cog):
     """Netrunner related commands"""
 
     def __init__(self, bot):

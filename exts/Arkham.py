@@ -8,7 +8,7 @@ import requests
 from discord.ext import commands
 from unidecode import unidecode
 
-class Arkham:
+class Arkham(commands.Cog):
     """Arkham Horror related commands"""
 
     def __init__(self, bot):

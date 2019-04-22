@@ -18,7 +18,7 @@ from collections import Counter
 from discord.ext import commands
 from .utils import checks, scrollable
 
-class Chan:
+class Chan(commands.Cog):
     """Grabs a link to various chan threads"""
     def __init__(self, bot):
         self.bot = bot

@@ -20,7 +20,7 @@ GIT_RELOAD_EXIT_CODE = 5
 # File to store the channel id scavenge was called from
 SCAVENGE_FILE_NAME = 'scavenge_channel.txt'
 
-class Admin:
+class Admin(commands.Cog):
     """Admin-only commands that make the bot dynamic."""
 
     def __init__(self, bot):

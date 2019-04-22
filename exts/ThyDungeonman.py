@@ -8,7 +8,7 @@ import requests
 # import emoji
 # from json.decoder import JSONDecodeError
 from discord.ext import commands
-class Dungeonman:
+class Dungeonman(commands.Cog):
     """
     Thy Dungeonman! Thy hunger!
     """

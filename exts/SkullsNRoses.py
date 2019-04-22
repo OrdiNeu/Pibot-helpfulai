@@ -24,7 +24,7 @@ PHASE_ANTEING = 2
 PHASE_BETTING = 3
 PHASE_FLIPPING = 4
 
-class SkullsSession:
+class SkullsSession(commands.Cog):
     """One active skulls N roses game"""
     def __init__(self, initialplayer):
         self.players = []

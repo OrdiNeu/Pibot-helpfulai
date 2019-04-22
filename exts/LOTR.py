@@ -7,7 +7,7 @@ import requests
 
 from discord.ext import commands
 
-class LOTR:
+class LOTR(commands.Cog):
     """Lord of the Rings related commands"""
 
     def __init__(self, bot):

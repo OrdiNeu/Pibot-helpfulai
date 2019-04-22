@@ -7,7 +7,7 @@ import selenium.webdriver
 import selenium.common.exceptions
 
 
-class Fortune:
+class Fortune(commands.Cog):
     """Fortune generating related commands"""
 
     def __init__(self, bot):

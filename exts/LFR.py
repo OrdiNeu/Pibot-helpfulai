@@ -12,7 +12,7 @@ from discord.ext import commands
 from .utils.DiscordArgParse import DiscordArgparseParseError, DiscordArgParse
 
 
-class LFR:
+class LFR(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
         self.api_cards = [{}]
