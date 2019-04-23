@@ -18,8 +18,10 @@ from collections import Counter
 from discord.ext import commands
 from .utils import checks, scrollable
 
+
 class Chan(commands.Cog):
     """Grabs a link to various chan threads"""
+
     def __init__(self, bot):
         self.bot = bot
 
@@ -40,7 +42,7 @@ class Chan(commands.Cog):
                 if "com" in t:
                     potential_responses.append(html2text.html2text(t["com"]))
         if len(potential_responses) > 0:
-            random_pos = random.randint(0, len(potential_responses)-1)
+            random_pos = random.randint(0, len(potential_responses) - 1)
             response = scrollable.Scrollable(self.bot)
             await response.send(ctx.message.channel, potential_responses, random_pos)
         else:
@@ -83,6 +85,7 @@ class Chan(commands.Cog):
             await ctx.channel.send_message(response)
         else:
             await ctx.channel.send_message("No thread found.")
+
 
 def setup(bot):
     bot.add_cog(Chan(bot))

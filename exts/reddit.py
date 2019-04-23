@@ -10,8 +10,10 @@ import requests
 from discord.ext import commands
 from .utils import scrollable
 
+
 class Reddit(commands.Cog):
     """Reddit-related commands"""
+
     def __init__(self, bot):
         self.bot = bot
 
@@ -45,6 +47,7 @@ class Reddit(commands.Cog):
             await response.send(ctx.message.channel, potential_responses, 0)
         else:
             await self.bot.say("Error in grabbing " + url + " boss.")
+
 
 def setup(bot):
     bot.add_cog(Reddit(bot))

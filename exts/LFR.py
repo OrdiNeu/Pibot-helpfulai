@@ -129,7 +129,7 @@ class LFR(commands.Cog):
                         c_response += "```\n"
                         for c_key in print_fields:
                             if c_key in card.keys():
-                                #c_response += self.transform_api_items_to_printable_format(c_key, card[c_key])
+                                # c_response += self.transform_api_items_to_printable_format(c_key, card[c_key])
                                 c_response += card[c_key]
                                 # if c_key not in special_fields:
                                 #    c_response += "{0}:\"{1}\"\n".format(

@@ -24,8 +24,10 @@ PHASE_ANTEING = 2
 PHASE_BETTING = 3
 PHASE_FLIPPING = 4
 
+
 class SkullsSession(commands.Cog):
     """One active skulls N roses game"""
+
     def __init__(self, initialplayer):
         self.players = []
         self.decks = {}
@@ -52,13 +54,13 @@ class SkullsSession(commands.Cog):
         try:
             position = int(position_str)
         except ValueError:
-            return(PLAYER_HAS_NO_SUCH_ANTE)
+            return (PLAYER_HAS_NO_SUCH_ANTE)
         if len(self.decks[player.name]) >= position:
-            return(PLAYER_HAS_NO_SUCH_ANTE)
+            return (PLAYER_HAS_NO_SUCH_ANTE)
 
         if self.phase == PHASE_ANTEING:
             if self.players[self.curPlayer] != player:
-                return(WRONG_PLAYER_RESPONDED)
+                return (WRONG_PLAYER_RESPONDED)
 
             # Push the selected tile onto the pile
             selected = self.decks[player.name].pop(position)
@@ -67,10 +69,10 @@ class SkullsSession(commands.Cog):
             # Swap player
             self.curPlayer += 1
             self.curPlayer %= len(self.players)
-            return(0)
+            return (0)
         elif self.phase == PHASE_INITANTE:
             if len(self.piles[player.name]) > 0:
-                return(PLAYER_ALREADY_ANTED)
+                return (PLAYER_ALREADY_ANTED)
 
             # Push the selected tile onto the pile
             selected = self.decks[player.name].pop(position)
@@ -80,35 +82,35 @@ class SkullsSession(commands.Cog):
             self.curPlayer += 1
             if self.curPlayer >= len(self.players):
                 self.phase = PHASE_ANTEING
-                return(INIT_PHASE_OVER)
+                return (INIT_PHASE_OVER)
         else:
-            return(WRONG_GAME_PHASE)
+            return (WRONG_GAME_PHASE)
 
     def playerBet(self, player, amount):
         """Bet a certain amount"""
         if self.phase != PHASE_BETTING or \
-            self.phase != PHASE_ANTEING:
-            return(WRONG_GAME_PHASE)
+                self.phase != PHASE_ANTEING:
+            return (WRONG_GAME_PHASE)
         if self.players[self.curPlayer] != player:
-            return(WRONG_PLAYER_RESPONDED)
+            return (WRONG_PLAYER_RESPONDED)
         if int(amount) <= self.lastBet:
-            return(BET_TOO_LOW)
+            return (BET_TOO_LOW)
         if int(amount) > self.totalTiles:
-            return(BET_TOO_HIGH)
+            return (BET_TOO_HIGH)
 
         self.lastBet = int(amount)
         self.lastBettingPlayer = player
         self.phase = PHASE_BETTING
-        return(0)
+        return (0)
 
     def startGame(self, player):
         """Start the game, checking that the given player is first"""
         if self.players[0] != player:
-            return(WRONG_PLAYER_RESPONDED)
+            return (WRONG_PLAYER_RESPONDED)
         if len(self.players) < 2:
-            return(NOT_ENOUGH_PLAYERS)
+            return (NOT_ENOUGH_PLAYERS)
         self.phase = PHASE_INITANTE
-        return(0)
+        return (0)
 
     def getDefaultHand(self):
         """Return a starting hand for the player"""
@@ -117,14 +119,17 @@ class SkullsSession(commands.Cog):
             self.getRoseWord(),
             self.getRoseWord(),
             self.getSkullWord()
-            ]
+        ]
 
     def getCurPlayer(self):
         return self.players[self.curPlayer]
+
     def getRoseWord(self):
-        return("Rose")
+        return ("Rose")
+
     def getSkullWord(self):
-        return("Skull")
+        return ("Skull")
+
 
 class Skulls:
     """SkullsNRoses related commands"""
@@ -137,7 +142,7 @@ class Skulls:
     def getGameName(self, message):
         return message.server + "#" + message.channel
 
-    @commands.command(aliases = ['skullsnroses','skulls'], pass_context = True)
+    @commands.command(aliases=['skullsnroses', 'skulls'], pass_context=True)
     async def snr(self, ctx):
         """Begins a game of Skulls N Roses"""
         game_name = self.getGameName(ctx.message)
@@ -154,10 +159,10 @@ class Skulls:
             author + " wants to play a round of Skulls 'N Roses!\n" + \
             "Please say !down if you would like to play.\n" + \
             author + " can say !start to begin the round."
-            )
+        )
 
-    @commands.command(pass_context = True)
-    async def ante(self, ctx, tile : str):
+    @commands.command(pass_context=True)
+    async def ante(self, ctx, tile: str):
         """Play a tile from hand in an active game"""
         game_name = self.getGameName(ctx.message)
         author = ctx.message.author.name
@@ -177,7 +182,7 @@ class Skulls:
         retval = session.playerAnte(author, tile)
         if retval == PLAYER_HAS_NO_SUCH_ANTE:
             await self.bot.say(author + ": that is not a valid tile\n" + \
-                                "Your tiles have been DM'd to you")
+                               "Your tiles have been DM'd to you")
             await self.remind(ctx)
         elif retval == WRONG_GAME_PHASE:
             await self.bot.say("No antes can be placed right now.")
@@ -193,7 +198,7 @@ class Skulls:
             elif session.phase == PHASE_ANTEING:
                 await self.whoseturn(ctx)
 
-    @commands.command(pass_context = True)
+    @commands.command(pass_context=True)
     async def bet(self, ctx, amount):
         """Make a bet of how many you can flip in an active game"""
         game_name = self.getGameName(ctx.message)
@@ -222,7 +227,7 @@ class Skulls:
             await self.bot.say(author + " has bet " + amount + "!")
             await self.whoseturn(ctx)
 
-    @commands.command(pass_context = True)
+    @commands.command(pass_context=True)
     async def start(self, ctx):
         game_name = self.getGameName(ctx.message)
         author = ctx.message.author.name
@@ -251,10 +256,10 @@ class Skulls:
 
             # Tell all players their hand
             for player in session.players.keys():
-                await self.remind(ctx, who = player)
+                await self.remind(ctx, who=player)
 
-    @commands.command(aliases = ['remindme'], pass_context = True)
-    async def remind(self, ctx, who = ""):
+    @commands.command(aliases=['remindme'], pass_context=True)
+    async def remind(self, ctx, who=""):
         """ Remind a user what tiles they have """
         game_name = self.getGameName(ctx.message)
         author = ctx.message.author.name
@@ -271,7 +276,7 @@ class Skulls:
         message += "\n".join(str(i[0]) + ": " + i[1] for i in zipped_hand)
         await self.bot.send_message(ctx.author, message)
 
-    @commands.command(aliases = ['whichplayer'], pass_context = True)
+    @commands.command(aliases=['whichplayer'], pass_context=True)
     async def whoseturn(self, ctx):
         """Remind the room whose turn it is"""
         game_name = self.getGameName(ctx.message)
@@ -284,7 +289,7 @@ class Skulls:
 
         await self.bot.say("It is currently " + session.getCurPlayer + "'s turn.")
 
-    @commands.command(pass_context = True)
+    @commands.command(pass_context=True)
     async def down(self, ctx):
         # Add a player to the current game
         game_name = self.getGameName(ctx.message)
@@ -296,6 +301,7 @@ class Skulls:
 
         session = self.activeGames[game_name]
         await self.bot.say(author + " has been added to the game!\n")
+
 
 def setup(bot):
     bot.add_cog(Skulls(bot))

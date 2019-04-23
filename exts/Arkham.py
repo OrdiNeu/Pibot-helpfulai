@@ -8,6 +8,7 @@ import requests
 from discord.ext import commands
 from unidecode import unidecode
 
+
 class Arkham(commands.Cog):
     """Arkham Horror related commands"""
 
@@ -83,7 +84,8 @@ class Arkham(commands.Cog):
             m_response += self.deck_parse(re_decklist_id.group(2))
         await self.bot.say(m_response[:2000])
 
-    @commands.command(aliases=['arkham', 'arkhamhorror', 'ahe', 'ahb', 'ah1', 'ah2', 'ah3', 'ah4', 'ah5', 'aha'], pass_context=True)
+    @commands.command(aliases=['arkham', 'arkhamhorror', 'ahe', 'ahb', 'ah1', 'ah2', 'ah3', 'ah4', 'ah5', 'aha'],
+                      pass_context=True)
     async def ah(self, ctx):
         """Arkham Horror card lookup"""
         m_query = ' '.join(ctx.message.content.split()[1:]).lower()
@@ -94,13 +96,13 @@ class Arkham(commands.Cog):
             "mississippi manatee": "leo de luca",
             "manatee": "leo de luca",
             "ordineu": "scavenging"
-            }
+        }
         if m_query in query_corrections.keys():
             m_query = query_corrections[m_query]
 
         # Auto-link some images instead of other users' names
         query_redirects = {
-            }
+        }
         m_response = ""
         if m_query in query_redirects.keys():
             m_response = query_redirects[m_query]
@@ -132,7 +134,7 @@ class Arkham(commands.Cog):
                 # search card back sides
                 m_cards = [c for c in self.ah_api if
                            (c['name'].lower().__contains__(m_query) and 'backimagesrc' in c) or (
-                           "back_name" in c and c["back_name"].lower().__contains__(m_query))]
+                                   "back_name" in c and c["back_name"].lower().__contains__(m_query))]
                 img = 'backimagesrc'
             elif ctx.invoked_with == "aha":
                 # search all cards

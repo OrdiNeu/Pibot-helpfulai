@@ -8,7 +8,6 @@ import discord
 from discord.ext import commands
 
 
-
 class waifu(commands.Cog):
     """Fortune generating related commands"""
 

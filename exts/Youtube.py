@@ -50,7 +50,6 @@ https://developers.google.com/api-client-library/python/guide/aaa_client_secrets
                                    CLIENT_SECRETS_FILE))
 
 
-
 class Youtube_Lookup:
     """youtube generating related commands"""
 
@@ -59,12 +58,13 @@ class Youtube_Lookup:
         self.leg_api_key = "AIzaSyBDgSAyyKh1Fak5XFxmRVumT8p6mTxJJW8"
         self.client_secrets_file = "client_secrets.json"
 
-    @commands.command(pass_context = True)
+    @commands.command(pass_context=True)
     async def fortune(self, ctx):
         """Grabs your fortune for the day!"""
         fort = await self.get_fortune(ctx.message.author.id)
 
         await ctx.channel.say(fortune[True])
+
 
 def setup(bot):
     bot.add_cog(Fortune(bot))
