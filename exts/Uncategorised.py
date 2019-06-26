@@ -87,12 +87,17 @@ class Uncategorised(commands.Cog):
         # <span id="pk_name">Oncute</span>
         # <img id="pk_img" height=160 width=160 src=http://images.alexonsager.net/pokemon/fused/102/102.95.png /><br />
 
-        m = re.search('<span id="pk_name">(.*?)<', text)
-        name = "**" + m.group(1) + "**"
+        m = re.search(' id="pk_name">(.*?)<', text)
+        if m is not None:
+            name = "**" + m.group(1) + "**"
+        else:
+            name = "broke pok"
 
-        n = re.search('<img id="pk_img" height=160 width=160 src=(.*?)/><br', text)
-        url = n.group(1)
-
+        n = re.search(r'<img id="pk_img" height=160 width=160 src=(.*?)/><br', text)
+        if n is not None:
+            url = n.group(1)
+        else:
+            url = None
         # turn into embed
         e = discord.Embed(title=name)
         # colour=?
