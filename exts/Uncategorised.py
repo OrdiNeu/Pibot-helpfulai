@@ -46,7 +46,7 @@ class Uncategorised(commands.Cog):
         try:
             status_code = requests.get(requests_url.format(rand_face, rand_body, rand_color)).status_code
             if status_code != 200:
-                await ctx.channel.send("Bad Pok img, try again")
+                await ctx.channel.send("Bad Pok img, try again. debug: status code = {}".format(status_code))
                 return
             # leave third option (color) at default for now it seems buggy
             name_text = requests.get(nameurl.format(rand_face, rand_body, rand_color)).text
