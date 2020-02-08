@@ -162,12 +162,12 @@ class Uncategorised(commands.Cog):
     async def garfemon(self, ctx):
         """Posts a random Garfemon"""
         number = random.randint(1, 11)
-        site = "http://garfemon.tumblr.com/page/" + str(number)
+        site = "https://garfemon.tumblr.com/page/" + str(number)
         text = requests.get(site).text
 
-        m = re.findall('http://garfemon.tumblr.com/post/(.*?)"', text)
+        m = re.findall('https://garfemon.tumblr.com/post/(.*?)"', text)
         foundA = random.choice(m)
-        garf = requests.get("http://garfemon.tumblr.com/post/" + foundA).text
+        garf = requests.get("https://garfemon.tumblr.com/post/" + foundA).text
         n = re.search('<img src="(.*?)" alt="', garf)
         img = n.group(1)
 
