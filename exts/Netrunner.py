@@ -407,13 +407,14 @@ class NetrunQuiz(MsgListener):
 
     def __init__(self, bot, channel, nr_api, key_transforms, mode, rounds=1, timetowait=5):
         super().__init__()
-        self.bot = bot
+        self.bot = bot # No longer used
         self.api = nr_api
         self.card = None
         self.answer = ""
         self.has_answered = {}
         self.scores = {}
         self.attach(channel.id)
+        self.channel = channel
         self.mode = mode
         self.rounds = rounds
         self.rounds_played = 0
@@ -440,29 +441,27 @@ class NetrunQuiz(MsgListener):
             question = self.key_transforms[self.q_category]
         else:
             question = self.q_category
-        await self.bot.send_message(channel,
-                                    "What **{0}** is: *{1}*?".format(question, self.card["title"]))
+        await channel.send("What **{0}** is: *{1}*?".format(question, self.card["title"]))
 
     async def on_message(self, msg):
         """Handle people's responses"""
         if not self.sleeping and msg.author.id not in self.has_answered:
             self.has_answered[msg.author.id] = 1
             if msg.content.lower() == str(self.answer):
-                await self.bot.add_reaction(msg, u"\U0001F3C6")
-                await self.bot.send_message(msg.channel,
-                                            msg.author.name + " got it!\n")
+                await msg.add_reaction(u"\U0001F3C6")
+                await msg.channel.send(msg.author.name + " got it!\n")
                 if msg.author.name in self.scores:
                     self.scores[msg.author.name] += 1
                 else:
                     self.scores[msg.author.name] = 1
                 await self.end_round(msg.channel)
             else:
-                await self.bot.add_reaction(msg, u"\U0001F6AB")
+                await msg.add_reaction(u"\U0001F6AB")
         if msg.content.lower() == "!end":
-            await self.bot.send_message(msg.channel, "Ending the Fun...")
+            await msg.channel.send("Ending the Fun...")
             await self.end_game(msg.channel, print_scores=True)
         elif msg.content.lower() == "!skip":
-            await self.bot.send_message(msg.channel, "Skipping the round...")
+            await msg.channel.send("Skipping the round...")
             await self.end_round(msg.channel)
 
     def is_over(self):
@@ -486,7 +485,7 @@ class NetrunQuiz(MsgListener):
         scores = sorted(scores, key=lambda z: z[1], reverse=True)
         printable = tabulate(scores, headers=["Player", "Score"])
         printable = "```\n" + printable + "\n```"
-        await self.bot.send_message(channel, printable)
+        await self.channel.send(printable)
 
     async def end_game(self, channel, print_scores=False):
         """End the game"""
@@ -496,7 +495,7 @@ class NetrunQuiz(MsgListener):
 
     async def end_round(self, channel):
         """End the current question"""
-        await self.bot.send_message(channel, "It was: " + str(self.answer))
+        await self.channel.send("It was: " + str(self.answer))
         self.has_answered = {}
         self.rounds_played += 1
         if self.is_over():
@@ -716,7 +715,7 @@ class Netrunner(commands.Cog):
             error_embed.description = badUrlError.msg
             return error_embed
 
-    async def find_and_say_card(self, string_to_parse, use_embed=True):
+    async def find_and_say_card(self, string_to_parse, ctx, use_embed=True):
         if not self.init_api:
             self.refresh_nr_api()
         search_criteria_list, render_option, error_string = self.flag_parse(string_to_parse)
@@ -728,40 +727,40 @@ class Netrunner(commands.Cog):
                     continue
                 time.sleep(0.5)
                 if use_embed:
-                    await self.bot.say(embed=card.render_embed(render_option))
+                    await ctx.channel.send(embed=card.render_embed(render_option))
                 else:
-                    await self.bot.say(card.render_text(render_option))
+                    await ctx.channel.send(card.render_text(render_option))
         if error_string:
             time.sleep(0.5)
-            await self.bot.say("I saw these errors: '{}'".format(error_string))
+            await ctx.channel.send("I saw these errors: '{}'".format(error_string))
         # TODO It'd be nice to calculate the pool of cards by legality that we searched...
         time.sleep(0.5)
-        await self.bot.say("listed {} of {} matched cards (total {})".format(
+        await ctx.channel.send("listed {} of {} matched cards (total {})".format(
             min(num_matches, self.max_card_search, ), num_matches, len(self.card_list)))
 
     @commands.command(name="flag_nets", aliases=['nets'])
-    async def arg_parse_nets(self, *, string_to_parse: str):
-        await self.find_and_say_card(string_to_parse, use_embed=True)
+    async def arg_parse_nets(self, ctx, *, string_to_parse: str):
+        await self.find_and_say_card(string_to_parse, ctx, use_embed=True)
 
     @commands.command(name="flag_nets_cr", aliases=['netscr'])
-    async def arg_parse_nets_cr(self, *, string_to_parse: str):
-        await self.find_and_say_card(string_to_parse + " --legality cr ", use_embed=True)
+    async def arg_parse_nets_cr(self, ctx, *, string_to_parse: str):
+        await self.find_and_say_card(string_to_parse + " --legality cr ", ctx, use_embed=True)
 
     @commands.command(name="flag_nets_legacy", aliases=['netslegacy'])
-    async def arg_parse_nets_legacy(self, *, string_to_parse: str):
-        await self.find_and_say_card(string_to_parse + " --legality legacy ", use_embed=True)
+    async def arg_parse_nets_legacy(self, ctx, *, string_to_parse: str):
+        await self.find_and_say_card(string_to_parse + " --legality legacy ", ctx, use_embed=True)
 
     @commands.command(aliases=['nr', 'netrunner'])
-    async def nr_flags(self, *, string_to_parse: str):
-        await self.find_and_say_card(string_to_parse + " --image-only ", use_embed=True)
+    async def nr_flags(self, ctx, *, string_to_parse: str):
+        await self.find_and_say_card(string_to_parse + " --image-only ", ctx, use_embed=True)
 
     @commands.command(aliases=['nrcr', 'cache_refresh'])
-    async def cr_flags(self, *, string_to_parse: str):
-        await self.find_and_say_card(string_to_parse + " --image-only --legality cr ", use_embed=True)
+    async def cr_flags(self, ctx, *, string_to_parse: str):
+        await self.find_and_say_card(string_to_parse + " --image-only --legality cr ", ctx, use_embed=True)
 
     @commands.command(aliases=['nrleg', 'nr_legacy'])
-    async def legacy_flags(self, *, string_to_parse: str):
-        await self.find_and_say_card(string_to_parse + " --image-only --legality legacy ", use_embed=True)
+    async def legacy_flags(self, ctx, *, string_to_parse: str):
+        await self.find_and_say_card(string_to_parse + " --image-only --legality legacy ", ctx, use_embed=True)
 
     @commands.command(aliases=['broke'])
     async def nr_debug(self, *, cmd: str):
@@ -825,7 +824,7 @@ class Netrunner(commands.Cog):
             mode = NetrunQuiz.MODE_ONESHOT
             if args_dict["rounds"]:
                 if args_dict["points"]:
-                    await self.bot.say("You can't have both rounds and fptp set!")
+                    await ctx.channel.send("You can't have both rounds and fptp set!")
                     return
                 num_rounds = args_dict["rounds"]
                 mode = NetrunQuiz.MODE_ROUNDS
@@ -841,9 +840,9 @@ class Netrunner(commands.Cog):
             await quiz.ask_question(ctx.message.channel)
         except DiscordArgparseParseError as se:
             if se.value is not None:
-                await self.bot.say(se.value)
+                await ctx.channel.send(se.value)
             if quiz_opts.exit_message is not None:
-                await self.bot.say(quiz_opts.exit_message)
+                await ctx.channel.send(quiz_opts.exit_message)
 
     @staticmethod
     def apply_title_transform_jokes(card_title_criteria):
