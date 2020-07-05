@@ -1,6 +1,7 @@
 # Fortune-finding extension for pibot
 ### PREAMBLE ##################################################################
 import datetime
+import time
 import re
 from unidecode import unidecode
 
@@ -63,6 +64,8 @@ class Fortune(commands.Cog):
             else:
                 rand_val = random.randrange(minimum_rand, maximum_rand)
             self.fortuned_users[author_id] = rand_val
+            # reset the prng for other functions
+            random.seed(int(time.time()*100))
         return self.fortuned_users[author_id]
 
     @commands.command(aliases=['fortuna', 'bib'], pass_context=True)
