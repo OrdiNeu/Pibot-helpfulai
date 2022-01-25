@@ -6,7 +6,7 @@ A discord bot for personal use. Looks up cards from Netrunner/Lord of the Rings/
 
 Just follow this link:
 https://discordapp.com/oauth2/authorize?permissions=0&client_id=272179716654628865&scope=bot
-Feel free to invite it wherever you want
+Feel free to invite it wherever you want. Message me at `@OrdiNeu#6488` if you need to.
 
 # Setting Up Your Own Instance
 
