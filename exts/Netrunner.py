@@ -274,7 +274,7 @@ class NetrunnerDBCard:
                 return self.image_url
         # else form the netrunnerdb image url
         # format the code from int to 0 back-filled string
-        return "https://netrunnerdb.com/card_image/{:05}.png".format(self.code)
+        return "https://static.nrdbassets.com/v1/large/{:05}.jpg".format(self.code)
 
     def get_type_code_sort_val(self):
         return {'identity': 0, 'agenda': 1, 'asset': 2, 'upgrade': 3, 'operation': 4, 'ice': 5, 'event': 6,
