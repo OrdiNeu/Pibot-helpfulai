@@ -173,5 +173,5 @@ class Arkham(commands.Cog):
         await self.bot.say(m_response[:2000])
 
 
-def setup(bot):
-    bot.add_cog(Arkham(bot))
+async def setup(bot):
+    await bot.add_cog(Arkham(bot))

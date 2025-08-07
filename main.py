@@ -1,5 +1,6 @@
 # Launch script for the Helpful AI running on OrdiNeu's RaspberryPi
 # PREAMBLE ####################################################################
+import asyncio
 import datetime
 import os
 import sys
@@ -34,11 +35,16 @@ EXTENSIONS = [
     "exts.waifu"
 ]
 
+intents = discord.Intents.default()
+intents.message_content = True
+intents.messages = True
+#intents.members = True
 bot = commands.Bot(
     command_prefix=COMMAND_PREFIX,
     description=DESCRIPTION,
     pm_help=None,
-    help_attrs=HELP_ATTRS
+    help_attrs=HELP_ATTRS,
+    intents=intents
 )
 
 RESTART_EXIT_CODE = 4
@@ -194,18 +200,19 @@ def load_twitter():
             creds['access_token_secret']
             )
 
-# Login and run
-if __name__ == '__main__':
+def main():
     #load_twitter()
     #exts.utils.youtube.init("../pibot-google-secret.json")
     credentials = load_credentials()
     token = credentials['token']
 
     bot.client_id = credentials['client_id']
-    bot.loop.create_task(exts.utils.alarm._check_alarm(bot))
+    #bot.loop.create_task(exts.utils.alarm._check_alarm(bot))
+    loop = asyncio.get_event_loop()
     for extension in EXTENSIONS:
         try:
-            bot.load_extension(extension)
+            loop.run_until_complete(bot.load_extension(extension))
+            #bot.load_extension(extension)
         except Exception as e:
             print(
                 'Failed to load extension {}\n{}: {}'.format(
@@ -225,3 +232,7 @@ if __name__ == '__main__':
 
     # It shouldn't get to this point, so just try to restart
     sys.exit(RESTART_EXIT_CODE)
+
+# Login and run
+if __name__ == '__main__':
+    main()

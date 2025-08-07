@@ -214,5 +214,5 @@ class LFR(commands.Cog):
         return m_match
 
 
-def setup(bot):
-    bot.add_cog(LFR(bot))
+async def setup(bot):
+    await bot.add_cog(LFR(bot))

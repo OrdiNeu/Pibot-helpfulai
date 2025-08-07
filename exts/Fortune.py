@@ -132,8 +132,8 @@ class Fortune(commands.Cog):
         await ctx.channel.send(embed=e)
 
 
-def setup(bot):
-    bot.add_cog(Fortune(bot))
+async def setup(bot):
+    await bot.add_cog(Fortune(bot))
 
 
 """

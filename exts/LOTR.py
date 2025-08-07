@@ -44,5 +44,5 @@ class LOTR(commands.Cog):
         await self.bot.say(m_response)
 
 
-def setup(bot):
-    bot.add_cog(LOTR(bot))
+async def setup(bot):
+    await bot.add_cog(LOTR(bot))

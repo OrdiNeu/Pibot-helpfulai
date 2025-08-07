@@ -34,8 +34,8 @@ class waifu(commands.Cog):
         await ctx.channel.send(embed=e)
 
 
-def setup(bot):
-    bot.add_cog(waifu(bot))
+async def setup(bot):
+    await bot.add_cog(waifu(bot))
 
 
 """

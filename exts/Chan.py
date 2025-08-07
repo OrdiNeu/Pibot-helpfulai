@@ -87,5 +87,5 @@ class Chan(commands.Cog):
             await ctx.channel.send_message("No thread found.")
 
 
-def setup(bot):
-    bot.add_cog(Chan(bot))
+async def setup(bot):
+    await bot.add_cog(Chan(bot))

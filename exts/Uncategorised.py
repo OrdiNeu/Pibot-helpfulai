@@ -429,5 +429,5 @@ class Uncategorised(commands.Cog):
                 await ctx.channel.send("I couldn't find the role '{}' to assign you to".format(target_role))
 
 
-def setup(bot):
-    bot.add_cog(Uncategorised(bot))
+async def setup(bot):
+    await bot.add_cog(Uncategorised(bot))

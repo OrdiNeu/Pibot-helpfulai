@@ -49,5 +49,5 @@ class Reddit(commands.Cog):
             await self.bot.say("Error in grabbing " + url + " boss.")
 
 
-def setup(bot):
-    bot.add_cog(Reddit(bot))
+async def setup(bot):
+    await bot.add_cog(Reddit(bot))

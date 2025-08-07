@@ -792,7 +792,7 @@ class Netrunner(commands.Cog):
         decks = [c for c in requests.get(
             'https://netrunnerdb.com/api/2.0/public/decklists/by_date/%s' % today).json()['data']]
         # adding a check for yesterday function, should return recursively from the previous date with a deck
-        if len(decks) is 0:
+        if len(decks) == 0:
             yesterday = _date.today() - _timedelta(1)
             yesterday = yesterday.strftime("Y-%m-%d")
             return self.rand_deck(yesterday)
@@ -965,5 +965,5 @@ def test_arg_parse_nets(string_to_parse: str):
     return m_response
 
 
-def setup(bot):
-    bot.add_cog(Netrunner(bot))
+async def setup(bot):
+    await bot.add_cog(Netrunner(bot))
