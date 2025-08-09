@@ -29,4 +29,5 @@ html2text
 tabulate
 tweepy
 unidecode
+oauth2client
 ```
