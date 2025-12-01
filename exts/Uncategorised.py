@@ -161,15 +161,29 @@ class Uncategorised(commands.Cog):
     @commands.command()
     async def garfemon(self, ctx):
         """Posts a random Garfemon"""
-        number = random.randint(1, 11)
-        site = "https://garfemon.tumblr.com/page/" + str(number)
-        text = requests.get(site).text
+        # For some reason Tumblr will occasionally not return what we expect, so we'll try three times
+        garf = ""
+        for i in range(3):
+            number = random.randint(1, 11)
+            site = "https://garfemon.tumblr.com/page/" + str(number)
+            text = requests.get(site).text
+            m = re.findall('https://garfemon.tumblr.com/post/(.*?)"', text)
+            if m is None:
+                time.sleep(1.2)
+                continue
 
-        m = re.findall('https://garfemon.tumblr.com/post/(.*?)"', text)
-        foundA = random.choice(m)
-        garf = requests.get("https://garfemon.tumblr.com/post/" + foundA).text
-        n = re.search('<img src="(.*?)" alt="', garf)
-        img = n.group(1)
+            foundA = random.choice(m)
+            garf = requests.get("https://garfemon.tumblr.com/post/" + foundA).text
+            n = re.search('<img src="(.*?)" alt="', garf)
+            if n is None:
+                garf = ""
+                time.sleep(1.2)
+                continue
+            img = n.group(1)
+
+        if garf == "":
+            await ctx.channel.send("Tried three times to load a garf, and failed")
+            return
 
         # find description and name
         # http://68.media.tumblr.com/
