@@ -168,7 +168,7 @@ class Uncategorised(commands.Cog):
             site = "https://garfemon.tumblr.com/page/" + str(number)
             text = requests.get(site).text
             m = re.findall('https://garfemon.tumblr.com/post/(.*?)"', text)
-            if m is None:
+            if len(m) <= 0:
                 time.sleep(1.2)
                 continue
 
